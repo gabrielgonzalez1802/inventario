@@ -38,7 +38,8 @@ public class DatabaseWebSecurity extends WebSecurityConfigurerAdapter {
 			"/js/**",
 			"/css/**").permitAll()
 		// Las vistas públicas no requieren autenticación
-		.antMatchers("/",
+		.antMatchers(
+			"/registro",
 			"/signup").permitAll()
 		
 //		// Asignar permisos a URLs por ROLES

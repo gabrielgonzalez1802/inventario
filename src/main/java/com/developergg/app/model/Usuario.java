@@ -63,9 +63,9 @@ public class Usuario {
 	}
 	
 	@ManyToMany(fetch=FetchType.EAGER)
-	@JoinTable(name="usuarioperfil",
-			   joinColumns = @JoinColumn(name="idUsuario"),
-			   inverseJoinColumns = @JoinColumn(name="idPerfil")			
+	@JoinTable(name="usuario_perfil",
+			   joinColumns = @JoinColumn(name="id_usuario"),
+			   inverseJoinColumns = @JoinColumn(name="id_perfil")			
 			)
 	private List<Perfil> perfiles;
 

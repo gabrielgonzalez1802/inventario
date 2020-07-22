@@ -1,5 +1,6 @@
 package com.developergg.app.model;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -12,6 +13,7 @@ public class Perfil {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY) // auto_increment MySQL
+	@Column(name = "id_perfil")
 	private Integer id;
 	private String perfil;
 
