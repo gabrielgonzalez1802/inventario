@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<title>Login</title>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+<script th:src='@{/particles.js-master/particles.js}'></script>
+<link th:href="@{/css/login.css}" rel="stylesheet">
+<link href="https://pagecdn.io/lib/easyfonts/fonts.css" rel="stylesheet" /></head>
+<body>
+<div id="particles-js"></div>
+        <!-- Alertas -->
+	<div class="padre">
+	   <div class="hijo">
+	     <div class="headerLogin"></div>
+			<div class="row justify-content-center align-items-center"
+				style="margin-left: auto; margin-right: auto">
+				<div id="" class="prueba">
+					<form id="login-form" class="form" th:action="@{/login}"
+						method="POST">
+						<div class="contenedor">
+							<img class="logo" alt="" th:src="@{/img/onlineshop_78377.png}">
+						</div>
+						<h3 class="text-center text-white">Iniciar Sesi&oacute;n</h3>
+						<div class="form-group">
+							<input type="text" placeholder="Usuario" name="username"
+								autocomplete="off" class="form-control" />
+						</div>
+						<div class="form-group">
+							<input type="password" placeholder="Contrase&ntilde;a"
+								autocomplete="off" name="password" class="form-control" />
+						</div>
+						<div class="form-group">
+							<input type="submit" name="submit" class="btn btn-info btn-md"
+								value="Ingresar">
+						</div>
+						<div id="" class="">
+							<a href="?act=restorePassword" class="text-white pull-left"><span
+								style="font-size: 16px">&iquest;Olvid&oacute; su
+									contrase&ntilde;a?</span></a> <a
+								href="../../modules/users/form.php?form=add"
+								class="text-white pull-right"><span
+								style="font-size: 16px; margin-left: 80px;">Registrarse</span></a>
+						</div>
+					</form>
+				</div>
+			</div>
+			<div class="footerLogin"></div>
+	   </div>
+	</div>		    
+   
+</body>
+</html>
+<script>
+	/* ---- particles.js config ---- */
+
+	particlesJS("particles-js", {
+		"particles" : {
+			"number" : {
+				"value" : 200,
+				"density" : {
+					"enable" : true,
+					"value_area" : 800
+				}
+			},
+			"color" : {
+				"value" : "#ffffff"
+			},
+			"shape" : {
+				"type" : "circle",
+				"stroke" : {
+					"width" : 0,
+					"color" : "#000000"
+				},
+				"polygon" : {
+					"nb_sides" : 5
+				},
+				"image" : {
+					"src" : "img/github.svg",
+					"width" : 100,
+					"height" : 100
+				}
+			},
+			"opacity" : {
+				"value" : 0.5,
+				"random" : false,
+				"anim" : {
+					"enable" : false,
+					"speed" : 1,
+					"opacity_min" : 0.1,
+					"sync" : false
+				}
+			},
+			"size" : {
+				"value" : 3,
+				"random" : true,
+				"anim" : {
+					"enable" : false,
+					"speed" : 40,
+					"size_min" : 0.1,
+					"sync" : false
+				}
+			},
+			"line_linked" : {
+				"enable" : true,
+				"distance" : 150,
+				"color" : "#ffffff",
+				"opacity" : 0.4,
+				"width" : 1
+			},
+			"move" : {
+				"enable" : true,
+				"speed" : 6,
+				"direction" : "none",
+				"random" : false,
+				"straight" : false,
+				"out_mode" : "out",
+				"bounce" : false,
+				"attract" : {
+					"enable" : false,
+					"rotateX" : 600,
+					"rotateY" : 1200
+				}
+			}
+		},
+		"interactivity" : {
+			"detect_on" : "canvas",
+			"events" : {
+				"onhover" : {
+					"enable" : true,
+					"mode" : "grab"
+				},
+				"onclick" : {
+					"enable" : true,
+					"mode" : "push"
+				},
+				"resize" : true
+			},
+			"modes" : {
+				"grab" : {
+					"distance" : 140,
+					"line_linked" : {
+						"opacity" : 1
+					}
+				},
+				"bubble" : {
+					"distance" : 400,
+					"size" : 40,
+					"duration" : 2,
+					"opacity" : 8,
+					"speed" : 3
+				},
+				"repulse" : {
+					"distance" : 200,
+					"duration" : 0.4
+				},
+				"push" : {
+					"particles_nb" : 4
+				},
+				"remove" : {
+					"particles_nb" : 2
+				}
+			}
+		},
+		"retina_detect" : true
+	});
+
+	/* ---- stats.js config ---- */
+
+	var count_particles, update;
+	count_particles = document.querySelector('.js-count-particles');
+	update = function() {
+		requestAnimationFrame(update);
+	};
+	requestAnimationFrame(update);
+</script>
