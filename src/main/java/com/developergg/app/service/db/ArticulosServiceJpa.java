@@ -16,7 +16,7 @@ import com.developergg.app.service.IArticulosService;
 public class ArticulosServiceJpa implements IArticulosService{
 	
 	@Autowired
-	ArticulosRepository repo;
+	private ArticulosRepository repo;
 
 	@Override
 	public List<Articulo> buscarTodos() {

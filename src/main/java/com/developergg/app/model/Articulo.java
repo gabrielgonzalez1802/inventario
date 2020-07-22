@@ -6,8 +6,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import org.springframework.beans.factory.annotation.Value;
-
 @Entity
 @Table(name = "articulos")
 public class Articulo {
