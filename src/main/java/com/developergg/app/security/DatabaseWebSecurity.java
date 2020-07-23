@@ -34,6 +34,7 @@ public class DatabaseWebSecurity extends WebSecurityConfigurerAdapter {
 		.antMatchers(
 			"/particles.js-master/**",
 			"/img/**",
+			"/bootstrap/**",
 			"/fragments/**",
 			"/js/**",
 			"/css/**").permitAll()

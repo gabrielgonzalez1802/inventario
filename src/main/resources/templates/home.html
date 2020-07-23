@@ -1,254 +1,302 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
   <head>
-    <meta name="description" content="Vali is a responsive and free admin theme built with Bootstrap 4, SASS and PUG.js. It's fully customizable and modular.">
-    <!-- Twitter meta-->
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:site" content="@pratikborsadiya">
-    <meta property="twitter:creator" content="@pratikborsadiya">
-    <!-- Open Graph Meta-->
-    <meta property="og:type" content="website">
-    <meta property="og:site_name" content="Vali Admin">
-    <meta property="og:title" content="Vali - Free Bootstrap 4 admin theme">
-    <meta property="og:url" content="http://pratikborsadiya.in/blog/vali-admin">
-    <meta property="og:image" content="http://pratikborsadiya.in/blog/vali-admin/hero-social.png">
-    <meta property="og:description" content="Vali is a responsive and free admin theme built with Bootstrap 4, SASS and PUG.js. It's fully customizable and modular.">
     <title>Sistema Celulares</title>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- Main CSS-->
-    <link rel="stylesheet" type="text/css" th:href="@{/css/main.css}">
-    <!-- Stile Menu -->
-    <link rel="stylesheet" type="text/css" th:href="@{/css/menuEfecto.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/bootstrap/css/bootstrap.min.css}">
+	<link rel="stylesheet" type="text/css" th:href="@{/css/sticky-dark-top-nav.css}">
     <!-- Font-icon css-->
     <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+ 	<link rel="stylesheet" type="text/css" th:href="@{/css/sticky-dark-top-nav.css}">
+ 	<link rel="stylesheet" type="text/css" th:href="@{/css/dashboard.css}">
   </head>
-  <body class="app sidebar-mini">
-    <!-- Navbar-->
-	<span th:insert="fragments/topMenu :: menu-principal"></span>
-
-    <!-- Fin Navbar -->
-    <!-- Sidebar menu-->
-    <div class="app-sidebar__overlay" data-toggle="sidebar"></div>
-    <aside class="app-sidebar">
-      <div class="app-sidebar__user"><img class="app-sidebar__user-avatar" th:src="@{/img/modulos/clientes.png}" alt="User Image">
-        <div>
-          <p class="app-sidebar__user-name">Aero Tiendas</p>
-          <p class="app-sidebar__user-designation">Root Administrador</p>
-        </div>
-      </div>
-      <ul class="app-menu">
-        <li><a class="app-menu__item active" href="dashboard.html"><i class="app-menu__icon fa fa-dashboard"></i><span class="app-menu__label">Dashboard</span></a></li>
-<!--         <li class="treeview"><a class="app-menu__item" href="#" data-toggle="treeview"><i class="app-menu__icon fa fa-laptop"></i><span class="app-menu__label">UI Elements</span><i class="treeview-indicator fa fa-angle-right"></i></a> -->
-<!--           <ul class="treeview-menu"> -->
-<!--             <li><a class="treeview-item" href="bootstrap-components.html"><i class="icon fa fa-circle-o"></i> Bootstrap Elements</a></li> -->
-<!--             <li><a class="treeview-item" href="https://fontawesome.com/v4.7.0/icons/" target="_blank" rel="noopener"><i class="icon fa fa-circle-o"></i> Font Icons</a></li> -->
-<!--             <li><a class="treeview-item" href="ui-cards.html"><i class="icon fa fa-circle-o"></i> Cards</a></li> -->
-<!--             <li><a class="treeview-item" href="widgets.html"><i class="icon fa fa-circle-o"></i> Widgets</a></li> -->
-<!--           </ul> -->
-<!--         </li> -->
-<!--         <li><a class="app-menu__item" href="charts.html"><i class="app-menu__icon fa fa-pie-chart"></i><span class="app-menu__label">Charts</span></a></li> -->
-<!--         <li class="treeview"><a class="app-menu__item" href="#" data-toggle="treeview"><i class="app-menu__icon fa fa-edit"></i><span class="app-menu__label">Forms</span><i class="treeview-indicator fa fa-angle-right"></i></a> -->
-<!--           <ul class="treeview-menu"> -->
-<!--             <li><a class="treeview-item" href="form-components.html"><i class="icon fa fa-circle-o"></i> Form Components</a></li> -->
-<!--             <li><a class="treeview-item" href="form-custom.html"><i class="icon fa fa-circle-o"></i> Custom Components</a></li> -->
-<!--             <li><a class="treeview-item" href="form-samples.html"><i class="icon fa fa-circle-o"></i> Form Samples</a></li> -->
-<!--             <li><a class="treeview-item" href="form-notifications.html"><i class="icon fa fa-circle-o"></i> Form Notifications</a></li> -->
-<!--           </ul> -->
-<!--         </li> -->
-<!--         <li class="treeview"><a class="app-menu__item" href="#" data-toggle="treeview"><i class="app-menu__icon fa fa-th-list"></i><span class="app-menu__label">Tables</span><i class="treeview-indicator fa fa-angle-right"></i></a> -->
-<!--           <ul class="treeview-menu"> -->
-<!--             <li><a class="treeview-item" href="table-basic.html"><i class="icon fa fa-circle-o"></i> Basic Tables</a></li> -->
-<!--             <li><a class="treeview-item" href="table-data-table.html"><i class="icon fa fa-circle-o"></i> Data Tables</a></li> -->
-<!--           </ul> -->
-<!--         </li> -->
-<!--         <li class="treeview"><a class="app-menu__item" href="#" data-toggle="treeview"><i class="app-menu__icon fa fa-file-text"></i><span class="app-menu__label">Pages</span><i class="treeview-indicator fa fa-angle-right"></i></a> -->
-<!--           <ul class="treeview-menu"> -->
-<!--             <li><a class="treeview-item" href="blank-page.html"><i class="icon fa fa-circle-o"></i> Blank Page</a></li> -->
-<!--             <li><a class="treeview-item" href="page-login.html"><i class="icon fa fa-circle-o"></i> Login Page</a></li> -->
-<!--             <li><a class="treeview-item" href="page-lockscreen.html"><i class="icon fa fa-circle-o"></i> Lockscreen Page</a></li> -->
-<!--             <li><a class="treeview-item" href="page-user.html"><i class="icon fa fa-circle-o"></i> User Page</a></li> -->
-<!--             <li><a class="treeview-item" href="page-invoice.html"><i class="icon fa fa-circle-o"></i> Invoice Page</a></li> -->
-<!--             <li><a class="treeview-item" href="page-calendar.html"><i class="icon fa fa-circle-o"></i> Calendar Page</a></li> -->
-<!--             <li><a class="treeview-item" href="page-mailbox.html"><i class="icon fa fa-circle-o"></i> Mailbox</a></li> -->
-<!--             <li><a class="treeview-item" href="page-error.html"><i class="icon fa fa-circle-o"></i> Error Page</a></li> -->
-<!--           </ul> -->
-<!--         </li> -->
-<!--         <li><a class="app-menu__item" href="docs.html"><i class="app-menu__icon fa fa-file-code-o"></i><span class="app-menu__label">Docs</span></a></li> -->
-      </ul>
-    </aside>
-    <main class="app-content">
-      <div class="app-title">
-        <div>
-          <h1><i class="fa fa-dashboard"></i> Dashboard - AERO TIENDAS</h1>
-          <p>Av. Olimpica La Barraquita Santiago</p>
-           <p>809-357-6248</p>
-        </div>
-        <ul class="app-breadcrumb breadcrumb">
-          <li class="breadcrumb-item"><i class="fa fa-home fa-lg"></i></li>
-          <li class="breadcrumb-item"><a href="#">Dashboard</a></li>
+  <body>
+    <nav class="navbar navbar-light navbar-expand-sm bg-dark navbar-fixed-top navigation-clean-button" style="background-color: #565959;margin-top: 0px;">
+        <div class="container-fluid"><a class="navbar-brand text-white" href="#">Sistema</a><button data-toggle="collapse" class="navbar-toggler" data-target="#navcol-1" style="margin-top: 5px;margin-bottom: 5px;background-color: #c6ccba;"><span class="sr-only">Toggle navigation</span><span class="navbar-toggler-icon"></span></button>
+            <div
+                class="collapse navbar-collapse text-uppercase shadow-sm" id="navcol-1">
+                <ul class="nav navbar-nav text-capitalize nav-right" style="width: 100%;">
+                    <li class="nav-item dropdown pv7 pv5"><a class="dropdown-toggle nav-link pv6" data-toggle="dropdown" aria-expanded="false" style="color: rgba(255,255,255,0.9);" href="#"><i class="fa fa-archive"></i>&nbsp;Inventario</a>
+                        <div class="dropdown-menu" role="menu" style="background-color: rgba(255,255,255,0.9);"><a class="dropdown-item" role="presentation" href="articulos.html">Articulos</a><a class="dropdown-item" role="presentation" href="articulo_transito.html">Articulo en transito</a><a class="dropdown-item" role="presentation" href="articulo_enviados.html">Articulo enviados</a>
+                            <div
+                                class="dropdown-divider" role="presentation"></div><a class="dropdown-item pv3 pv8" role="presentation" href="suplidores.html">suplidores</a><a class="dropdown-item pv3 pv8" role="presentation" href="ver_compras.html">Compras</a>
+                        <div class="dropdown-divider" role="presentation"></div><a class="dropdown-item pv3 pv8" role="presentation" href="seriales.html">Seriales</a><a class="dropdown-item" role="presentation" href="seriales_transito.html">Seriales Transito</a>
+                        <div class="dropdown-divider" role="presentation"></div><a class="dropdown-item" role="presentation" href="inventario.html">Hacer Inventario</a></div>
+        </li>
+        <li class="nav-item dropdown pv3 pv5"><a class="dropdown-toggle nav-link pv7 pv4 pv6" data-toggle="dropdown" aria-expanded="false" style="color: rgba(255,255,255,0.9);" href="#"><i class="fa fa-shopping-bag"></i>&nbsp;Ventas</a>
+            <div class="dropdown-menu" role="menu" style="background-color: rgba(255,255,255,0.9);"><a class="dropdown-item" role="presentation" href="ver_facturas.html">Ver Facturas</a><a class="dropdown-item" role="presentation" href="clientes.html">Clientes</a>
+                <div class="dropdown-divider" role="presentation"></div><a class="dropdown-item" role="presentation" href="devolucion_factura.html">Hacer Devoluciones</a><a class="dropdown-item" role="presentation" href="devolucion_ver.html">Ver Devoluciones</a>
+                <div class="dropdown-divider" role="presentation"></div><a class="dropdown-item" role="presentation" href="vendedores.html">Vendedores</a><a class="dropdown-item pv8" role="presentation" href="comision_ver.html">Comision Ventas</a><a class="dropdown-item" role="presentation" href="factura_cambios.html">Ver Cambio Equipos</a>
+                <a
+                    class="dropdown-item" role="presentation" href="cotizaciones.html">Ver Cotizaciones</a>
+            </div>
+        </li>
+        <li class="nav-item dropdown"><a class="dropdown-toggle nav-link pv7 pv4 pv5 pv6" data-toggle="dropdown" aria-expanded="false" style="color: rgba(255,255,255,0.9);" href="#"><i class="fa fa-dollar"></i>&nbsp;Caja</a>
+            <div class="dropdown-menu" role="menu" style="background-color: rgba(255,255,255,0.9);"><a class="dropdown-item" role="presentation" href="cuadre.html">Cuadre</a><a class="dropdown-item" role="presentation" href="ingreso.html">Ingresos</a><a class="dropdown-item" role="presentation" href="gasto.html">Gastos</a></div>
+        </li>
+        <li class="nav-item dropdown pv3"><a class="dropdown-toggle nav-link pv7" data-toggle="dropdown" aria-expanded="false" style="color: rgba(255,255,255,0.9);" href="#"><i class="fa fa-phone"></i>&nbsp;Taller</a>
+            <div class="dropdown-menu" role="menu" style="background-color: rgba(255,255,255,0.9);"><a class="dropdown-item pv4" role="presentation" href="taller.html">Equipos</a><a class="dropdown-item pv5 pv6" role="presentation" href="taller_articulos.html">Articulos</a></div>
+        </li>
+        <li class="nav-item dropdown"><a class="dropdown-toggle nav-link pv7 pv3 pv4 pv5 pv6" data-toggle="dropdown" aria-expanded="false" style="color: rgba(255,255,255,0.9);" href="#"><i class="fa fa-money"></i>&nbsp;CxC</a>
+            <div class="dropdown-menu" role="menu" style="background-color: rgba(255,255,255,0.9);"><a class="dropdown-item" role="presentation" href="cxc.html">Ver CxC</a><a class="dropdown-item" role="presentation" href="factura_vencidas.html">Facturas Vencidas</a><a class="dropdown-item" role="presentation" href="cxc_abonos.html">Ver Abonos</a></div>
+        </li>
+        <li class="nav-item dropdown pv3"><a class="dropdown-toggle nav-link pv7 pv4 pv5 pv6 pv8" data-toggle="dropdown" aria-expanded="false" style="color: rgba(255,255,255,0.9);" href="#"><i class="fa fa-clock-o"></i>&nbsp;CxP</a>
+            <div class="dropdown-menu" role="menu" style="background-color: rgba(255,255,255,0.9);"><a class="dropdown-item" role="presentation" href="cxp.html">Ver CxP</a><a class="dropdown-item" role="presentation" href="cxp_abonos.html">Ver Pagos</a></div>
+        </li>
+        <li class="nav-item dropdown pv3"><a class="dropdown-toggle nav-link pv7 pv2 pv5 pv6 pv8" data-toggle="dropdown" aria-expanded="false" style="color: rgba(255,255,255,0.9);" href="#"><i class="fa fa-print"></i>&nbsp;Reportes</a>
+            <div class="dropdown-menu" role="menu" style="background-color: rgba(255,255,255,0.9);"><a class="dropdown-item pv7" role="presentation" href="articulo_reporte.html">Articulos</a><a class="dropdown-item pv7" role="presentation" href="inventario_reporte.html">Inventario</a><a class="dropdown-item pv7" role="presentation" href="inventario_valor_reporte.html">Valor Inventario</a>
+                <a
+                    class="dropdown-item" role="presentation" href="compras_reporte.html">&nbsp;Compras</a><a class="dropdown-item pv4" role="presentation" href="factura_reporte.html">Ventas</a><a class="dropdown-item pv4" role="presentation" href="cliente_reporte.html">Clientes</a><a class="dropdown-item pv4" role="presentation"
+                        href="suplidor_reporte.html">Suplidores</a><a class="dropdown-item pv4" role="presentation" href="taller_reporte.html">Taller</a><a class="dropdown-item pv7 pv4" role="presentation" href="serial_reporte.html">Seriales</a><a class="dropdown-item pv7 pv4"
+                        role="presentation" href="ganancia_reporte.html">Ganancia</a><a class="dropdown-item pv4" role="presentation" href="gasto_reporte.html">Gastos</a><a class="dropdown-item pv4" role="presentation" href="ingreso_reporte.html">Ingresos</a></div>
+        </li>
+        <li class="nav-item dropdown pv3"><a class="dropdown-toggle nav-link pv7 pv2 pv5 pv6 pv4 pv8" data-toggle="dropdown" aria-expanded="false" style="color: rgba(255,255,255,0.9);" href="#"><i class="fa fa-gears"></i>&nbsp;Ajustes</a>
+            <div class="dropdown-menu" role="menu" style="background-color: rgba(255,255,255,0.9);"><a class="dropdown-item" role="presentation" href="usuarios.html">Usuarios</a><a class="dropdown-item" role="presentation" href="almacenes.html">Tiendas</a><a class="dropdown-item" role="presentation" href="comprobante.html">Comprobante Grupos</a>
+                <a
+                    class="dropdown-item" role="presentation" href="comprobantes_fiscal.html">Comprobante Fiscales</a><a class="dropdown-item" role="presentation" href="ingreso_tipo.html">Tipo Ingresos</a><a class="dropdown-item" role="presentation" href="gasto_tipo.html">Tipo Gasto</a><a class="dropdown-item" role="presentation"
+                        id="nuevo_codigo" href="#">Codigo Activacion</a></div>
+        </li>
+        <li class="nav-item dropdown pv3"><a class="dropdown-toggle nav-link pv7 pv2 pv5 pv6 pv4 pv3 pv1 pv8" data-toggle="dropdown" aria-expanded="false" style="color: rgba(255,255,255,0.9);" href="#"><i class="fa fa-briefcase"></i>&nbsp;Adm</a>
+            <div class="dropdown-menu" role="menu"
+                style="background-color: rgba(255,255,255,0.9);"><a class="dropdown-item" role="presentation" href="propietario.html">Propietarios</a><a class="dropdown-item" role="presentation" href="sucursales.html">Sucursales</a><a class="dropdown-item" role="presentation" href="usuario_almacen.html">Usuarios</a></div>
+        </li>
+        <li class="nav-item" role="presentation"><a class="nav-link" id="cambio_password" href="#" style="color: rgba(255,255,255,0.9);"><i class="fa fa-key"></i>&nbsp;Pass</a></li>
+        <li class="nav-item" role="presentation"><a class="nav-link" id="salir_menu" href="#" style="color: rgba(255,255,255,0.9);"><i class="fa fa-external-link-square"></i>&nbsp;Salir</a></li>
         </ul>
-      </div>
-      <div class="row">
-        <div class="col-md-6 col-lg-3">
-          <div class="widget-small primary coloured-icon">        
-           <img alt="" class="icon" th:src="@{/img/modulos/Box.png}">
-<!--           <i class="icon fa fa-users fa-3x"></i> -->
-            <div class="info">
-              <h4>Art&iacute;culos</h4>
-              <p><b>5</b></p>
-            </div>
-          </div>
+        <p class="ml-auto navbar-text actions"> </p>
         </div>
-        <div class="col-md-6 col-lg-3">
-          <div class="widget-small info coloured-icon">
-<!--           <i class="icon fa fa-thumbs-o-up fa-3x"></i> -->
-            <img alt="" class="icon" th:src="@{/img/modulos/Accounting.png}">
-            <div class="info">
-              <h4>Ventas</h4>
-              <p><b>25</b></p>
-            </div>
-          </div>
         </div>
-        <div class="col-md-6 col-lg-3">
-          <div class="widget-small warning coloured-icon">
-<!--           <i class="icon fa fa-files-o fa-3x"></i> -->
-			<img alt="" class="icon" th:src="@{/img/modulos/clientes.png}">
-            <div class="info">
-              <h4>Clientes</h4>
-              <p><b>10</b></p>
+    </nav>
+    <div class="container text-white" style="margin-bottom: 127px;">
+        <div class="row" id="contenedor_menu">
+            <div class="col-md-6 col-lg-3 pv7 pv3 pv5 pv6" id="articulos">
+                <div class="card shadow card-info" style="margin-top: 10px;">
+                    <div class="card-header text-primary" style="background-color: #e4e4e4;">
+                        <div class="row" style="height: 60px;">
+                            <div class="col-6"><img th:src="@{/img/modulos/Box.png}"></div>
+                            <div class="col-6 text-right">
+                                <p id="menu_articulo_total" class="announcement-heading"><strong>0</strong></p>
+                                <p class="announcement-text"><strong>Articulos</strong></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body bg-dark" id="icono_articulo" style="height: 0px;background-color: #666d70;">
+                        <div class="row" style="margin-top: -15px;">
+                            <div class="col-8 text-white">
+                                <p>Inventario</p>
+                            </div>
+                            <div class="col text-right"><i class="fa fa-star fa-arrow-circle-right" style="font-size: 23px;"></i></div>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
-        </div>
-        <div class="col-md-6 col-lg-3">
-          <div class="widget-small danger coloured-icon">
-<!--           <i class="icon fa fa-star fa-3x"></i> -->
-			<img alt="" class="icon" th:src="@{/img/modulos/seriales.png}">
-            <div class="info">
-              <h4>Seriales</h4>
-              <p><b>500</b></p>
+            <div class="col-md-6 col-lg-3 pv7 pv4 pv5 pv6" id="ventas">
+                <div class="card shadow card-info" style="margin-top: 10px;">
+                    <div class="card-header text-primary shadow" style="background-color: #e4e4e4;">
+                        <div class="row" style="height: 60px;">
+                            <div class="col-6"><img th:src="@{/img/modulos/Accounting.png}"></div>
+                            <div class="col-6 text-right">
+                                <p id="menu_factura_total" class="announcement-heading"><strong>0</strong></p>
+                                <p class="announcement-text"><strong>Ventas</strong></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body bg-dark" id="icono_factura" style="height: 0;background-color: #666d70;">
+                        <div class="row" style="margin-top: -15px;">
+                            <div class="col-8 text-white">
+                                <p>Ventas</p>
+                            </div>
+                            <div class="col text-right"><i class="fa fa-star fa-arrow-circle-right" style="font-size: 23px;"></i></div>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
-        </div>
-                <div class="col-md-6 col-lg-3">
-          <div class="widget-small primary coloured-icon">
-<!--           <i class="icon fa fa-users fa-3x"></i> -->
-			<img alt="" class="icon" th:src="@{/img/modulos/telefono.png}">
-            <div class="info">
-              <h4>Taller</h4>
-              <p><b>5</b></p>
+            <div class="col-md-6 col-lg-3 pv7 pv3 pv4 pv5 pv6" id="clientes">
+                <div class="card shadow card-info" style="margin-top: 10px;">
+                    <div class="card-header text-primary" style="background-color: #e4e4e4;">
+                        <div class="row" style="height: 60px;">
+                            <div class="col-6"><img th:src="@{/img/modulos/clientes.png}"></div>
+                            <div class="col-6 text-right">
+                                <p id="menu_cliente_total" class="announcement-heading"><strong>0</strong></p>
+                                <p class="announcement-text"><strong>Clientes</strong></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body text-info bg-dark shadow" id="icono_clientes" style="height: 0;background-color: #666d70;">
+                        <div class="row" style="margin-top: -15px;">
+                            <div class="col-8 text-white">
+                                <p>Clientes</p>
+                            </div>
+                            <div class="col text-right text-white"><i class="fa fa-star fa-arrow-circle-right" style="font-size: 23px;"></i></div>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
-        </div>
-        <div class="col-md-6 col-lg-3">
-          <div class="widget-small info coloured-icon">
-<!--           <i class="icon fa fa-thumbs-o-up fa-3x"></i> -->
-			<img alt="" class="icon" th:src="@{/img/modulos/money.png}">
-            <div class="info">
-              <h4>CxC</h4>
-              <p><b>25</b></p>
+            <div class="col-md-6 col-lg-3 pv7 pv3 pv5 pv6" id="seriales">
+                <div class="card shadow card-info" style="margin-top: 10px;">
+                    <div class="card-header text-primary" style="background-color: #e4e4e4;">
+                        <div class="row" style="height: 60px;">
+                            <div class="col-6"><img th:src="@{/img/modulos/seriales.png}"></div>
+                            <div class="col-6 text-right">
+                                <p id="menu_seriales_total" class="announcement-heading"><strong>0</strong></p>
+                                <p class="announcement-text"><strong>Seriales</strong></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body text-info bg-dark" id="icono_seriales" style="height: 0;background-color: #666d70;">
+                        <div class="row" style="margin-top: -15px;">
+                            <div class="col-8 text-white">
+                                <p>&nbsp;IMEI</p>
+                            </div>
+                            <div class="col text-right text-white"><i class="fa fa-star fa-arrow-circle-right" style="font-size: 23px;"></i></div>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
-        </div>
-        <div class="col-md-6 col-lg-3">
-          <div class="widget-small warning coloured-icon">
-<!--           <i class="icon fa fa-files-o fa-3x"></i> -->
-			<img alt="" class="icon" th:src="@{/img/modulos/calculator.png}">
-            <div class="info">
-              <h4>Cuadre</h4>
-              <p><b>10</b></p>
+            <div class="col-md-6 col-lg-3 pv7 pv4" id="taller">
+                <div class="card shadow card-info" style="margin-top: 10px;">
+                    <div class="card-header text-primary" style="background-color: #e4e4e4;color: #f9f9f9;">
+                        <div class="row" style="height: 60px;">
+                            <div class="col-6"><img th:src="@{/img/modulos/telefono.png}"></div>
+                            <div class="col-6 text-right">
+                                <p id="menu_taller_total" class="announcement-heading"><strong>0</strong></p>
+                                <p class="announcement-text"><strong>Taller</strong></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body text-info bg-dark" id="icono_taller" style="height: 0;background-color: #666d70;">
+                        <div class="row" style="margin-top: -15px;">
+                            <div class="col-8 text-white">
+                                <p>Taller</p>
+                            </div>
+                            <div class="col text-right text-white"><i class="fa fa-star fa-arrow-circle-right" style="font-size: 23px;"></i></div>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
-        </div>
-        <div class="col-md-6 col-lg-3">
-          <div class="widget-small danger coloured-icon">
-<!--           <i class="icon fa fa-star fa-3x"></i> -->
-			<img alt="" class="icon" th:src="@{/img/modulos/clientes.png}">
-            <div class="info">
-              <h4>Vendedor</h4>
-              <p><b>500</b></p>
+            <div class="col-md-6 col-lg-3 pv7 pv4 pv5 pv6" id="cxc">
+                <div class="card shadow card-info" style="margin-top: 10px;">
+                    <div class="card-header text-primary" style="background-color: #e4e4e4;">
+                        <div class="row" style="height: 60px;">
+                            <div class="col-6"><img th:src="@{/img/modulos/money.png}"></div>
+                            <div class="col-6 text-right">
+                                <p id="menu_cxc_total" class="announcement-heading"><strong>0</strong></p>
+                                <p class="announcement-text"><strong>CXC</strong></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body text-info bg-dark" id="icono_cxc" style="height: 0;background-color: #666d70;">
+                        <div class="row" style="margin-top: -15px;">
+                            <div class="col-8 text-white">
+                                <p>Cta. x C</p>
+                            </div>
+                            <div class="col text-right text-white"><i class="fa fa-star fa-arrow-circle-right" style="font-size: 23px;"></i></div>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-md-6">
-          <div class="tile">
-            <h3 class="tile-title">Entrada de Art&iacute;culos</h3>
-            <div class="embed-responsive embed-responsive-16by9">
-              <canvas class="embed-responsive-item" id="lineChartDemo"></canvas>
+            <div class="col-md-6 col-lg-3 pv7 pv3 pv4 pv5 pv6" id="cuadre">
+                <div class="card shadow card-info" style="margin-top: 10px;">
+                    <div class="card-header text-primary" style="background-color: #e4e4e4;">
+                        <div class="row" style="height: 60px;">
+                            <div class="col-6"><img th:src="@{/img/modulos/calculator.png}"></div>
+                            <div class="col-6 text-right">
+                                <p id="menu_cuadre_total" class="announcement-heading"><strong>0</strong></p>
+                                <p class="announcement-text"><strong>Cuadre</strong></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body text-info bg-dark" id="icono_cuadre" style="height: 0;background-color: #666d70;">
+                        <div class="row" style="margin-top: -15px;">
+                            <div class="col-8 text-white">
+                                <p>Cuadre</p>
+                            </div>
+                            <div class="col text-right text-white"><i class="fa fa-star fa-arrow-circle-right" style="font-size: 23px;"></i></div>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
-        </div>
-        <div class="col-md-6">
-          <div class="tile">
-            <h3 class="tile-title">Sucursales</h3>
-            <div class="embed-responsive embed-responsive-16by9">
-              <canvas class="embed-responsive-item" id="pieChartDemo"></canvas>
+            <div class="col-md-6 col-lg-3" id="cuadre">
+                <div class="card shadow card-info" style="margin-top: 10px;">
+                    <div class="card-header text-primary" style="background-color: #e4e4e4;">
+                        <div class="row" style="height: 60px;">
+                            <div class="col-6"><img th:src="@{/img/modulos/logout.png}"></div>
+                            <div class="col-6 text-right">
+                                <p class="announcement-heading"><br></p>
+                                <p class="announcement-text"><strong>Salir</strong></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body text-info bg-dark" id="salir_sistema" style="height: 0;background-color: #666d70;">
+                        <div class="row" style="margin-top: -15px;">
+                            <div class="col-8 text-white">
+                                <p>Salir</p>
+                            </div>
+                            <div class="col text-right text-white"><i class="fa fa-star fa-arrow-circle-right" style="font-size: 23px;"></i></div>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
         </div>
-      </div>
-      
-    </main>
-    <!-- Essential javascripts for application to work-->
-    <script th:src="@{/js/jquery-3.3.1.min.js}"></script>
-    <script th:src="@{/js/popper.min.js}"></script>
-    <script th:src="@{/js/bootstrap.min.js}"></script>
-    <script th:src="@{/js/main.js}"></script>
-    <!-- The javascript plugin to display page loading on top-->
-    <script th:src="@{/js/plugins/pace.min.js}"></script>
-    <!-- Page specific javascripts-->
-    <script type="text/javascript" th:src="@{/js/plugins/chart.js}"></script>
-    <!-- Menu efect -->
-    <script th:src="@{/js/menuEfect.js}"></script>
-    <script type="text/javascript">
-      var data = {
-      	labels: ["January", "February", "March", "April", "May"],
-      	datasets: [
-      		{
-      			label: "My First dataset",
-      			fillColor: "rgba(220,220,220,0.2)",
-      			strokeColor: "rgba(220,220,220,1)",
-      			pointColor: "rgba(220,220,220,1)",
-      			pointStrokeColor: "#fff",
-      			pointHighlightFill: "#fff",
-      			pointHighlightStroke: "rgba(220,220,220,1)",
-      			data: [65, 59, 80, 81, 56]
-      		},
-      		{
-      			label: "My Second dataset",
-      			fillColor: "rgba(151,187,205,0.2)",
-      			strokeColor: "rgba(151,187,205,1)",
-      			pointColor: "rgba(151,187,205,1)",
-      			pointStrokeColor: "#fff",
-      			pointHighlightFill: "#fff",
-      			pointHighlightStroke: "rgba(151,187,205,1)",
-      			data: [28, 48, 40, 19, 86]
-      		}
-      	]
-      };
-      var pdata = [
-      	{
-      		value: 300,
-      		color: "#46BFBD",
-      		highlight: "#5AD3D1",
-      		label: "Complete"
-      	},
-      	{
-      		value: 50,
-      		color:"#F7464A",
-      		highlight: "#FF5A5E",
-      		label: "In-Progress"
-      	}
-      ]
-      
-      var ctxl = $("#lineChartDemo").get(0).getContext("2d");
-      var lineChart = new Chart(ctxl).Line(data);
-      
-      var ctxp = $("#pieChartDemo").get(0).getContext("2d");
-      var pieChart = new Chart(ctxp).Pie(pdata);
-    </script>
-  </body>
+ <p></p> 
+        <div class="card text-primary border rounded">
+            <div class="card-body" style="margin-top: 0px;"><img th:src="@{/img/modulos/clientes.png}" id="logo_empresa" height="100px">
+                <h1 class="card-title" id="nombre_negocio" style="font-size: 16px;" th:text="${almacenAcct.nombre}">Nombre del Negocio</h1>
+                <h5 class="text-muted card-subtitle mb-2" id="direccion_negocio" style="font-size: 14px; " th:text="${almacenAcct.direccion}">Direccion</h5>
+                <h5 class="text-muted card-subtitle mb-2" id="telefono_negocio" style="font-size: 12px;" th:text="${almacenAcct.telefono}">809-000-0000</h5>
+                <h6 class="card-subtitle mb-2" id="usuario_actual" style="font-size: 14px;" th:text="${usuario.username}">usuario</h6>
+                <h6 class="text-danger card-subtitle mb-2" id="privilegio" style="font-size: 13px;" th:text="${perfil}">Privilegio</h6>
+                <h6 class="text-right text-danger card-subtitle mb-2" id="vencimiento_sistema" style="font-size: 12px;">Vence</h6>
+                <h6 class="text-right text-danger card-subtitle mb-2" id="vencimiento_fecha" style="font-size: 12px;">Vence</h6>
+                <div class="row pv2 pv3 pv4 pv5 pv6 pv7 pv8">
+                    <div class="col-md-9 col-lg-6 col-xl-5">
+						<form class="bg-primary border rounded" id="frm_cambiar_sucursal"
+							style="padding: 17px;">
+							<label class="text-white"><strong>Cambiar de
+									Sucursal</strong></label>
+							<select class="custom-select custom-select-sm" id="id_almacen_menu">
+								<option th:each="almacen : ${almacenes}"
+									th:value="${almacen.id}" 
+									th:text="${almacen.nombre}">
+								</option>
+							</select>
+							<button class="btn btn-success btn-sm border rounded"
+								type="submit" style="margin-top: 8px;">Cambiar</button>
+						</form>
+					</div>
+                </div><a class="card-link" href="#"></a></div>
+        </div>
+    </div>
+    <div class="modal" role="dialog" tabindex="-1" id="modal_cambio_password">
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-primary"><i class="fa fa-key" style="color: rgba(255,255,255,0.9);font-size: 24px;"></i>
+                    <h6 class="modal-title">&nbsp; Cambiar Password</h6><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button></div>
+                <div class="modal-body"><label>Password Anterior:</label><input type="password" id="password_1" class="form-control" placeholder="Password Viejo"><label>Password Nuevo:</label><input type="password" id="password_2" class="form-control" placeholder="Password Nuevo"></div>
+                <div
+                    class="modal-footer"><button class="btn btn-danger btn-sm border rounded" type="button" data-dismiss="modal">Cerrar</button><button class="btn btn-success btn-sm border rounded" id="btn_cambiar_pass" type="button">Cambiar</button></div>
+        </div>
+    </div>
+    </div><input type="hidden" id="modulo" value="menu_99">
+    <div class="modal" role="dialog" tabindex="-1" id="modal_codigo_activacion">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-primary">
+                    <h6 class="modal-title">Generar codigo de Activacion</h6><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button></div>
+                <div class="modal-body">
+                    <p><strong>Codigo de Registro de Equipo</strong></p><select id="id_almacen" class="form-control"></select></div>
+                <div class="modal-footer"><button class="btn btn-danger btn-sm" type="button" data-dismiss="modal">Salir</button><button class="btn btn-warning btn-sm border rounded" id="btn_generar_codigo" type="button">Generar Codigo</button></div>
+            </div>
+        </div>
+    </div>
+    <script th:src="@{/js/jquery.min.js}"></script>
+    <script th:src="@{/bootstrap/js/bootstrap.min.js}"></script>
+            <script type="text/javascript">
+        	$("#salir_sistema").click(function(){
+        		window.location = "/logout";
+        	});
+        </script>
+</body>
 </html>
