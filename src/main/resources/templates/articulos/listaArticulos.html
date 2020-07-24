@@ -1,14 +1,84 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
-<meta charset="ISO-8859-1">
-<title>Insert title here</title>
-</head>
-<body>
-<h1>lista de articulos</h1>
-<div th:each="articulo : ${articulos}">
-	<p th:text="${articulo.nombre}"></p>
-	<p th:text="${articulo.costo}"></p>
-</div>
+  <head>
+    <title>Sistema Celulares</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" th:href="@{/bootstrap/css/bootstrap.min.css}">
+	<link rel="stylesheet" type="text/css" th:href="@{/css/sticky-dark-top-nav.css}">
+    <!-- Font-icon css-->
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+ 	<link rel="stylesheet" type="text/css" th:href="@{/css/sticky-dark-top-nav.css}">
+ 	<link rel="stylesheet" type="text/css" th:href="@{/css/Minimal-tabs.css}">
+ 	<link rel="stylesheet" type="text/css" th:href="@{/css/dashboard.css}">
+ 	<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css">
+ 	<link rel="stylesheet" type="text/css" th:href="@{/fontawesom/css/all.min.css}">
+ 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+ 	<style>
+	  	.table-primary, .table-primary>th, .table-primary>td {
+	   		 background-color: #25396d;
+	   		 color:#ffff;
+		}
+		.table-primary th, .table-primary td, .table-primary thead th, .table-primary tbody+tbody {
+		    border-color: #25396d;
+		}
+  </style>
+  </head>
+  <body>
+     <span th:insert="fragments/topMenu :: menu-principal"></span> 
+     <br>
+	<div class="container text-white">
+		<div class="card text-primary border rounded">
+			<div class="card-body" style="margin-top: 0px;">
+				<h1 class="card-title" id="nombre_negocio" style="font-size: 16px;">Consulta
+					de art&iacute;culos 
+					<a class="btn btn-primary" style="float: right;" th:href="@{/articulos/form}">Agregar</a>
+				</h1>
+				<br>
+					<table class="table table-striped" id="tabla">
+							<thead>
+								<tr class="table-primary">
+									<th>C&oacute;digo</th>
+									<th>Nombre</th>
+									<th>Precio Max</th>
+									<th>Precio Min</th>
+									<th>Inv.</th>
+									<th></th>
+								</tr>
+							</thead>
+							<tbody>
+								 <tr th:each="articulo:${articulos}">
+				                  <td th:text="${articulo.codigo}"></td>
+				                  <td th:text="${articulo.nombre}"></td>  
+				                  <td th:text="${articulo.precio_maximo}"></td>
+				                  <td th:text="${articulo.precio_minimo}"></td>
+				                  <td></td>
+				                  <td>
+				                    <a th:href="@{/vacantes/edit/{id} (id=${articulo.id})}" class="btn btn-primary btn-sm" role="button" title="Editar el registro."><i class="fas fa-atlas" aria-hidden="true"></i></a>
+				                    <a th:href="@{/vacantes/edit/{id} (id=${articulo.id})}" class="btn btn-info btn-sm" role="button" title="Editar el registro."><i class="fas fa-exchange-alt" aria-hidden="true"></i></a>
+				                    <a th:href="@{/vacantes/edit/{id} (id=${articulo.id})}" class="btn btn-success btn-sm" role="button" title="Editar el registro."><i class="fas fa-arrow-left" aria-hidden="true"></i></a>
+				                    <a th:href="@{/vacantes/delete/{id} (id=${articulo.id})}" onclick="return confirm('¿Estas seguro?')" class="btn btn-warning btn-sm" role="button" title="Eliminar el registro."><i class="fa fa-edit" aria-hidden="true"></i></a>
+				                  </td>
+				                </tr>
+							</tbody>
+						</table>
+			</div>
+			<a class="card-link" href="#"></a>
+		</div>
+	</div>
+	<script th:src="@{/js/jquery.min.js}"></script>
+    <script th:src="@{/bootstrap/js/bootstrap.min.js}"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+	<script type="text/javascript">
+
+		$(document).ready(function() {
+			$('#tabla').DataTable();
+		});
+
+		$("#salir_sistema").click(function() {
+			window.location = "/logout";
+		});
+	</script>
 </body>
 </html>

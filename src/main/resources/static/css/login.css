@@ -1,10 +1,15 @@
-body {
-  margin: 0;
-  padding: 0;
-  background-color: #17a2b8;
-  height: 100%;
-  width: 100%;
-  font:normal 75% Arial, Helvetica, sans-serif;
+body   {
+	min-height: 100%;
+	background-size: cover;
+	height: 100vh;
+	width: 100%;
+	background-image: url("../img/turntable.jpg");
+	background-repeat: no-repeat;
+	background-size: cover;
+	margin: 0;
+	padding: 0;
+	background-color: #17a2b8;
+	font: normal 75% Arial, Helvetica, sans-serif;
 }
 
 .padre {
@@ -13,6 +18,7 @@ body {
   height: 300px;
 
 }
+
 .hijo {
  -webkit-border-radius: 30px 30px;  /* Safari  */
  -moz-border-radius: 30px 30px;     /* Firefox */
@@ -23,15 +29,6 @@ body {
  left: 50%;
  margin-top: -50px;
  margin-left: -180px;
- /*   background: rgba(39, 40, 34, 0.7); */
- /* background: rgba(204,213,255,1);Old Browsers */
- /* background: -moz-radial-gradient(center, ellipse cover, rgba(204,213,255,1) 0%, rgba(46,109,255,0.82) 100%); FF3.6+ */
- /* background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%, rgba(204,213,255,1)), color-stop(100%, rgba(46,109,255,0.82)));Chrome, Safari4+ */
- /* background: -webkit-radial-gradient(center, ellipse cover, rgba(204,213,255,1) 0%, rgba(46,109,255,0.82) 100%); Chrome10+,Safari5.1+ */
- /* background: -o-radial-gradient(center, ellipse cover, rgba(204,213,255,1) 0%, rgba(46,109,255,0.82) 100%); Opera 11.10+ */
- /* background: -ms-radial-gradient(center, ellipse cover, rgba(204,213,255,1) 0%, rgba(46,109,255,0.82) 100%); IE 10+ */
- /* background: radial-gradient(ellipse at center, rgba(204,213,255,1) 0%, rgba(46,109,255,0.82) 100%);W3C */
- /* filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ccd5ff', endColorstr='#2e6dff', GradientType=1 );IE6-9 fallback on horizontal gradient */
  background: rgba(204,206,255,1);/* Old Browsers */
  background: -moz-radial-gradient(center, ellipse cover, rgba(204,206,255,1) 0%, rgba(21,133,201,0.82) 91%, rgba(3,126,196,0.82) 100%); /* FF3.6+ */
  background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%, rgba(204,206,255,1)), color-stop(91%, rgba(21,133,201,0.82)), color-stop(100%, rgba(3,126,196,0.82)));/* Chrome, Safari4+ */
@@ -43,102 +40,6 @@ body {
  -webkit-box-shadow: 2px 2px 5px 0px rgba(0,0,0,0.75);
  -moz-box-shadow: 2px 2px 5px 0px rgba(0,0,0,0.75);
  box-shadow: 2px 2px 5px 0px rgba(0,0,0,0.75);
-}
-
-.hijo2 {
- -webkit-border-radius: 30px 30px;  /* Safari  */
-  -moz-border-radius: 30px 30px;     /* Firefox */
-  width: 350px;
-  height: 480px;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  margin-top: -50px;
-  margin-left: -180px;
-/*   background: rgba(39, 40, 34, 0.7); */
-/* background: rgba(204,213,255,1);Old Browsers */
-/* background: -moz-radial-gradient(center, ellipse cover, rgba(204,213,255,1) 0%, rgba(46,109,255,0.82) 100%); FF3.6+ */
-/* background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%, rgba(204,213,255,1)), color-stop(100%, rgba(46,109,255,0.82)));Chrome, Safari4+ */
-/* background: -webkit-radial-gradient(center, ellipse cover, rgba(204,213,255,1) 0%, rgba(46,109,255,0.82) 100%); Chrome10+,Safari5.1+ */
-/* background: -o-radial-gradient(center, ellipse cover, rgba(204,213,255,1) 0%, rgba(46,109,255,0.82) 100%); Opera 11.10+ */
-/* background: -ms-radial-gradient(center, ellipse cover, rgba(204,213,255,1) 0%, rgba(46,109,255,0.82) 100%); IE 10+ */
-/* background: radial-gradient(ellipse at center, rgba(204,213,255,1) 0%, rgba(46,109,255,0.82) 100%);W3C */
-/* filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ccd5ff', endColorstr='#2e6dff', GradientType=1 );IE6-9 fallback on horizontal gradient */
-background: rgba(204,206,255,1);/* Old Browsers */
-background: -moz-radial-gradient(center, ellipse cover, rgba(204,206,255,1) 0%, rgba(21,133,201,0.82) 91%, rgba(3,126,196,0.82) 100%); /* FF3.6+ */
-background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%, rgba(204,206,255,1)), color-stop(91%, rgba(21,133,201,0.82)), color-stop(100%, rgba(3,126,196,0.82)));/* Chrome, Safari4+ */
-background: -webkit-radial-gradient(center, ellipse cover, rgba(204,206,255,1) 0%, rgba(21,133,201,0.82) 91%, rgba(3,126,196,0.82) 100%); /* Chrome10+,Safari5.1+ */
-background: -o-radial-gradient(center, ellipse cover, rgba(204,206,255,1) 0%, rgba(21,133,201,0.82) 91%, rgba(3,126,196,0.82) 100%); /* Opera 11.10+ */
-background: -ms-radial-gradient(center, ellipse cover, rgba(204,206,255,1) 0%, rgba(21,133,201,0.82) 91%, rgba(3,126,196,0.82) 100%); /* IE 10+ */
-background: radial-gradient(ellipse at center, rgba(204,206,255,1) 0%, rgba(21,133,201,0.82) 91%, rgba(3,126,196,0.82) 100%);/* W3C */
-filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ccceff', endColorstr='#037ec4', GradientType=1 );/* IE6-9 fallback on horizontal gradient */
--webkit-box-shadow: 2px 2px 5px 0px rgba(0,0,0,0.75);
--moz-box-shadow: 2px 2px 5px 0px rgba(0,0,0,0.75);
-box-shadow: 2px 2px 5px 0px rgba(0,0,0,0.75);
-}
-
-.hijo3 {
- -webkit-border-radius: 30px 30px;  /* Safari  */
-  -moz-border-radius: 30px 30px;     /* Firefox */
-  width: 350px;
-  height: 400px;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  margin-top: -50px;
-  margin-left: -180px;
-/*   background: rgba(39, 40, 34, 0.7); */
-/* background: rgba(204,213,255,1);Old Browsers */
-/* background: -moz-radial-gradient(center, ellipse cover, rgba(204,213,255,1) 0%, rgba(46,109,255,0.82) 100%); FF3.6+ */
-/* background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%, rgba(204,213,255,1)), color-stop(100%, rgba(46,109,255,0.82)));Chrome, Safari4+ */
-/* background: -webkit-radial-gradient(center, ellipse cover, rgba(204,213,255,1) 0%, rgba(46,109,255,0.82) 100%); Chrome10+,Safari5.1+ */
-/* background: -o-radial-gradient(center, ellipse cover, rgba(204,213,255,1) 0%, rgba(46,109,255,0.82) 100%); Opera 11.10+ */
-/* background: -ms-radial-gradient(center, ellipse cover, rgba(204,213,255,1) 0%, rgba(46,109,255,0.82) 100%); IE 10+ */
-/* background: radial-gradient(ellipse at center, rgba(204,213,255,1) 0%, rgba(46,109,255,0.82) 100%);W3C */
-/* filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ccd5ff', endColorstr='#2e6dff', GradientType=1 );IE6-9 fallback on horizontal gradient */
-background: rgba(204,206,255,1);/* Old Browsers */
-background: -moz-radial-gradient(center, ellipse cover, rgba(204,206,255,1) 0%, rgba(21,133,201,0.82) 91%, rgba(3,126,196,0.82) 100%); /* FF3.6+ */
-background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%, rgba(204,206,255,1)), color-stop(91%, rgba(21,133,201,0.82)), color-stop(100%, rgba(3,126,196,0.82)));/* Chrome, Safari4+ */
-background: -webkit-radial-gradient(center, ellipse cover, rgba(204,206,255,1) 0%, rgba(21,133,201,0.82) 91%, rgba(3,126,196,0.82) 100%); /* Chrome10+,Safari5.1+ */
-background: -o-radial-gradient(center, ellipse cover, rgba(204,206,255,1) 0%, rgba(21,133,201,0.82) 91%, rgba(3,126,196,0.82) 100%); /* Opera 11.10+ */
-background: -ms-radial-gradient(center, ellipse cover, rgba(204,206,255,1) 0%, rgba(21,133,201,0.82) 91%, rgba(3,126,196,0.82) 100%); /* IE 10+ */
-background: radial-gradient(ellipse at center, rgba(204,206,255,1) 0%, rgba(21,133,201,0.82) 91%, rgba(3,126,196,0.82) 100%);/* W3C */
-filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ccceff', endColorstr='#037ec4', GradientType=1 );/* IE6-9 fallback on horizontal gradient */
--webkit-box-shadow: 2px 2px 5px 0px rgba(0,0,0,0.75);
--moz-box-shadow: 2px 2px 5px 0px rgba(0,0,0,0.75);
-box-shadow: 2px 2px 5px 0px rgba(0,0,0,0.75);
-}
-
-.hijo4 {
- -webkit-border-radius: 30px 30px;  /* Safari  */
-  -moz-border-radius: 30px 30px;     /* Firefox */
-  width: 350px;
-  height: 530px;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  margin-top: -50px;
-  margin-left: -180px;
-/*   background: rgba(39, 40, 34, 0.7); */
-/* background: rgba(204,213,255,1);Old Browsers */
-/* background: -moz-radial-gradient(center, ellipse cover, rgba(204,213,255,1) 0%, rgba(46,109,255,0.82) 100%); FF3.6+ */
-/* background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%, rgba(204,213,255,1)), color-stop(100%, rgba(46,109,255,0.82)));Chrome, Safari4+ */
-/* background: -webkit-radial-gradient(center, ellipse cover, rgba(204,213,255,1) 0%, rgba(46,109,255,0.82) 100%); Chrome10+,Safari5.1+ */
-/* background: -o-radial-gradient(center, ellipse cover, rgba(204,213,255,1) 0%, rgba(46,109,255,0.82) 100%); Opera 11.10+ */
-/* background: -ms-radial-gradient(center, ellipse cover, rgba(204,213,255,1) 0%, rgba(46,109,255,0.82) 100%); IE 10+ */
-/* background: radial-gradient(ellipse at center, rgba(204,213,255,1) 0%, rgba(46,109,255,0.82) 100%);W3C */
-/* filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ccd5ff', endColorstr='#2e6dff', GradientType=1 );IE6-9 fallback on horizontal gradient */
-background: rgba(204,206,255,1);/* Old Browsers */
-background: -moz-radial-gradient(center, ellipse cover, rgba(204,206,255,1) 0%, rgba(21,133,201,0.82) 91%, rgba(3,126,196,0.82) 100%); /* FF3.6+ */
-background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%, rgba(204,206,255,1)), color-stop(91%, rgba(21,133,201,0.82)), color-stop(100%, rgba(3,126,196,0.82)));/* Chrome, Safari4+ */
-background: -webkit-radial-gradient(center, ellipse cover, rgba(204,206,255,1) 0%, rgba(21,133,201,0.82) 91%, rgba(3,126,196,0.82) 100%); /* Chrome10+,Safari5.1+ */
-background: -o-radial-gradient(center, ellipse cover, rgba(204,206,255,1) 0%, rgba(21,133,201,0.82) 91%, rgba(3,126,196,0.82) 100%); /* Opera 11.10+ */
-background: -ms-radial-gradient(center, ellipse cover, rgba(204,206,255,1) 0%, rgba(21,133,201,0.82) 91%, rgba(3,126,196,0.82) 100%); /* IE 10+ */
-background: radial-gradient(ellipse at center, rgba(204,206,255,1) 0%, rgba(21,133,201,0.82) 91%, rgba(3,126,196,0.82) 100%);/* W3C */
-filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ccceff', endColorstr='#037ec4', GradientType=1 );/* IE6-9 fallback on horizontal gradient */
--webkit-box-shadow: 2px 2px 5px 0px rgba(0,0,0,0.75);
--moz-box-shadow: 2px 2px 5px 0px rgba(0,0,0,0.75);
-box-shadow: 2px 2px 5px 0px rgba(0,0,0,0.75);
 }
 
 .hijo input{

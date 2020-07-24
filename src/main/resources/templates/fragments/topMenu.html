@@ -1,95 +1,181 @@
-<header th:fragment="menu-principal" class="app-header">
-	<a class="app-header__logo" href="index.html">Sistema</a>
-	<!-- Sidebar toggle button-->
-	<a class="app-sidebar__toggle" href="#" data-toggle="sidebar"
-		aria-label="Hide Sidebar"></a>
-	<!-- Navbar Right Menu-->
-	<ul class="app-nav">
-		<li class="app-search"><input class="app-search__input"
-			type="search" placeholder="Search">
-			<button class="app-search__button">
-				<i class="fa fa-search"></i>
-			</button></li>
-		<!--Notification Menu-->
-		<li class="dropdown"><a class="app-nav__item" href="#"
-			data-toggle="dropdown" aria-label="Show notifications"><i
-				class="fa fa-bell-o fa-lg"></i></a>
-			<ul class="app-notification dropdown-menu dropdown-menu-right">
-				<li class="app-notification__title">You have 4 new
-					notifications.</li>
-				<div class="app-notification__content">
-					<li><a class="app-notification__item" href="javascript:;"><span
-							class="app-notification__icon"><span
-								class="fa-stack fa-lg"><i
-									class="fa fa-circle fa-stack-2x text-primary"></i><i
-									class="fa fa-envelope fa-stack-1x fa-inverse"></i></span></span>
-							<div>
-								<p class="app-notification__message">Lisa sent you a mail</p>
-								<p class="app-notification__meta">2 min ago</p>
-							</div></a></li>
-					<li><a class="app-notification__item" href="javascript:;"><span
-							class="app-notification__icon"><span
-								class="fa-stack fa-lg"><i
-									class="fa fa-circle fa-stack-2x text-danger"></i><i
-									class="fa fa-hdd-o fa-stack-1x fa-inverse"></i></span></span>
-							<div>
-								<p class="app-notification__message">Mail server not working</p>
-								<p class="app-notification__meta">5 min ago</p>
-							</div></a></li>
-					<li><a class="app-notification__item" href="javascript:;"><span
-							class="app-notification__icon"><span
-								class="fa-stack fa-lg"><i
-									class="fa fa-circle fa-stack-2x text-success"></i><i
-									class="fa fa-money fa-stack-1x fa-inverse"></i></span></span>
-							<div>
-								<p class="app-notification__message">Transaction complete</p>
-								<p class="app-notification__meta">2 days ago</p>
-							</div></a></li>
-					<div class="app-notification__content">
-						<li><a class="app-notification__item" href="javascript:;"><span
-								class="app-notification__icon"><span
-									class="fa-stack fa-lg"><i
-										class="fa fa-circle fa-stack-2x text-primary"></i><i
-										class="fa fa-envelope fa-stack-1x fa-inverse"></i></span></span>
-								<div>
-									<p class="app-notification__message">Lisa sent you a mail</p>
-									<p class="app-notification__meta">2 min ago</p>
-								</div></a></li>
-						<li><a class="app-notification__item" href="javascript:;"><span
-								class="app-notification__icon"><span
-									class="fa-stack fa-lg"><i
-										class="fa fa-circle fa-stack-2x text-danger"></i><i
-										class="fa fa-hdd-o fa-stack-1x fa-inverse"></i></span></span>
-								<div>
-									<p class="app-notification__message">Mail server not
-										working</p>
-									<p class="app-notification__meta">5 min ago</p>
-								</div></a></li>
-						<li><a class="app-notification__item" href="javascript:;"><span
-								class="app-notification__icon"><span
-									class="fa-stack fa-lg"><i
-										class="fa fa-circle fa-stack-2x text-success"></i><i
-										class="fa fa-money fa-stack-1x fa-inverse"></i></span></span>
-								<div>
-									<p class="app-notification__message">Transaction complete</p>
-									<p class="app-notification__meta">2 days ago</p>
-								</div></a></li>
-					</div>
-				</div>
-				<li class="app-notification__footer"><a href="#">See all
-						notifications.</a></li>
-			</ul></li>
-		<!-- User Menu-->
-		<li class="dropdown"><a class="app-nav__item" href="#"
-			data-toggle="dropdown" aria-label="Open Profile Menu"><i
-				class="fa fa-user fa-lg"></i></a>
-			<ul class="dropdown-menu settings-menu dropdown-menu-right">
-				<li><a class="dropdown-item" href="page-user.html"><i
-						class="fa fa-cog fa-lg"></i> Settings</a></li>
-				<li><a class="dropdown-item" href="page-user.html"><i
-						class="fa fa-user fa-lg"></i> Profile</a></li>
-				<li><a class="dropdown-item" th:href="@{/logout}"><i
-						class="fa fa-sign-out fa-lg"></i> Logout</a></li>
-			</ul></li>
-	</ul>
-</header>
+<nav th:fragment="menu-principal"
+	class="navbar navbar-light navbar-expand-sm bg-dark navbar-fixed-top navigation-clean-button"
+	style="background-color: #565959; margin-top: 0px;">
+	<div class="container-fluid">
+		<a class="navbar-brand text-white" href="#">Sistema</a>
+		<button data-toggle="collapse" class="navbar-toggler"
+			data-target="#navcol-1"
+			style="margin-top: 5px; margin-bottom: 5px; background-color: #c6ccba;">
+			<span class="sr-only">Toggle navigation</span><span
+				class="navbar-toggler-icon"></span>
+		</button>
+		<div class="collapse navbar-collapse text-uppercase shadow-sm"
+			id="navcol-1">
+			<ul class="nav navbar-nav text-capitalize nav-right"
+				style="width: 100%;">
+				<li class="nav-item dropdown pv7 pv5"><a
+					class="dropdown-toggle nav-link pv6" data-toggle="dropdown"
+					aria-expanded="false" style="color: rgba(255, 255, 255, 0.9);"
+					href="#"><i class="fa fa-archive"></i>&nbsp;Inventario</a>
+					<div class="dropdown-menu" role="menu"
+						style="background-color: rgba(255, 255, 255, 0.9);">
+						<a class="dropdown-item" role="presentation" href="articulos.html">Articulos</a><a
+							class="dropdown-item" role="presentation"
+							href="articulo_transito.html">Articulo en transito</a><a
+							class="dropdown-item" role="presentation"
+							href="articulo_enviados.html">Articulo enviados</a>
+						<div class="dropdown-divider" role="presentation"></div>
+						<a class="dropdown-item pv3 pv8" role="presentation"
+							href="suplidores.html">suplidores</a><a
+							class="dropdown-item pv3 pv8" role="presentation"
+							href="ver_compras.html">Compras</a>
+						<div class="dropdown-divider" role="presentation"></div>
+						<a class="dropdown-item pv3 pv8" role="presentation"
+							href="seriales.html">Seriales</a><a class="dropdown-item"
+							role="presentation" href="seriales_transito.html">Seriales
+							Transito</a>
+						<div class="dropdown-divider" role="presentation"></div>
+						<a class="dropdown-item" role="presentation"
+							href="inventario.html">Hacer Inventario</a>
+					</div></li>
+				<li class="nav-item dropdown pv3 pv5"><a
+					class="dropdown-toggle nav-link pv7 pv4 pv6" data-toggle="dropdown"
+					aria-expanded="false" style="color: rgba(255, 255, 255, 0.9);"
+					href="#"><i class="fa fa-shopping-bag"></i>&nbsp;Ventas</a>
+					<div class="dropdown-menu" role="menu"
+						style="background-color: rgba(255, 255, 255, 0.9);">
+						<a class="dropdown-item" role="presentation"
+							href="ver_facturas.html">Ver Facturas</a><a class="dropdown-item"
+							role="presentation" href="clientes.html">Clientes</a>
+						<div class="dropdown-divider" role="presentation"></div>
+						<a class="dropdown-item" role="presentation"
+							href="devolucion_factura.html">Hacer Devoluciones</a><a
+							class="dropdown-item" role="presentation"
+							href="devolucion_ver.html">Ver Devoluciones</a>
+						<div class="dropdown-divider" role="presentation"></div>
+						<a class="dropdown-item" role="presentation"
+							href="vendedores.html">Vendedores</a><a class="dropdown-item pv8"
+							role="presentation" href="comision_ver.html">Comision Ventas</a><a
+							class="dropdown-item" role="presentation"
+							href="factura_cambios.html">Ver Cambio Equipos</a> <a
+							class="dropdown-item" role="presentation"
+							href="cotizaciones.html">Ver Cotizaciones</a>
+					</div></li>
+				<li class="nav-item dropdown"><a
+					class="dropdown-toggle nav-link pv7 pv4 pv5 pv6"
+					data-toggle="dropdown" aria-expanded="false"
+					style="color: rgba(255, 255, 255, 0.9);" href="#"><i
+						class="fa fa-dollar"></i>&nbsp;Caja</a>
+					<div class="dropdown-menu" role="menu"
+						style="background-color: rgba(255, 255, 255, 0.9);">
+						<a class="dropdown-item" role="presentation" href="cuadre.html">Cuadre</a><a
+							class="dropdown-item" role="presentation" href="ingreso.html">Ingresos</a><a
+							class="dropdown-item" role="presentation" href="gasto.html">Gastos</a>
+					</div></li>
+				<li class="nav-item dropdown pv3"><a
+					class="dropdown-toggle nav-link pv7" data-toggle="dropdown"
+					aria-expanded="false" style="color: rgba(255, 255, 255, 0.9);"
+					href="#"><i class="fa fa-phone"></i>&nbsp;Taller</a>
+					<div class="dropdown-menu" role="menu"
+						style="background-color: rgba(255, 255, 255, 0.9);">
+						<a class="dropdown-item pv4" role="presentation"
+							href="taller.html">Equipos</a><a class="dropdown-item pv5 pv6"
+							role="presentation" href="taller_articulos.html">Articulos</a>
+					</div></li>
+				<li class="nav-item dropdown"><a
+					class="dropdown-toggle nav-link pv7 pv3 pv4 pv5 pv6"
+					data-toggle="dropdown" aria-expanded="false"
+					style="color: rgba(255, 255, 255, 0.9);" href="#"><i
+						class="fa fa-money"></i>&nbsp;CxC</a>
+					<div class="dropdown-menu" role="menu"
+						style="background-color: rgba(255, 255, 255, 0.9);">
+						<a class="dropdown-item" role="presentation" href="cxc.html">Ver
+							CxC</a><a class="dropdown-item" role="presentation"
+							href="factura_vencidas.html">Facturas Vencidas</a><a
+							class="dropdown-item" role="presentation" href="cxc_abonos.html">Ver
+							Abonos</a>
+					</div></li>
+				<li class="nav-item dropdown pv3"><a
+					class="dropdown-toggle nav-link pv7 pv4 pv5 pv6 pv8"
+					data-toggle="dropdown" aria-expanded="false"
+					style="color: rgba(255, 255, 255, 0.9);" href="#"><i
+						class="fa fa-clock-o"></i>&nbsp;CxP</a>
+					<div class="dropdown-menu" role="menu"
+						style="background-color: rgba(255, 255, 255, 0.9);">
+						<a class="dropdown-item" role="presentation" href="cxp.html">Ver
+							CxP</a><a class="dropdown-item" role="presentation"
+							href="cxp_abonos.html">Ver Pagos</a>
+					</div></li>
+				<li class="nav-item dropdown pv3"><a
+					class="dropdown-toggle nav-link pv7 pv2 pv5 pv6 pv8"
+					data-toggle="dropdown" aria-expanded="false"
+					style="color: rgba(255, 255, 255, 0.9);" href="#"><i
+						class="fa fa-print"></i>&nbsp;Reportes</a>
+					<div class="dropdown-menu" role="menu"
+						style="background-color: rgba(255, 255, 255, 0.9);">
+						<a class="dropdown-item pv7" role="presentation"
+							href="articulo_reporte.html">Articulos</a><a
+							class="dropdown-item pv7" role="presentation"
+							href="inventario_reporte.html">Inventario</a><a
+							class="dropdown-item pv7" role="presentation"
+							href="inventario_valor_reporte.html">Valor Inventario</a> <a
+							class="dropdown-item" role="presentation"
+							href="compras_reporte.html">&nbsp;Compras</a><a
+							class="dropdown-item pv4" role="presentation"
+							href="factura_reporte.html">Ventas</a><a
+							class="dropdown-item pv4" role="presentation"
+							href="cliente_reporte.html">Clientes</a><a
+							class="dropdown-item pv4" role="presentation"
+							href="suplidor_reporte.html">Suplidores</a><a
+							class="dropdown-item pv4" role="presentation"
+							href="taller_reporte.html">Taller</a><a
+							class="dropdown-item pv7 pv4" role="presentation"
+							href="serial_reporte.html">Seriales</a><a
+							class="dropdown-item pv7 pv4" role="presentation"
+							href="ganancia_reporte.html">Ganancia</a><a
+							class="dropdown-item pv4" role="presentation"
+							href="gasto_reporte.html">Gastos</a><a class="dropdown-item pv4"
+							role="presentation" href="ingreso_reporte.html">Ingresos</a>
+					</div></li>
+				<li class="nav-item dropdown pv3"><a
+					class="dropdown-toggle nav-link pv7 pv2 pv5 pv6 pv4 pv8"
+					data-toggle="dropdown" aria-expanded="false"
+					style="color: rgba(255, 255, 255, 0.9);" href="#"><i
+						class="fa fa-gears"></i>&nbsp;Ajustes</a>
+					<div class="dropdown-menu" role="menu"
+						style="background-color: rgba(255, 255, 255, 0.9);">
+						<a class="dropdown-item" role="presentation" href="usuarios.html">Usuarios</a><a
+							class="dropdown-item" role="presentation" href="almacenes.html">Tiendas</a><a
+							class="dropdown-item" role="presentation" href="comprobante.html">Comprobante
+							Grupos</a> <a class="dropdown-item" role="presentation"
+							href="comprobantes_fiscal.html">Comprobante Fiscales</a><a
+							class="dropdown-item" role="presentation"
+							href="ingreso_tipo.html">Tipo Ingresos</a><a
+							class="dropdown-item" role="presentation" href="gasto_tipo.html">Tipo
+							Gasto</a><a class="dropdown-item" role="presentation"
+							id="nuevo_codigo" href="#">Codigo Activacion</a>
+					</div></li>
+				<li class="nav-item dropdown pv3"><a
+					class="dropdown-toggle nav-link pv7 pv2 pv5 pv6 pv4 pv3 pv1 pv8"
+					data-toggle="dropdown" aria-expanded="false"
+					style="color: rgba(255, 255, 255, 0.9);" href="#"><i
+						class="fa fa-briefcase"></i>&nbsp;Adm</a>
+					<div class="dropdown-menu" role="menu"
+						style="background-color: rgba(255, 255, 255, 0.9);">
+						<a class="dropdown-item" role="presentation"
+							href="propietario.html">Propietarios</a><a class="dropdown-item"
+							role="presentation" href="sucursales.html">Sucursales</a><a
+							class="dropdown-item" role="presentation"
+							href="usuario_almacen.html">Usuarios</a>
+					</div></li>
+				<li class="nav-item" role="presentation"><a class="nav-link"
+					id="cambio_password" href="#"
+					style="color: rgba(255, 255, 255, 0.9);"><i class="fa fa-key"></i>&nbsp;Pass</a></li>
+				<li class="nav-item" role="presentation"><a class="nav-link"
+					id="salir_menu" href="#" style="color: rgba(255, 255, 255, 0.9);"><i
+						class="fa fa-external-link-square"></i>&nbsp;Salir</a></li>
+			</ul>
+			<p class="ml-auto navbar-text actions"></p>
+		</div>
+	</div>
+</nav>

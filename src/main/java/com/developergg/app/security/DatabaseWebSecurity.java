@@ -35,6 +35,7 @@ public class DatabaseWebSecurity extends WebSecurityConfigurerAdapter {
 			"/particles.js-master/**",
 			"/img/**",
 			"/bootstrap/**",
+			"/fontawesom/**",
 			"/fragments/**",
 			"/js/**",
 			"/css/**").permitAll()
