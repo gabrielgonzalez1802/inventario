@@ -3,18 +3,15 @@
  */
 package com.developergg.app.model;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @Entity
@@ -30,6 +27,15 @@ public class Usuario {
 	private String nombre;
 	private String password;
 	private Integer estatus;
+	private Date fechaRegistro;
+	
+	@OneToOne
+	@JoinColumn(name = "privilegio")
+	private Perfil privilegio;
+	
+	@OneToOne
+	@JoinColumn(name = "id_almacen")
+	private Almacen almacen;
 	
 	public Integer getId() {
 		return id;
@@ -61,31 +67,22 @@ public class Usuario {
 	public void setEstatus(Integer estatus) {
 		this.estatus = estatus;
 	}
-	
-	@ManyToMany(fetch=FetchType.EAGER)
-	@JoinTable(name="usuario_perfil",
-			   joinColumns = @JoinColumn(name="id_usuario"),
-			   inverseJoinColumns = @JoinColumn(name="id_perfil")			
-			)
-	private List<Perfil> perfiles;
-
-	public void agregar(Perfil tempPerfil) {
-		if (perfiles == null) {
-			perfiles = new LinkedList<Perfil>();
-		}
-		perfiles.add(tempPerfil);
+	public Date getFechaRegistro() {
+		return fechaRegistro;
 	}
-
-	public List<Perfil> getPerfiles() {
-		return perfiles;
+	public void setFechaRegistro(Date fechaRegistro) {
+		this.fechaRegistro = fechaRegistro;
 	}
-
-	public void setPerfiles(List<Perfil> perfiles) {
-		this.perfiles = perfiles;
+	public Perfil getPrivilegio() {
+		return privilegio;
 	}
-	@Override
-	public String toString() {
-		return "Usuario [id=" + id + ", username=" + username + ", nombre=" + nombre + ", password=" + password
-				+ ", estatus=" + estatus + ", perfiles=" + perfiles + "]";
+	public void setPrivilegio(Perfil privilegio) {
+		this.privilegio = privilegio;
+	}
+	public Almacen getAlmacen() {
+		return almacen;
+	}
+	public void setAlmacen(Almacen almacen) {
+		this.almacen = almacen;
 	}
 }

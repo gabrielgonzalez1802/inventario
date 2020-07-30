@@ -3,11 +3,11 @@ package com.developergg.app.service;
 import java.util.List;
 
 import com.developergg.app.model.Categoria;
+import com.developergg.app.model.Propietario;
 
 public interface ICategoriasService {
 	List<Categoria> buscarTodas();
-	List<Categoria> buscarActivas();
 	Categoria buscarPorId(Integer idCategoria); 
-	void desactivarCategoria(Integer idCategoria);
+	List<Categoria> buscarPorPropietario(Propietario propietario);
 	void guardar(Categoria categoria);
 }

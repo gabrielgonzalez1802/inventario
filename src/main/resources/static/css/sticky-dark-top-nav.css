@@ -60,6 +60,20 @@
 .navigation-clean-button .navbar-collapse, .navigation-clean-button .navbar-form {
   border-top-color: #ddd;
 }
+.dropdown-toggle::after {
+    content: "";
+    border-bottom: 0;
+    font-family: 'FontAwesome';
+    line-height: 1;
+}
+.dropdown-item:hover, .dropdown-item:focus {
+    color: #fff;
+    text-decoration: none;
+    background-color: #27acc1 !important;
+}
+a {
+    -webkit-transition: color 0.3s,background-color 0.3s,border-color 0.3s;
+}
 
 .navigation-clean-button .navbar-nav > .active > a, .navigation-clean-button .navbar-nav > .open > a {
   background: none;
@@ -76,10 +90,11 @@
 }
 
 .navigation-clean-button.navbar .navbar-nav > li > a {
-  padding-left: 18px;
-  padding-right: 18px;
+    padding-left: 23px;
+    padding-right: 16px;
+	box-shadow: inset -1px 0 0 rgba(0,0,0,0.2);
+    border-right: 1px solid rgba(255,255,255,0.25);
 }
-
 .navigation-clean-button.navbar-default .navbar-nav > li > a {
   color: #dfe8ee;
   font-weight: 400;

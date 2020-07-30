@@ -38,34 +38,44 @@ public class Articulo {
 	private Double precio_mayor;
 	private String imei;
 	private String itbis;
-	private Integer minimo;
-	private Integer gama;
+	private String gama;
+	private String imagen = "no-image.png";
+	
+	private Integer rango_precio_maximo_desde;
+	private Integer rango_precio_maximo_hasta;
+	
+	private Integer rango_precio_minimo_desde;
+	private Integer rango_precio_minimo_hasta;
+	
+	private Integer rango_precio_mayor_desde;
+	private Integer rango_precio_mayor_hasta;
 	
 	@ManyToMany(fetch=FetchType.EAGER)
-	@JoinTable(name="oferta_articulo",
-			   joinColumns = @JoinColumn(name="id_articulo"),
-			   inverseJoinColumns = @JoinColumn(name="id_oferta")			
+	@JoinTable(name="articulos_articulos",
+			   joinColumns = @JoinColumn(name="articulo_id"),
+			   inverseJoinColumns = @JoinColumn(name="articulo_id_ref")			
 			)
-	private List<Oferta> ofertas;
+	private List<Articulo> articulos;
 	
-	public void agregar(Oferta tempOferta) {
-		if (ofertas == null) {
-			ofertas = new LinkedList<Oferta>();
+	public void agregar(Articulo tempArticulo) {
+		if (articulos == null) {
+			articulos = new LinkedList<Articulo>();
 		}
-		ofertas.add(tempOferta);
+		articulos.add(tempArticulo);
 	}
 	
-	//verificar
+	public void limpiar() {
+		articulos.clear();
+	}
+	
 	@Column(name = "id_usuario")
 	private Integer idUsuario;
 	
 	@OneToOne
 	@JoinColumn(name = "id_tienda")
 	private Propietario tienda;
-	
-	private Double size;
-	private String color;
-	private Integer eliminado;
+
+	private Integer eliminado = 0;
 	private Date fecha_eliminado;
 	
 	public Integer getId() {
@@ -134,16 +144,10 @@ public class Articulo {
 	public void setItbis(String itbis) {
 		this.itbis = itbis;
 	}
-	public Integer getMinimo() {
-		return minimo;
-	}
-	public void setMinimo(Integer minimo) {
-		this.minimo = minimo;
-	}
-	public Integer getGama() {
+	public String getGama() {
 		return gama;
 	}
-	public void setGama(Integer gama) {
+	public void setGama(String gama) {
 		this.gama = gama;
 	}
 	public Integer getIdUsuario() {
@@ -158,18 +162,6 @@ public class Articulo {
 	public void setTienda(Propietario tienda) {
 		this.tienda = tienda;
 	}
-	public Double getSize() {
-		return size;
-	}
-	public void setSize(Double size) {
-		this.size = size;
-	}
-	public String getColor() {
-		return color;
-	}
-	public void setColor(String color) {
-		this.color = color;
-	}
 	public Integer getEliminado() {
 		return eliminado;
 	}
@@ -181,5 +173,66 @@ public class Articulo {
 	}
 	public void setFecha_eliminado(Date fecha_eliminado) {
 		this.fecha_eliminado = fecha_eliminado;
+	}
+	public String getImagen() {
+		return imagen;
+	}
+	public void setImagen(String imagen) {
+		this.imagen = imagen;
+	}
+	public Integer getRango_precio_maximo_desde() {
+		return rango_precio_maximo_desde;
+	}
+	public void setRango_precio_maximo_desde(Integer rango_precio_maximo_desde) {
+		this.rango_precio_maximo_desde = rango_precio_maximo_desde;
+	}
+	public Integer getRango_precio_maximo_hasta() {
+		return rango_precio_maximo_hasta;
+	}
+	public void setRango_precio_maximo_hasta(Integer rango_precio_maximo_hasta) {
+		this.rango_precio_maximo_hasta = rango_precio_maximo_hasta;
+	}
+	public Integer getRango_precio_minimo_desde() {
+		return rango_precio_minimo_desde;
+	}
+	public void setRango_precio_minimo_desde(Integer rango_precio_minimo_desde) {
+		this.rango_precio_minimo_desde = rango_precio_minimo_desde;
+	}
+	public Integer getRango_precio_minimo_hasta() {
+		return rango_precio_minimo_hasta;
+	}
+	public void setRango_precio_minimo_hasta(Integer rango_precio_minimo_hasta) {
+		this.rango_precio_minimo_hasta = rango_precio_minimo_hasta;
+	}
+	public Integer getRango_precio_mayor_desde() {
+		return rango_precio_mayor_desde;
+	}
+	public void setRango_precio_mayor_desde(Integer rango_precio_mayor_desde) {
+		this.rango_precio_mayor_desde = rango_precio_mayor_desde;
+	}
+	public Integer getRango_precio_mayor_hasta() {
+		return rango_precio_mayor_hasta;
+	}
+	public void setRango_precio_mayor_hasta(Integer rango_precio_mayor_hasta) {
+		this.rango_precio_mayor_hasta = rango_precio_mayor_hasta;
+	}
+	public List<Articulo> getArticulos() {
+		return articulos;
+	}
+	public void setArticulos(List<Articulo> articulos) {
+		this.articulos = articulos;
+	}
+	@Override
+	public String toString() {
+		return "Articulo [id=" + id + ", nombre=" + nombre + ", codigo=" + codigo + ", codigo_barras=" + codigo_barras
+				+ ", categoria=" + categoria + ", costo=" + costo + ", precio_maximo=" + precio_maximo
+				+ ", precio_minimo=" + precio_minimo + ", precio_mayor=" + precio_mayor + ", imei=" + imei + ", itbis="
+				+ itbis + ", gama=" + gama + ", imagen=" + imagen + ", rango_precio_maximo_desde="
+				+ rango_precio_maximo_desde + ", rango_precio_maximo_hasta=" + rango_precio_maximo_hasta
+				+ ", rango_precio_minimo_desde=" + rango_precio_minimo_desde + ", rango_precio_minimo_hasta="
+				+ rango_precio_minimo_hasta + ", rango_precio_mayor_desde=" + rango_precio_mayor_desde
+				+ ", rango_precio_mayor_hasta=" + rango_precio_mayor_hasta + ", articulos=" + articulos + ", idUsuario="
+				+ idUsuario + ", tienda=" + tienda + ", eliminado=" + eliminado + ", fecha_eliminado=" + fecha_eliminado
+				+ "]";
 	}
 }

@@ -5,6 +5,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @Entity
@@ -16,8 +18,11 @@ public class Categoria {
 	private Integer id;
 	
 	private String nombre;
-	private Integer status;
 	
+	@OneToOne
+	@JoinColumn(name = "id_tienda")
+	private Propietario tienda;
+		
 	public Integer getId() {
 		return id;
 	}
@@ -30,15 +35,14 @@ public class Categoria {
 	public void setNombre(String nombre) {
 		this.nombre = nombre;
 	}
-	public Integer getStatus() {
-		return status;
+	public Propietario getTienda() {
+		return tienda;
 	}
-	public void setStatus(Integer status) {
-		this.status = status;
+	public void setTienda(Propietario tienda) {
+		this.tienda = tienda;
 	}
-	
 	@Override
 	public String toString() {
-		return "Categoria [id=" + id + ", nombre=" + nombre + ", status=" + status + "]";
+		return "Categoria [id=" + id + ", nombre=" + nombre + ", tienda=" + tienda + "]";
 	}
 }

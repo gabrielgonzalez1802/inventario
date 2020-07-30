@@ -42,7 +42,7 @@ public class Almacen {
 	@Column(name = "id_secuencia")
 	private Integer idSecuencia;
 	
-	private String imagen;
+	private String imagen = "no-image.png";
 	private String encabezado;
 	
 	@Column(name = "precio_label")

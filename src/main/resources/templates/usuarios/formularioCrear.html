@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <title>Sistema Celulares</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" sizes="64x64" th:href="@{/img/icon.png}">
+    <link rel="stylesheet" type="text/css" th:href="@{/bootstrap/css/bootstrap.min.css}">
+	<link rel="stylesheet" type="text/css" th:href="@{/css/sticky-dark-top-nav.css}">
+    <!-- Font-icon css-->
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap" rel="stylesheet">
+ 	<link rel="stylesheet" type="text/css" th:href="@{/css/Minimal-tabs.css}">
+ 	<link href = "https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" rel ="stylesheet"/>
+ 	<link rel="stylesheet" type="text/css" th:href="@{/css/dashboard.css}">
+ 	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap" rel="stylesheet">
+ 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+ 	<style>
+	  	.table-primary, .table-primary>th, .table-primary>td {
+	   		 background-color: #25396d;
+	   		 color:#ffff;
+		}
+		.table-primary th, .table-primary td, .table-primary thead th, .table-primary tbody+tbody {
+		    border-color: #25396d;
+		}
+		body{
+		color: #ffffff;
+		}
+		.card{
+		 background: rgba(204,206,255,1);/* Old Browsers */
+	 background: -moz-radial-gradient(center, ellipse cover, rgba(204,206,255,1) 0%, rgba(21,133,201,0.82) 91%, rgba(3,126,196,0.82) 100%); /* FF3.6+ */
+	 background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%, rgba(204,206,255,1)), color-stop(91%, rgba(21,133,201,0.82)), color-stop(100%, rgba(3,126,196,0.82)));/* Chrome, Safari4+ */
+	 background: -webkit-radial-gradient(center, ellipse cover, rgba(204,206,255,1) 0%, #b5996e 91%, rgba(3,126,196,0.82) 100%); /* Chrome10+,Safari5.1+ */
+	 background: -o-radial-gradient(center, ellipse cover, rgba(204,206,255,1) 0%, rgba(21,133,201,0.82) 91%, rgba(3,126,196,0.82) 100%); /* Opera 11.10+ */
+	 background: -ms-radial-gradient(center, ellipse cover, rgba(204,206,255,1) 0%, rgba(21,133,201,0.82) 91%, rgba(3,126,196,0.82) 100%); /* IE 10+ */
+	 background: radial-gradient(ellipse at center, rgba(204,206,255,1) 0%, rgb(28 28 28 / 82%) 91%, #1f3e5f 100%);/* W3C */
+	 filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ccceff', endColorstr='#037ec4', GradientType=1 );/* IE6-9 fallback on horizontal gradient */
+	 -webkit-box-shadow: 2px 2px 5px 0px rgba(0,0,0,0.75);
+	 -moz-box-shadow: 2px 2px 5px 0px rgba(0,0,0,0.75);
+	 box-shadow: 2px 2px 5px 0px rgba(0,0,0,0.75);
+}
+  </style>
+  </head>
+  <body>
+     <span th:insert="fragments/topMenu :: menu-principal"></span> 
+     <br>
+	<div class="container">
+		<div class="card">
+			<div class="card-body" style="margin-top: 0px;">
+			   <h4 class="card-header"><strong style="color: #fff;">Datos del Usuario</strong></h4>              
+				<br>
+
+		<form  method="post" th:object="${usuario}" th:action="@{/usuarios/save}" id="formCreateUser">       
+            	       
+              <div class="row">
+                <div class="col-md-3"> 
+                  <div class="form-group">
+                    <label for="nombre">Nombre</label>
+                    <input type="text" th:field="*{nombre}" class="form-control" id="nombre" placeholder="nombre" required="required">
+                  </div>
+                </div>
+                 <div class="col-md-3"> 
+                  <div class="form-group">
+                    <label for="codigo">Usuario</label>
+                    <input type="text" th:field="*{username}" class="form-control" id="username" placeholder="Usuario" required="required">
+                  </div>
+                </div>
+                 <div class="col-md-3"> 
+                  <div class="form-group">
+                    <label for="codigo">Contrase&ntilde;a</label>
+                    <input type="password"  th:field="*{password}" class="form-control" id="password" placeholder="Contrase&ntilde;a" required="required">
+                  </div>
+                </div>
+                 <div class="col-md-3"> 
+                  <div class="form-group">
+                    <label for="codigo">Almacen principal</label>
+                   		 <select th:field="*{almacen.id}" class="form-control">
+							<option th:each="almacen : ${almacenes}"
+									th:value="${almacen.id}" 
+									th:text="${almacen.nombre}">
+							</option>
+						</select>
+                  </div>
+                </div>
+              </div>
+                                                                   
+              <input type="submit" class="btn btn-lg btn-primary" value="Guardar"> 
+            </form>	
+			</div>
+			<a class="card-link" href="#"></a>
+		</div>	
+	</div>
+
+	<script th:src="@{/js/jquery.min.js}"></script>
+    <script th:src="@{/bootstrap/js/bootstrap.min.js}"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
+	 <span th:if="${msg != null}" class="alert alert-success" role="alert">
+		<script type="text/javascript">
+		Swal.fire({
+			  title: 'Muy bien!',
+			  text: 'Registro Guardado',
+			  icon: 'success',
+			  confirmButtonText: 'Cool'
+			})
+		</script>
+	</span>
+	<span th:if="${msgExiste != null}" class="alert alert-success" role="alert">
+		<script type="text/javascript">
+		Swal.fire({
+			  title: 'Alerta!',
+			  text: 'El usuario ya existe',
+			  icon: 'warning',
+			  confirmButtonText: 'Cool'
+			})
+		</script>
+	</span>
+	 <span th:insert="fragments/footer :: footer"></span>  
+</body>
+</html>

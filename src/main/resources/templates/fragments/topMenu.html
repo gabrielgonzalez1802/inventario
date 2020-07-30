@@ -1,8 +1,7 @@
 <nav th:fragment="menu-principal"
 	class="navbar navbar-light navbar-expand-sm bg-dark navbar-fixed-top navigation-clean-button"
-	style="background-color: #565959; margin-top: 0px;">
-	<div class="container-fluid">
-		<a class="navbar-brand text-white" href="#">Sistema</a>
+	style="background-color: #565959; margin-top: 0px;margin-bottom: 39px;">
+	<div class="container-fluid" style="font-family: 'Poppins', sans-serif;">
 		<button data-toggle="collapse" class="navbar-toggler"
 			data-target="#navcol-1"
 			style="margin-top: 5px; margin-bottom: 5px; background-color: #c6ccba;">
@@ -16,17 +15,17 @@
 				<li class="nav-item dropdown pv7 pv5"><a
 					class="dropdown-toggle nav-link pv6" data-toggle="dropdown"
 					aria-expanded="false" style="color: rgba(255, 255, 255, 0.9);"
-					href="#"><i class="fa fa-archive"></i>&nbsp;Inventario</a>
+					href="#">Inventario</a>
 					<div class="dropdown-menu" role="menu"
 						style="background-color: rgba(255, 255, 255, 0.9);">
-						<a class="dropdown-item" role="presentation" href="articulos.html">Articulos</a><a
+						<a class="dropdown-item" role="presentation" th:href="@{/articulos/}">Articulos</a><a
 							class="dropdown-item" role="presentation"
 							href="articulo_transito.html">Articulo en transito</a><a
 							class="dropdown-item" role="presentation"
 							href="articulo_enviados.html">Articulo enviados</a>
 						<div class="dropdown-divider" role="presentation"></div>
 						<a class="dropdown-item pv3 pv8" role="presentation"
-							href="suplidores.html">suplidores</a><a
+							th:href="@{/suplidores/}">suplidores</a><a
 							class="dropdown-item pv3 pv8" role="presentation"
 							href="ver_compras.html">Compras</a>
 						<div class="dropdown-divider" role="presentation"></div>
@@ -41,7 +40,7 @@
 				<li class="nav-item dropdown pv3 pv5"><a
 					class="dropdown-toggle nav-link pv7 pv4 pv6" data-toggle="dropdown"
 					aria-expanded="false" style="color: rgba(255, 255, 255, 0.9);"
-					href="#"><i class="fa fa-shopping-bag"></i>&nbsp;Ventas</a>
+					href="#">&nbsp;Ventas</a>
 					<div class="dropdown-menu" role="menu"
 						style="background-color: rgba(255, 255, 255, 0.9);">
 						<a class="dropdown-item" role="presentation"
@@ -64,8 +63,7 @@
 				<li class="nav-item dropdown"><a
 					class="dropdown-toggle nav-link pv7 pv4 pv5 pv6"
 					data-toggle="dropdown" aria-expanded="false"
-					style="color: rgba(255, 255, 255, 0.9);" href="#"><i
-						class="fa fa-dollar"></i>&nbsp;Caja</a>
+					style="color: rgba(255, 255, 255, 0.9);" href="#">&nbsp;Caja</a>
 					<div class="dropdown-menu" role="menu"
 						style="background-color: rgba(255, 255, 255, 0.9);">
 						<a class="dropdown-item" role="presentation" href="cuadre.html">Cuadre</a><a
@@ -75,7 +73,7 @@
 				<li class="nav-item dropdown pv3"><a
 					class="dropdown-toggle nav-link pv7" data-toggle="dropdown"
 					aria-expanded="false" style="color: rgba(255, 255, 255, 0.9);"
-					href="#"><i class="fa fa-phone"></i>&nbsp;Taller</a>
+					href="#">&nbsp;Taller</a>
 					<div class="dropdown-menu" role="menu"
 						style="background-color: rgba(255, 255, 255, 0.9);">
 						<a class="dropdown-item pv4" role="presentation"
@@ -85,8 +83,7 @@
 				<li class="nav-item dropdown"><a
 					class="dropdown-toggle nav-link pv7 pv3 pv4 pv5 pv6"
 					data-toggle="dropdown" aria-expanded="false"
-					style="color: rgba(255, 255, 255, 0.9);" href="#"><i
-						class="fa fa-money"></i>&nbsp;CxC</a>
+					style="color: rgba(255, 255, 255, 0.9);" href="#">&nbsp;CxC</a>
 					<div class="dropdown-menu" role="menu"
 						style="background-color: rgba(255, 255, 255, 0.9);">
 						<a class="dropdown-item" role="presentation" href="cxc.html">Ver
@@ -94,12 +91,12 @@
 							href="factura_vencidas.html">Facturas Vencidas</a><a
 							class="dropdown-item" role="presentation" href="cxc_abonos.html">Ver
 							Abonos</a>
-					</div></li>
+					</div></li><a class="navbar-brand text-white" th:href="@{/}" style="padding-left: 28px;border-right: 1px solid rgba(255,255,255,0.25);
+padding-right: 27px;">Sistema</a>
 				<li class="nav-item dropdown pv3"><a
 					class="dropdown-toggle nav-link pv7 pv4 pv5 pv6 pv8"
 					data-toggle="dropdown" aria-expanded="false"
-					style="color: rgba(255, 255, 255, 0.9);" href="#"><i
-						class="fa fa-clock-o"></i>&nbsp;CxP</a>
+					style="color: rgba(255, 255, 255, 0.9);" href="#">&nbsp;CxP</a>
 					<div class="dropdown-menu" role="menu"
 						style="background-color: rgba(255, 255, 255, 0.9);">
 						<a class="dropdown-item" role="presentation" href="cxp.html">Ver
@@ -109,8 +106,7 @@
 				<li class="nav-item dropdown pv3"><a
 					class="dropdown-toggle nav-link pv7 pv2 pv5 pv6 pv8"
 					data-toggle="dropdown" aria-expanded="false"
-					style="color: rgba(255, 255, 255, 0.9);" href="#"><i
-						class="fa fa-print"></i>&nbsp;Reportes</a>
+					style="color: rgba(255, 255, 255, 0.9);" href="#">&nbsp;Reportes</a>
 					<div class="dropdown-menu" role="menu"
 						style="background-color: rgba(255, 255, 255, 0.9);">
 						<a class="dropdown-item pv7" role="presentation"
@@ -140,11 +136,10 @@
 				<li class="nav-item dropdown pv3"><a
 					class="dropdown-toggle nav-link pv7 pv2 pv5 pv6 pv4 pv8"
 					data-toggle="dropdown" aria-expanded="false"
-					style="color: rgba(255, 255, 255, 0.9);" href="#"><i
-						class="fa fa-gears"></i>&nbsp;Ajustes</a>
+					style="color: rgba(255, 255, 255, 0.9);" href="#">&nbsp;Ajustes</a>
 					<div class="dropdown-menu" role="menu"
 						style="background-color: rgba(255, 255, 255, 0.9);">
-						<a class="dropdown-item" role="presentation" href="usuarios.html">Usuarios</a><a
+						<a class="dropdown-item" role="presentation" th:href="@{/usuarios/}">Usuarios</a><a
 							class="dropdown-item" role="presentation" href="almacenes.html">Tiendas</a><a
 							class="dropdown-item" role="presentation" href="comprobante.html">Comprobante
 							Grupos</a> <a class="dropdown-item" role="presentation"
@@ -158,19 +153,18 @@
 				<li class="nav-item dropdown pv3"><a
 					class="dropdown-toggle nav-link pv7 pv2 pv5 pv6 pv4 pv3 pv1 pv8"
 					data-toggle="dropdown" aria-expanded="false"
-					style="color: rgba(255, 255, 255, 0.9);" href="#"><i
-						class="fa fa-briefcase"></i>&nbsp;Adm</a>
+					style="color: rgba(255, 255, 255, 0.9);" href="#">&nbsp;Adm</a>
 					<div class="dropdown-menu" role="menu"
 						style="background-color: rgba(255, 255, 255, 0.9);">
 						<a class="dropdown-item" role="presentation"
-							href="propietario.html">Propietarios</a><a class="dropdown-item"
-							role="presentation" href="sucursales.html">Sucursales</a><a
+							th:href="@{/propietarios/}">Propietarios</a><a class="dropdown-item"
+							role="presentation" th:href="@{/almacenes/}">Sucursales</a><a
 							class="dropdown-item" role="presentation"
-							href="usuario_almacen.html">Usuarios</a>
+							 th:href="@{/usuarios/}">Usuarios</a>
 					</div></li>
 				<li class="nav-item" role="presentation"><a class="nav-link"
-					id="cambio_password" href="#"
-					style="color: rgba(255, 255, 255, 0.9);"><i class="fa fa-key"></i>&nbsp;Pass</a></li>
+					id="cambio_password" th:href="@{/usuarios/pwd}"
+					style="color: rgba(255, 255, 255, 0.9);">&nbsp;Pass</a></li>
 				<li class="nav-item" role="presentation"><a class="nav-link"
 					id="salir_menu" href="#" style="color: rgba(255, 255, 255, 0.9);"><i
 						class="fa fa-external-link-square"></i>&nbsp;Salir</a></li>
@@ -179,3 +173,4 @@
 		</div>
 	</div>
 </nav>
+  	<!-- fin menu -->

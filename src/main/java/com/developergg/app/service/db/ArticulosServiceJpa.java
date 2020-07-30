@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 import com.developergg.app.model.Articulo;
+import com.developergg.app.model.Propietario;
 import com.developergg.app.repository.ArticulosRepository;
 import com.developergg.app.service.IArticulosService;
 
@@ -44,5 +45,16 @@ public class ArticulosServiceJpa implements IArticulosService{
 			 repo.delete(optional.get());
 		}
 	}
+
+	@Override
+	public List<Articulo> buscarPorTienda(Propietario tienda) {
+		return repo.findByTienda(tienda);
+	}
+
+	@Override
+	public void save(Articulo articulo) {
+		repo.save(articulo);
+	}
+
 
 }

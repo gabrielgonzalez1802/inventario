@@ -35,4 +35,8 @@ public class PropietariosServiceJpa implements IPropietariosService{
 		return repo.buscarPorIdUsuario(idUsuario);
 	}
 
+	@Override
+	public void guardar(Propietario propietario) {
+		repo.save(propietario);
+	}
 }

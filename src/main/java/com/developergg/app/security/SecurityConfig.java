@@ -14,17 +14,18 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 @EnableWebSecurity
-public class DatabaseWebSecurity extends WebSecurityConfigurerAdapter {
+public class SecurityConfig extends WebSecurityConfigurerAdapter {
+	
 	@Autowired
 	private DataSource dataSource;
 	
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 		auth.jdbcAuthentication().dataSource(dataSource)
-				.usersByUsernameQuery("select username, password, estatus from usuarios where username=?")
-				.authoritiesByUsernameQuery("select u.username, p.perfil from usuario_perfil up "
-						+ "inner join Usuarios u on u.id_usuario = up.id_usuario "
-						+ "inner join Perfiles p on p.id_perfil = up.id_perfil " + "where u.username = ?");
+		.usersByUsernameQuery("select username, password, estatus from usuarios where username=?")
+		.authoritiesByUsernameQuery("select u.username, p.perfil " + 
+				"from perfiles p " + 
+				"inner join usuarios u on u.privilegio = p.id_perfil where u.username = ?");
 	}
 	
 	@Override

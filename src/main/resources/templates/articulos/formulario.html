@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <title>Sistema Celulares</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" sizes="64x64" th:href="@{/img/icon.png}">
+    <link rel="stylesheet" type="text/css" th:href="@{/bootstrap/css/bootstrap.min.css}">
+	<link rel="stylesheet" type="text/css" th:href="@{/css/sticky-dark-top-nav.css}">
+    <!-- Font-icon css-->
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap" rel="stylesheet">
+ 	<link rel="stylesheet" type="text/css" th:href="@{/css/Minimal-tabs.css}">
+ 	<link href = "https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" rel ="stylesheet"/>
+ 	<link rel="stylesheet" type="text/css" th:href="@{/css/dashboard.css}">
+ 	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap" rel="stylesheet">
+ 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+ 	<style>
+	  	.table-primary, .table-primary>th, .table-primary>td {
+	   		 background-color: #25396d;
+	   		 color:#ffff;
+		}
+		.table-primary th, .table-primary td, .table-primary thead th, .table-primary tbody+tbody {
+		    border-color: #25396d;
+		}
+  </style>
+  </head>
+  <body>
+     <span th:insert="fragments/topMenu :: menu-principal"></span> 
+     <br>
+	<div class="container">
+		<div class="card all">
+			<div class="card-body" style="margin-top: 0px;">
+			   <h4 class="card-header"><strong style="color: #fff;">Datos del Art&iacute;culo</strong></h4>              
+				<br>
+
+		<form method="post" th:object="${articulo}" th:action="@{/articulos/save}" id="formAddProduct" enctype="multipart/form-data">       
+             <input type="hidden" th:field="*{imagen}">
+              <div class="row">
+                <div class="col-md-5"> 
+                  <div class="form-group">
+                    <label for="nombre">Nombre</label>
+                    <input type="text" th:field="*{nombre}" class="form-control" id="nombre" required="required" placeholder="Nombre">
+                  </div>
+                </div>
+                 <div class="col-md-2"> 
+                  <div class="form-group">
+                    <label for="codigo">C&oacute;digo</label>
+                    <input type="text" th:field="*{codigo}" class="form-control" id="codigo" placeholder="C&oacute;digo">
+                  </div>
+                </div>
+                <div class="col-md-3"> 
+                  <div class="form-group">
+                    <label for="codigo_barras">C&oacute;digo de barras</label>
+                    <input type="text" class="form-control" th:field="*{codigo_barras}" id="codigo_barras" placeholder="C&oacute;digo de barras">
+                  </div>
+                </div>
+
+                 <div class="col-md-2"> 
+                  <div class="form-group">
+                    <label for="fecha">Costo</label>
+                    <input type="text" class="form-control" th:field="*{costo}" id="costo" placeholder="Costo" required="required">
+                  </div>  
+                </div>
+              </div>
+              
+              <hr style="border-top: 1px solid #D8D8D8;">
+                 
+              <div class="row">
+                <div class="col-md-2"> 
+                  <div class="form-group">
+                    <label for="precio_maximo">Precio M&aacute;ximo</label>
+                    <input type="text" th:field="*{precio_maximo}" class="form-control" id="precio_maximo" placeholder="Precio M&aacute;ximo" required="required" disabled="disabled">
+                  </div>  
+                </div>
+                 <div class="col-md-1"> 
+                  <div class="form-group">
+                    <label for="min_precio_maximo">Min</label>
+                    <input type="number" th:field="*{rango_precio_maximo_desde}" class="form-control" min = "0" id="min_precio_maximo" required="required" disabled="disabled">
+                  </div>  
+                </div>
+                 <div class="col-md-1"> 
+                  <div class="form-group">
+                    <label for="max_precio_maximo">Max</label>
+                    <input type="number" th:field="*{rango_precio_maximo_hasta}"  class="form-control" min = "0" id="max_precio_maximo" required="required" disabled="disabled">
+                  </div>  
+                </div>
+                 <div class="col-md-2"> 
+                  <div class="form-group">
+                    <label for="precio_minimo">Precio Minimo</label>
+                    <input type="text" class="form-control" th:field="*{precio_minimo}" id="precio_minimo" placeholder="Precio Minimo" required="required" disabled="disabled">
+                  </div>  
+                </div>
+                 <div class="col-md-1"> 
+                  <div class="form-group">
+                    <label for="min_precio_minimo">Min</label>
+                    <input type="number" class="form-control" th:field="*{rango_precio_minimo_desde}" min = "0" id="min_precio_minimo" required="required" disabled="disabled">
+                  </div>  
+                </div>
+                 <div class="col-md-1"> 
+                  <div class="form-group">
+                    <label for="max_precio_minimo">Max</label>
+                    <input type="number" th:field="*{rango_precio_minimo_hasta}" class="form-control" min = "0" id="max_precio_minimo" required="required" disabled="disabled">
+                  </div>  
+                </div>
+                <div class="col-md-2"> 
+                  <div class="form-group">
+                    <label for="precio_mayor">Precio x Mayor</label>
+                    <input type="text" class="form-control" th:field="*{precio_mayor}" id="precio_mayor" placeholder="Precio x Mayor" required="required" disabled="disabled">
+                  </div>  
+                </div>
+                <div class="col-md-1"> 
+                  <div class="form-group">
+                    <label for="min_precio_mayor">Min</label>
+                    <input type="number" th:field="*{rango_precio_mayor_desde}" class="form-control" min = "0" id="min_precio_mayor" required="required" disabled="disabled">
+                  </div>  
+                </div>
+                 <div class="col-md-1"> 
+                  <div class="form-group">
+                    <label for="max_precio_mayor">Max</label>
+                    <input type="number" th:field="*{rango_precio_mayor_hasta}" class="form-control" min = "0" id="max_precio_mayor" required="required" disabled="disabled">
+                  </div>  
+                </div>
+              </div>    
+            
+              <hr style="border-top: 1px solid #D8D8D8;">
+              
+              <div class="row">
+             	 <div class="col-md-3"> 
+                  <div class="form-group">
+                    <label for="imei">Imei</label>
+                   	<select class="form-control" th:field="*{imei}" id="imei">
+					  <option value="SI">Si</option>
+                      <option value="NO">No</option>
+                    </select>
+                  </div>  
+                </div>
+                <div class="col-md-3">
+                  <div class="form-group">
+                    <label for="itbis">Itbis</label>
+                    <select class="form-control" th:field="*{itbis}" id="itbis">
+					  <option value="SI">Si</option>
+                      <option value="NO">No</option>
+                    </select>
+                  </div>
+                </div>
+               <div class="col-md-3"> 
+                  <div class="form-group">
+                    <label for="gama">Gama</label>
+                     <select class="form-control" th:field="*{gama}" id="gama">
+					  <option value="BAJA">baja</option>
+                      <option value="MEDIA">media</option>
+                      <option value="ALTA">alta</option>
+                    </select>
+                  </div>  
+                </div>
+                <div class="col-md-3"> 
+                  <div class="form-group">
+                    <label for="imagen">Imagen</label>
+                     <input type="file" class="form-control-file" name="archivoImagen" id="archivoImagen">
+                  </div>
+                </div>
+              </div> 
+              
+              <hr style="border-top: 1px solid #D8D8D8;">
+             
+              <div class="row">
+                <div class="col-md-3">
+                  <label for="imagen">Imagen/Logo</label>
+                  <img th:src="@{/img/no-image.png}" class="rounded mx-auto d-block" alt="Generic placeholder image" width="150" height="150">            
+                </div>
+                  <div class="col-md-3"> 
+                  <div class="form-group">
+                    <label for="categoria">Categor&iacute;a</label>
+                    <select class="form-control"  th:field="*{categoria.id}" id="categoria">
+					  	<option th:each="categoria : ${categorias}"
+								th:value="${categoria.id}" 
+								th:text="${categoria.nombre}">
+						</option>
+                    </select>
+                  </div>
+                </div>
+              </div> 
+              <input type="submit" class="btn btn-lg btn-primary" value="Guardar"> 
+            </form>	
+			</div>
+			<a class="card-link" href="#"></a>
+		</div>	
+	</div>
+
+	<script th:src="@{/js/jquery.min.js}"></script>
+    <script th:src="@{/bootstrap/js/bootstrap.min.js}"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
+	<span th:if="${msg != null}" class="alert alert-success" role="alert">
+		<script type="text/javascript">
+		Swal.fire({
+			  title: 'Muy bien!',
+			  text: 'Registro guardado',
+			  icon: 'success',
+			  confirmButtonText: 'Cool'
+			})
+		</script>
+	</span>
+	<span th:if="${msg2 != null}" class="alert alert-success" role="alert">
+		<script type="text/javascript">
+		Swal.fire({
+			  title: 'Muy bien!',
+			  text: 'Registro Modificado',
+			  icon: 'success',
+			  confirmButtonText: 'Cool'
+			})
+		</script>
+	</span>
+	<script type="text/javascript">
+		
+   		 var _mSelect2 = $("#js-example-basic-multiple").select2();
+   		 
+			//Si se introduce el costo activamos los demas campos
+			$("#costo").keydown(function(){
+				var costo = $("#costo").val();
+				if(costo.length > 0){
+					$("#precio_mayor").prop('disabled', false);
+					$("#min_precio_mayor").prop('disabled', false);
+					$("#max_precio_mayor").prop('disabled', false);
+					
+					$("#precio_maximo").prop('disabled', false);
+					$("#min_precio_maximo").prop('disabled', false);
+					$("#max_precio_maximo").prop('disabled', false);
+					
+					$("#precio_minimo").prop('disabled', false);
+					$("#min_precio_minimo").prop('disabled', false);
+					$("#max_precio_minimo").prop('disabled', false);
+				}else{
+					//vaciamos los imputs y desactivamos
+					$("#precio_mayor").val("");
+					$("#min_precio_mayor").val("");
+					$("#max_precio_mayor").val("");
+
+					$("#precio_maximo").val("");
+					$("#min_precio_maximo").val("");
+					$("#max_precio_maximo").val("");	
+			
+					$("#precio_minimo").val("");
+					$("#min_precio_minimo").val("");
+					$("#max_precio_minimo").val("");	
+					
+					$("#precio_mayor").prop('disabled', true);
+					$("#min_precio_mayor").prop('disabled', true);
+					$("#max_precio_mayor").prop('disabled', true);
+					
+					$("#precio_maximo").prop('disabled', true);
+					$("#min_precio_maximo").prop('disabled', true);
+					$("#max_precio_maximo").prop('disabled', true);
+					
+					$("#precio_minimo").prop('disabled', true);
+					$("#min_precio_minimo").prop('disabled', true);
+					$("#max_precio_minimo").prop('disabled', true);
+				}
+			});
+			
+   		 
+			//Validacion before submit
+   		   $("#formAddProduct").submit(function() {
+   			//Vaidacion: el costo no puede ser mayor a ningún precio de venta
+   				var costo = $("#costo").val();
+   				var precio_mayor = $("#precio_mayor").val();
+   				var precio_maximo = $("#precio_maximo").val();
+   				var precio_minimo = $("#precio_minimo").val();
+   				   				
+   				if(costo>precio_mayor || costo>precio_maximo || costo>precio_minimo){
+   					Swal.fire({
+   						  title: 'Alerta!',
+   						  text: 'El costo no puede ser mayor a ningun precio de venta',
+   						  icon: 'warning',
+   						  confirmButtonText: 'Entendido'
+   						})
+   					return false;	
+   				}else{
+   					return true;
+   				}
+	   		});
+	</script>
+	 <span th:insert="fragments/footer :: footer"></span>  
+</body>
+</html>

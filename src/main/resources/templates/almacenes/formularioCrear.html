@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <title>Sistema Celulares</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" sizes="64x64" th:href="@{/img/icon.png}">
+    <link rel="stylesheet" type="text/css" th:href="@{/bootstrap/css/bootstrap.min.css}">
+	<link rel="stylesheet" type="text/css" th:href="@{/css/sticky-dark-top-nav.css}">
+    <!-- Font-icon css-->
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap" rel="stylesheet">
+ 	<link rel="stylesheet" type="text/css" th:href="@{/css/Minimal-tabs.css}">
+ 	<link href = "https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" rel ="stylesheet"/>
+ 	<link rel="stylesheet" type="text/css" th:href="@{/css/dashboard.css}">
+ 	<link href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" rel="stylesheet" >
+ 	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap" rel="stylesheet">
+ 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+ 	<style>
+	  	.table-primary, .table-primary>th, .table-primary>td {
+	   		 background-color: #25396d;
+	   		 color:#ffff;
+		}
+		.table-primary th, .table-primary td, .table-primary thead th, .table-primary tbody+tbody {
+		    border-color: #25396d;
+		}
+
+  </style>
+  </head>
+  <body>
+     <span th:insert="fragments/topMenu :: menu-principal"></span> 
+     <br>
+	<div class="container">
+		<div class="card all">
+			<div class="card-body" style="margin-top: 0px;">
+			   <h4 class="card-header"><strong style="color: #fff;">Datos del Almacen</strong></h4>              
+				<br>
+
+		<form method="post" th:object="${almacen}" th:action="@{/almacenes/save}" id="formCreateAlmacen"  enctype="multipart/form-data">       
+            	       
+              <div class="row">
+                <div class="col-md-3"> 
+                  <div class="form-group">
+                    <input type="hidden" th:field="*{imagen}">
+                    <label for="nombre">Nombre</label>
+                    <input type="text" class="form-control" th:field="*{nombre}" id="nombre" placeholder="Nombre" required="required">
+                  </div>
+                </div>
+                 <div class="col-md-3"> 
+                  <div class="form-group">
+                    <label for="direccion">Direcci&oacute;n</label>
+                    <input type="text" class="form-control" th:field="*{direccion}" id="direccion" placeholder=Direcci&oacute;n required="required">
+                  </div>
+                </div>
+                 <div class="col-md-3"> 
+                  <div class="form-group">
+                    <label for="telefono">Tel&eacute;fono</label>
+                    <input type="text" class="form-control" th:field="*{telefono}" id="telefono" placeholder="Tel&eacute;fono" required="required">
+                  </div>
+                </div>
+                <div class="col-md-3"> 
+                  <div class="form-group">
+                    <label for="telefono">RNC</label>
+                    <input type="text" th:field="*{rnc}" class="form-control" id="rnc"  placeholder="RNC">
+                  </div>
+                </div>
+              </div>
+              
+              <div class="row">
+                <div class="col-md-3"> 
+                  <div class="form-group">
+                    <label for="propietario">Propietario</label>
+	                    <select th:field="*{propietario.id}" class="form-control">
+							<option th:each="propietario : ${propietarios}"
+									th:value="${propietario.id}" 
+									th:text="${propietario.nombre}">
+							</option>
+						</select>
+                  </div>
+                </div>
+                 <div class="col-md-3"> 
+                  <div class="form-group">
+                    <label for="direccion">Vencimiento</label>
+                      <input type="text" th:field="*{vencimiento}" class="form-control" id="fecha" placeholder="Fecha de vencimiento" required="required">
+                  </div>
+                </div>
+                <div class="col-md-3"> 
+                  <div class="form-group">
+                    <label for="imagen">Imagen</label>
+                    <input type="file" class="form-control-file" name="archivoImagen" id="imagen">
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <label for="imagen">Imagen/Logo</label>
+                  <img th:src="@{/img/no-image.png}" class="rounded mx-auto d-block" alt="Generic placeholder image" width="150" height="150">            
+                </div>
+              </div>
+                                                                   
+              <input type="submit" class="btn btn-lg btn-primary" value="Guardar"> 
+            </form>	
+			</div>
+			<a class="card-link" href="#"></a>
+		</div>	
+	</div>
+	<script th:src="@{/js/jquery.min.js}"></script>
+    <script th:src="@{/bootstrap/js/bootstrap.min.js}"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
+	<span th:if="${msg != null}" class="alert alert-success" role="alert">
+		<script type="text/javascript">
+		Swal.fire({
+			  title: 'Muy bien!',
+			  text: 'Registro Creado',
+			  icon: 'success',
+			  confirmButtonText: 'Cool'
+			})
+		</script>
+	</span>
+	<span th:if="${msg2 != null}" class="alert alert-success" role="alert">
+		<script type="text/javascript">
+		Swal.fire({
+			  title: 'Muy bien!',
+			  text: 'Registro Modificado',
+			  icon: 'success',
+			  confirmButtonText: 'Cool'
+			})
+		</script>
+	</span>
+	<span th:if="${msg3 != null}" class="alert alert-warning" role="alert">
+		<script type="text/javascript">
+		Swal.fire({
+			  title: 'Alerta!',
+			  text: 'Almacen no encontrado, puede crear un almacen nuevo en el formulario',
+			  icon: 'warning',
+			  confirmButtonText: 'Cool'
+			})
+		</script>
+	</span>
+	<script type="text/javascript">
+	   $(function () {
+	          $("#fecha").datepicker({dateFormat: 'dd-mm-yy'});
+	        }
+	      );
+	</script>
+	 <span th:insert="fragments/footer :: footer"></span>  
+</body>
+</html>

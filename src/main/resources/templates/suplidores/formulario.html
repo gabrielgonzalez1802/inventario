@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <title>Sistema Celulares</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" sizes="64x64" th:href="@{/img/icon.png}">
+    <link rel="stylesheet" type="text/css" th:href="@{/bootstrap/css/bootstrap.min.css}">
+	<link rel="stylesheet" type="text/css" th:href="@{/css/sticky-dark-top-nav.css}">
+    <!-- Font-icon css-->
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap" rel="stylesheet">
+ 	<link rel="stylesheet" type="text/css" th:href="@{/css/Minimal-tabs.css}">
+ 	<link href = "https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" rel ="stylesheet"/>
+ 	<link rel="stylesheet" type="text/css" th:href="@{/css/dashboard.css}">
+ 	<link href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" rel="stylesheet" >
+ 	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap" rel="stylesheet">
+ 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+ 	<style>
+	  	.table-primary, .table-primary>th, .table-primary>td {
+	   		 background-color: #25396d;
+	   		 color:#ffff;
+		}
+		.table-primary th, .table-primary td, .table-primary thead th, .table-primary tbody+tbody {
+		    border-color: #25396d;
+		}
+
+  </style>
+  </head>
+  <body>
+     <span th:insert="fragments/topMenu :: menu-principal"></span> 
+     <br>
+	<div class="container">
+		<div class="card all">
+			<div class="card-body" style="margin-top: 0px;">
+			   <h4 class="card-header"><strong style="color: #fff;">Datos del Suplidor</strong></h4>              
+				<br>
+
+		<form method="post" th:object="${suplidor}" th:action="@{/suplidores/save}" id="formSuplidor" enctype="multipart/form-data">       
+              <input type="hidden" th:field="*{id}">   
+              <div class="row">
+                <div class="col-md-3"> 
+                  <div class="form-group">
+                    <label for="codigo">Codigo</label>
+                    <input type="text" class="form-control" th:field="*{codigo}" id="nombre" placeholder="Codigo">
+                  </div>
+                </div>
+                <div class="col-md-3"> 
+                  <div class="form-group">
+                    <label for="telefono">Cedula / RNC</label>
+                    <input type="text" class="form-control" th:field="*{rnc}" id="rnc" placeholder="Cedula / RNC">
+                  </div>
+                </div>
+                <div class="col-md-6"> 
+                  <div class="form-group">
+                    <label for="nombre">Nombre Suplidor</label>
+                    <input type="text" class="form-control" th:field="*{nombre}" id="nombre" name="nombre" placeholder="Nombre" required="required">
+                  </div>
+                </div>
+              </div>
+              
+              <div class="row">
+              	<div class="col-md-6"> 
+                  <div class="form-group">
+                    <label for="direccion">Direcci&oacute;n</label>
+                    <input type="text" class="form-control" th:field="*{direccion}" id="direccion" placeholder="Direcci&oacute;n" required="required">
+                  </div>
+                </div>
+                 <div class="col-md-3"> 
+                  <div class="form-group">
+                    <label for="telefono">Tel&eacute;fono</label>
+                    <input type="text" class="form-control" th:field="*{telefono}" id="telefono" placeholder="Tel&eacute;fono">
+                  </div>
+                </div>
+                <div class="col-md-3"> 
+                  <div class="form-group">
+                    <label for="celular">Celular</label>
+                      <input type="text" th:field="*{celular}" class="form-control" id="celular" placeholder="Celular" required="required">
+                  </div>
+                </div>
+              </div>
+              
+               <div class="row">
+              	<div class="col-md-4"> 
+                  <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="text" class="form-control" th:field="*{email}" id="email" placeholder="Email">
+                  </div>
+                </div>
+                 <div class="col-md-3"> 
+                  <div class="form-group">
+                    <label for="contacto">Contacto</label>
+                    <input type="text" class="form-control" th:field="*{contacto}" id="contacto" placeholder="Contacto">
+                  </div>
+                </div>
+              </div>
+                                                                   
+              <input type="submit" class="btn btn-lg btn-primary" value="Guardar"> 
+            </form>	
+			</div>
+			<a class="card-link" href="#"></a>
+		</div>	
+	</div>
+	<script th:src="@{/js/jquery.min.js}"></script>
+    <script th:src="@{/bootstrap/js/bootstrap.min.js}"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
+	<span th:if="${msg != null}" class="alert alert-success" role="alert">
+		<script type="text/javascript">
+		Swal.fire({
+			  title: 'Muy bien!',
+			  text: 'Registro Creado',
+			  icon: 'success',
+			  confirmButtonText: 'Cool'
+			})
+		</script>
+	</span>
+	<span th:if="${msg2 != null}" class="alert alert-success" role="alert">
+		<script type="text/javascript">
+		Swal.fire({
+			  title: 'Muy bien!',
+			  text: 'Registro Modificado',
+			  icon: 'success',
+			  confirmButtonText: 'Cool'
+			})
+		</script>
+	</span>
+	<span th:if="${msg3 != null}" class="alert alert-success" role="alert">
+		<script type="text/javascript">
+		Swal.fire({
+			  title: 'Alerta!',
+			  text: 'El registro no existe',
+			  icon: 'warning',
+			  confirmButtonText: 'Cool'
+			})
+		</script>
+	</span>
+	<span th:if="${msg4 != null}" class="alert alert-success" role="alert">
+		<script type="text/javascript">
+		Swal.fire({
+			  title: 'Muy bien!',
+			  text: 'El registro ha sido eliminado',
+			  icon: 'success',
+			  confirmButtonText: 'Cool'
+			})
+		</script>
+	</span>
+	 <span th:insert="fragments/footer :: footer"></span>  
+</body>
+</html>

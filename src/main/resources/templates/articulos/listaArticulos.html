@@ -5,6 +5,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" sizes="64x64" th:href="@{/img/icon.png}">
     <link rel="stylesheet" type="text/css" th:href="@{/bootstrap/css/bootstrap.min.css}">
 	<link rel="stylesheet" type="text/css" th:href="@{/css/sticky-dark-top-nav.css}">
     <!-- Font-icon css-->
@@ -15,15 +16,32 @@
  	<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css">
  	<link rel="stylesheet" type="text/css" th:href="@{/fontawesom/css/all.min.css}">
  	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+ 	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap" rel="stylesheet">
  	<style>
-	  	.table-primary, .table-primary>th, .table-primary>td {
-	   		 background-color: #25396d;
-	   		 color:#ffff;
-		}
-		.table-primary th, .table-primary td, .table-primary thead th, .table-primary tbody+tbody {
-		    border-color: #25396d;
-		}
-  </style>
+.table-primary, .table-primary>th, .table-primary>td {
+	background-color: #25396d;
+	color: #ffff;
+}
+
+.table-primary th, .table-primary td, .table-primary thead th,
+	.table-primary tbody+tbody {
+	border-color: #25396d;
+}
+
+.btn-sm, .btn-group-sm>.btn {
+	font-size: 15px;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.current,
+	.dataTables_wrapper .dataTables_paginate .paginate_button.current:hover
+{
+	  background-image: linear-gradient(#54b4eb, #2FA4E7 60%, #1d9ce5);
+}
+.dataTables_wrapper .dataTables_paginate .paginate_button.current, .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+    color: #fffdfd !important;
+    border-color: #2FA4E7;
+}
+</style>
   </head>
   <body>
      <span th:insert="fragments/topMenu :: menu-principal"></span> 
@@ -33,7 +51,7 @@
 			<div class="card-body" style="margin-top: 0px;">
 				<h1 class="card-title" id="nombre_negocio" style="font-size: 16px;">Consulta
 					de art&iacute;culos 
-					<a class="btn btn-primary" style="float: right;" th:href="@{/articulos/form}">Agregar</a>
+					<a class="btn btn-primary" style="float: right;" th:href="@{/articulos/create}">Agregar</a>
 				</h1>
 				<br>
 					<table class="table table-striped" id="tabla">
@@ -56,9 +74,9 @@
 				                  <td></td>
 				                  <td>
 				                    <a th:href="@{/vacantes/edit/{id} (id=${articulo.id})}" class="btn btn-primary btn-sm" role="button" title="Editar el registro."><i class="fas fa-atlas" aria-hidden="true"></i></a>
-				                    <a th:href="@{/vacantes/edit/{id} (id=${articulo.id})}" class="btn btn-info btn-sm" role="button" title="Editar el registro."><i class="fas fa-exchange-alt" aria-hidden="true"></i></a>
-				                    <a th:href="@{/vacantes/edit/{id} (id=${articulo.id})}" class="btn btn-success btn-sm" role="button" title="Editar el registro."><i class="fas fa-arrow-left" aria-hidden="true"></i></a>
-				                    <a th:href="@{/vacantes/delete/{id} (id=${articulo.id})}" onclick="return confirm('¿Estas seguro?')" class="btn btn-warning btn-sm" role="button" title="Eliminar el registro."><i class="fa fa-edit" aria-hidden="true"></i></a>
+				                    <a th:href="@{/vacantes/edit/{id} (id=${articulo.id})}" class="btn btn-info btn-sm" data-toggle="tooltip" data-placement="top" title="Entrada y Salida" role="button"><i class="fas fa-exchange-alt" aria-hidden="true"></i></a>
+				                    <a th:href="@{/articulos/edit/{id} (id=${articulo.id})}" class="btn btn-success btn-sm" data-toggle="tooltip" data-placement="top" title="Modificar" role="button"><i class="fa fa-edit" aria-hidden="true"></i></a>
+				                  	<a th:href="@{/vacantes/delete/{id} (id=${articulo.id})}" onclick="return confirm('¿Estas seguro?')" class="btn btn-danger btn-sm" data-toggle="tooltip" data-placement="top" title="Eliminar" role="button"><i class="fa fa-trash" aria-hidden="true"></i></a>
 				                  </td>
 				                </tr>
 							</tbody>
@@ -71,14 +89,12 @@
     <script th:src="@{/bootstrap/js/bootstrap.min.js}"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
 	<script type="text/javascript">
-
 		$(document).ready(function() {
-			$('#tabla').DataTable();
-		});
-
-		$("#salir_sistema").click(function() {
-			window.location = "/logout";
+			$('#tabla').DataTable({
+				"scrollY": "400px"
+			});
 		});
 	</script>
+	 <span th:insert="fragments/footer :: footer"></span>  
 </body>
 </html>

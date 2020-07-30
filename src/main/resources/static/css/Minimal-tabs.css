@@ -1,6 +1,27 @@
 .nav-tabs {
   border-bottom: none;
 }
+.container-fluid {
+    width: 100%;
+    padding-right: 15px;
+    padding-left: 3px !important;
+    margin-right: auto;
+    margin-left: auto;
+}
+nav.navbar.navbar-light.navbar-expand-sm.bg-dark.navbar-fixed-top.navigation-clean-button {
+    background: #9cad2e;
+    background: -moz-linear-gradient(top,#9cad2e 0,#70823b 100%);
+    background: -webkit-gradient(linear,left top,left bottom,color-stop(0,#9cad2e),color-stop(100%,#70823b));
+    background: -webkit-linear-gradient(top,#9cad2e 0,#70823b 100%);
+    background: -o-linear-gradient(top,#9cad2e 0,#70823b 100%);
+    background: -ms-linear-gradient(top,#9cad2e 0,#70823b 100%);
+    background: linear-gradient(to bottom,#17a2b8 0,#50c7da 100%);
+}
+.navbar-light .navbar-nav .nav-link:hover, .navbar-light .navbar-nav .nav-link:focus {
+    color: rgba(0,0,0,0.7);
+    color: #FFF !important;
+    background-color: #0f7788 !important;
+}
 
 .nav-tabs > li.active > a, .nav-tabs > li.active > a:focus, .nav-tabs > li.active > a:hover {
   color: #555;
@@ -15,7 +36,7 @@
   margin: 0;
   line-height: normal;
   border: none;
-  border-bottom: solid 5px gray;
+  border-bottom: solid 0px gray;
 }
 
 .nav-tabs > li > a:hover {

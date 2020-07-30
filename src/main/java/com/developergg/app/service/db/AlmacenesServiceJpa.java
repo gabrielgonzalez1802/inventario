@@ -45,4 +45,9 @@ public class AlmacenesServiceJpa implements IAlmacenesService{
 	public void eliminar(Integer idAlmacen) {
 		repo.deleteById(idAlmacen);
 	}
+
+	@Override
+	public void save(Almacen almacen) {
+		repo.save(almacen);
+	}
 }

@@ -23,7 +23,6 @@ import com.developergg.app.model.Propietario;
 import com.developergg.app.model.Usuario;
 import com.developergg.app.service.IAlmacenesService;
 import com.developergg.app.service.ICodigoActivacionService;
-import com.developergg.app.service.IPropietariosService;
 import com.developergg.app.service.IUsuariosService;
 
 @Controller
@@ -34,9 +33,6 @@ public class HomeController {
 	
 	@Autowired
 	private IAlmacenesService serviceAlmacen;
-	
-	@Autowired
-	private IPropietariosService servicePropietario;
 	
 	@Autowired
 	private ICodigoActivacionService serviceCodigoActivacion;
@@ -56,15 +52,16 @@ public class HomeController {
 			RedirectAttributes attributes) {
 		//verificamos si el código coincide y esta activo
 		CodigoActivacion codigoAct = serviceCodigoActivacion.buscarPorCodigo(codigo);
+		//FIXME: GGONZALEZ VERIFICAR CODIGO.
 		if(codigoAct!=null) {
 			if(codigoAct.getEstado()==1) {
 				model.addAttribute("authority", 1);
 				model.addAttribute("code", codigo);
 			}
-			return "/registro";
+			return "registro";
 		}
 		attributes.addFlashAttribute("msg", "Codigo Invalido");
-		return "redirect:/registro";
+		return "redirect:registro";
 	}
 	
 	@GetMapping("/")
@@ -74,17 +71,14 @@ public class HomeController {
 		List<Almacen> almacenes= null;
 		Usuario usuario = null;
 		System.out.println("username: "+userName);
-		if(session.getAttribute("usuario") == null) {
-			usuario = serviceUsuarios.buscarPorUsername(userName);
-			usuario.setPassword(null);
-			System.out.println("Usuario: "+usuario);
-			session.setAttribute("usuario", usuario);
-		}else {
-			usuario = (Usuario) session.getAttribute("usuario");
-		}
 		
-		//Obtenemos la informacion del propietario
-		Propietario propietario = servicePropietario.buscarPorIdUsuario(usuario.getId());
+		usuario = serviceUsuarios.buscarPorUsername(userName);
+		usuario.setPassword(null);
+		System.out.println("Usuario: " + usuario);
+		session.setAttribute("usuario", usuario);
+		
+		//Obtenemos la informacion del propietario por el almacen
+		Propietario propietario = usuario.getAlmacen().getPropietario();
 		
 		//Roles del usuario
 		for (GrantedAuthority rol : auth.getAuthorities()) {
@@ -96,12 +90,12 @@ public class HomeController {
 				almacenes = serviceAlmacen.buscarPorIdTienda(propietario.getId());
 			}
 		}
-		Almacen almacenAcct = serviceAlmacen.buscarPorIdTienda(propietario.getId()).get(0);
+		//Agregamos el usuario a la sesion
+		session.setAttribute("usuario", usuario);
+
 		model.addAttribute("usuario", usuario);
-		model.addAttribute("perfil", usuario.getPerfiles().get(0).getPerfil());
-    	model.addAttribute("almacenAcct", almacenAcct);
 		model.addAttribute("almacenes", almacenes);
-		return "/home";
+		return "home";
 	}
 	
 	@GetMapping("/logout")
@@ -109,11 +103,6 @@ public class HomeController {
 		SecurityContextLogoutHandler logoutHandler = new SecurityContextLogoutHandler();
 		logoutHandler.logout(request, null, null);
 		return "redirect:/";
-	}
-	
-	@GetMapping("/home")
-	public String mostrarHome(Model model) {
-		return "home";
 	}
 	
     @ModelAttribute

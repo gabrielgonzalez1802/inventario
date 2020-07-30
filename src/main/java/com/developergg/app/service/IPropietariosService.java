@@ -8,4 +8,5 @@ public interface IPropietariosService {
 	List<Propietario> buscarTodos();
 	Propietario buscarPorId(Integer idPropietario);
 	Propietario buscarPorIdUsuario(Integer idUsuario);
+	void guardar(Propietario propietario);
 }

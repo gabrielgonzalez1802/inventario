@@ -10,4 +10,5 @@ public interface IAlmacenesService {
 	List<Almacen> buscarPorIdTienda(Integer idTienda);
 	void guardar(Almacen almacen);
 	void eliminar(Integer idAlmacen);
+	void save(Almacen almacen);
 }

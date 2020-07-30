@@ -1,6 +1,7 @@
 package com.developergg.app.service.db;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,6 +35,15 @@ public class UsuariosServiceJpa implements IUsuariosService{
 	@Override
 	public Usuario buscarPorUsername(String username) {
 		return repo.findByUsername(username);
+	}
+
+	@Override
+	public Usuario buscarPorId(Integer idUsuario) {
+		Optional<Usuario> optional = repo.findById(idUsuario);
+		if(optional.isPresent()) {
+			return optional.get();
+		}
+		return null;
 	}
 
 }

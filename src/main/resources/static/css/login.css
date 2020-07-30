@@ -302,3 +302,12 @@ canvas {
   position: relative;
   text-align: center;
 }
+
+@media only screen and (max-width: 320px) {
+  body {
+    .hijo{
+    	width: 320px;
+    	left: 55%;
+    }
+  }
+}

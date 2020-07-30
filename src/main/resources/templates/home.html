@@ -5,6 +5,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" sizes="64x64" th:href="@{/img/icon.png}">
     <link rel="stylesheet" type="text/css" th:href="@{/bootstrap/css/bootstrap.min.css}">
 	<link rel="stylesheet" type="text/css" th:href="@{/css/sticky-dark-top-nav.css}">
     <!-- Font-icon css-->
@@ -21,7 +22,7 @@
                 <div class="card celeste card-info" style="margin-top: 10px;">
                     <div class="card-header text-primary">
                         <div class="row" style="height: 60px;">
-                            <div class="col-6"><img th:src="@{/img/modulos/Box.png}"></div>
+                            <div class="col-6"><img th:src="@{/img/modulos/articulos1.png}"></div>
                             <div class="col-6 text-right">
                                 <p id="menu_articulo_total" class="announcement-heading"><strong>0</strong></p>
                                 <p class="announcement-text"><strong>Articulos</strong></p>
@@ -42,7 +43,7 @@
                 <div class="card celeste card-info" style="margin-top: 10px;">
                     <div class="card-header text-primary">
                         <div class="row" style="height: 60px;">
-                            <div class="col-6"><img th:src="@{/img/modulos/Accounting.png}"></div>
+                            <div class="col-6"><img th:src="@{/img/modulos/ventas4.png}"></div>
                             <div class="col-6 text-right">
                                 <p id="menu_articulo_total" class="announcement-heading"><strong>0</strong></p>
                                 <p class="announcement-text"><strong>Ventas</strong></p>
@@ -86,7 +87,7 @@
                 <div class="card celeste card-info" style="margin-top: 10px;">
                     <div class="card-header text-primary">
                         <div class="row" style="height: 60px;">
-                            <div class="col-6"><img th:src="@{/img/modulos/seriales.png}"></div>
+                            <div class="col-6"><img th:src="@{/img/modulos/imei7.png}"></div>
                             <div class="col-6 text-right">
                                 <p id="menu_articulo_total" class="announcement-heading"><strong>0</strong></p>
                                 <p class="announcement-text"><strong>Seriales</strong></p>
@@ -107,7 +108,7 @@
                 <div class="card celeste card-info" style="margin-top: 10px;">
                     <div class="card-header text-primary">
                         <div class="row" style="height: 60px;">
-                            <div class="col-6"><img th:src="@{/img/modulos/telefono.png}"></div>
+                            <div class="col-6"><img th:src="@{/img/modulos/telefono1.png}"></div>
                             <div class="col-6 text-right">
                                 <p id="menu_articulo_total" class="announcement-heading"><strong>0</strong></p>
                                 <p class="announcement-text"><strong>Taller</strong></p>
@@ -128,7 +129,7 @@
                 <div class="card celeste card-info" style="margin-top: 10px;">
                     <div class="card-header text-primary">
                         <div class="row" style="height: 60px;">
-                            <div class="col-6"><img th:src="@{/img/modulos/money.png}"></div>
+                            <div class="col-6"><img th:src="@{/img/modulos/monedas2.png}"></div>
                             <div class="col-6 text-right">
                                 <p id="menu_articulo_total" class="announcement-heading"><strong>0</strong></p>
                                 <p class="announcement-text"><strong>CXC</strong></p>
@@ -189,15 +190,15 @@
             </div>
         </div>
  <p></p> 
-        <div class="card text-primary border rounded">
-            <div class="card-body" style="margin-top: 0px;"><img th:src="@{/img/modulos/clientes.png}" id="logo_empresa" height="100px">
-                <h1 class="card-title" id="nombre_negocio" style="font-size: 16px;" th:text="${almacenAcct.nombre}">Nombre del Negocio</h1>
-                <h5 class="text-muted card-subtitle mb-2" id="direccion_negocio" style="font-size: 14px; " th:text="${almacenAcct.direccion}">Direccion</h5>
-                <h5 class="text-muted card-subtitle mb-2" id="telefono_negocio" style="font-size: 12px;" th:text="${almacenAcct.telefono}">809-000-0000</h5>
-                <h6 class="card-subtitle mb-2" id="usuario_actual" style="font-size: 14px;" th:text="${usuario.username}">usuario</h6>
-                <h6 class="text-danger card-subtitle mb-2" id="privilegio" style="font-size: 13px;" th:text="${perfil}">Privilegio</h6>
-                <h6 class="text-right text-danger card-subtitle mb-2" id="vencimiento_sistema" style="font-size: 12px;">Vence</h6>
-                <h6 class="text-right text-danger card-subtitle mb-2" id="vencimiento_fecha" style="font-size: 12px;">Vence</h6>
+        <div class="card text-primary border rounded" style="background:rgba(255,255,255,0.5);">
+            <div class="text-right card-body" style="margin-top: 0px;"><img th:src="@{/logos/{img} (img=*{usuario.almacen.imagen})}" id="logo_empresa" height="100px">
+                <h1 class="text-right card-title" id="nombre_negocio" style="font-size: 16px;" th:text="${usuario.almacen.nombre}">Nombre del Negocio</h1>
+                <h5 class="text-right text-muted card-subtitle mb-2" id="direccion_negocio" style="color:black; font-size: 14px;" th:text="${usuario.almacen.direccion}">Direccion</h5>
+                <h5 class="text-right text-muted card-subtitle mb-2" id="telefono_negocio" style="font-size: 12px;" th:text="${usuario.almacen.telefono}">809-000-0000</h5>
+                <h6 class="text-right card-subtitle mb-2" id="usuario_actual" style="font-size: 14px;" th:text="${usuario.username}">usuario</h6>
+                <h6 class="text-righttext-danger card-subtitle mb-2" id="privilegio" style="font-size: 13px;" th:text="${usuario.privilegio.perfil}">Privilegio</h6>
+                <h6 class="text-right text-danger card-subtitle mb-2" id="vencimiento_sistema" style="font-size: 12px;" th:text="'Vence : ' + ${#dates.format(usuario.almacen.vencimiento, 'dd-MM-yyyy')}">Vence</h6>
+<!--                 <h6 class="text-right text-danger card-subtitle mb-2" id="vencimiento_fecha" style="font-size: 12px;">Vence</h6> -->
                 <div class="row pv2 pv3 pv4 pv5 pv6 pv7 pv8">
 <!--                     <div class="col-md-9 col-lg-6 col-xl-5"> -->
 <!-- 						<form class="bg-primary border rounded" id="frm_cambiar_sucursal" -->
@@ -219,13 +220,6 @@
     </div>
     <script th:src="@{/js/jquery.min.js}"></script>
     <script th:src="@{/bootstrap/js/bootstrap.min.js}"></script>
-            <script type="text/javascript">
-        	$("#salir_sistema").click(function(){
-        		window.location = "/logout";
-        	});
-        	$("#icono_articulo").click(function(){
-        		window.location = "/articulos/";
-        	});
-        </script>
+    <span th:insert="fragments/footer :: footer"></span>  
 </body>
 </html>
