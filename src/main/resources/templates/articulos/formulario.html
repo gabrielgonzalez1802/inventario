@@ -16,15 +16,6 @@
  	<link rel="stylesheet" type="text/css" th:href="@{/css/dashboard.css}">
  	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap" rel="stylesheet">
  	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
- 	<style>
-	  	.table-primary, .table-primary>th, .table-primary>td {
-	   		 background-color: #25396d;
-	   		 color:#ffff;
-		}
-		.table-primary th, .table-primary td, .table-primary thead th, .table-primary tbody+tbody {
-		    border-color: #25396d;
-		}
-  </style>
   </head>
   <body>
      <span th:insert="fragments/topMenu :: menu-principal"></span> 
@@ -170,23 +161,61 @@
                   <label for="imagen">Imagen/Logo</label>
                   <img th:src="@{/img/no-image.png}" class="rounded mx-auto d-block" alt="Generic placeholder image" width="150" height="150">            
                 </div>
-                  <div class="col-md-3"> 
+                <div class="col-md-3"> 
                   <div class="form-group">
                     <label for="categoria">Categor&iacute;a</label>
                     <select class="form-control"  th:field="*{categoria.id}" id="categoria">
-					  	<option th:each="categoria : ${categorias}"
-								th:value="${categoria.id}" 
-								th:text="${categoria.nombre}">
-						</option>
+                   		 <option th:fragment="listaCategorias" 
+                   		 th:each="cat : ${listaCategorias}" 
+                   		 th:value="${cat.id}" 
+                   		 th:text="${cat.nombre}" />
                     </select>
-                  </div>
+                  </div>                  
                 </div>
+                 <div class="col-md-3">
+                  <div class="form-group">
+                  		 <br>
+                		 <button type="button" id="btnModalAddCategory" data-toggle="tooltip" data-placement="top" title="Crear Categor&iacute;a" class="btn btn-lg btn-primary"> + </button>
+                	</div>   
+                </div>                
+                
               </div> 
               <input type="submit" class="btn btn-lg btn-primary" value="Guardar"> 
             </form>	
 			</div>
 			<a class="card-link" href="#"></a>
 		</div>	
+		
+		<!-- Modal Catogory -->
+		<div class="modal fade" id="modalAddCategory" tabindex="-1" role="dialog"
+			aria-labelledby="exampleModalLabel" aria-hidden="true">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content all">
+					<div class="modal-header">
+						<h5 class="modal-title" id="exampleModalLabel" style="color: #ffff;">Nueva Categor&iacute;a</h5>
+						<button type="button" class="close" data-dismiss="modal"
+							aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<form>
+							<div class="form-group">
+								<label for="nameCategory" class="col-form-label">Nombre de la Categor&iacute;a:</label>
+								<input type="text" class="form-control" id="nameCategory">
+							</div>
+						</form>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary"
+							data-dismiss="modal" id="closeCategoryModal">Close</button>
+						<button type="button" id="guardarCategoria" class="btn btn-primary">Guardar</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
 	</div>
 
 	<script th:src="@{/js/jquery.min.js}"></script>
@@ -213,9 +242,23 @@
 		</script>
 	</span>
 	<script type="text/javascript">
+		$('#categoria').load("/categorias/ajax/getAll");
+		$("#btnModalAddCategory").click(function(){
+			$('#modalAddCategory').modal('show');
+		});
+		
+		$("#closeCategoryModal").click(function(){
+			$('#nameCategory').val('');
+		});
+		
+		$("#guardarCategoria").click(function(){
+			var categoria = $("#nameCategory").val();
+			var url = "/categorias/ajax/create/"+categoria;
+			$('#categoria').load(url);
+			$('#modalAddCategory').modal('hide');
+		});
 		
    		 var _mSelect2 = $("#js-example-basic-multiple").select2();
-   		 
 			//Si se introduce el costo activamos los demas campos
 			$("#costo").keydown(function(){
 				var costo = $("#costo").val();

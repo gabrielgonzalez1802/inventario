@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <title>Sistema Celulares</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" sizes="64x64" th:href="@{/img/icon.png}">
+    <link rel="stylesheet" type="text/css" th:href="@{/bootstrap/css/bootstrap.min.css}">
+	<link rel="stylesheet" type="text/css" th:href="@{/css/sticky-dark-top-nav.css}">
+    <!-- Font-icon css-->
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap" rel="stylesheet">
+ 	<link rel="stylesheet" type="text/css" th:href="@{/css/Minimal-tabs.css}">
+ 	<link href = "https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" rel ="stylesheet"/>
+ 	<link rel="stylesheet" type="text/css" th:href="@{/css/dashboard.css}">
+ 	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap" rel="stylesheet">
+ 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+ 	<style>
+	  	.table-primary, .table-primary>th, .table-primary>td {
+	   		 background-color: #25396d;
+	   		 color:#ffff;
+		}
+		.table-primary th, .table-primary td, .table-primary thead th, .table-primary tbody+tbody {
+		    border-color: #25396d;
+		}
+  </style>
+  </head>
+  <body>
+     <span th:insert="fragments/topMenu :: menu-principal"></span> 
+     <br>
+	<div class="container">
+		<div class="card all">
+			<div class="card-body" style="margin-top: 0px;">
+			   <h4 class="card-header"><strong style="color: #fff;">Entrada y Salida</strong></h4>    <!-- th:action="@{/articulos/inventario/serial/save}"  -->     
+				<br>
+		<div id="ajaxLoadedContent">
+			
+		</div>
+		<form method="post" th:fragment="results" th:object="${articuloSerial}" id="articuloSerial">       
+             <input type="hidden" th:field="*{id}">
+              <div class="row">
+                <div class="col-md-6"> 
+                  <div class="form-group">
+                    <label for="nombre">Articulo</label>
+                    <input type="hidden" th:field="*{articulo.id}" th:value="${articulo.id}">
+                    <input type="text" th:field="${articulo.nombre}" disabled="disabled" class="form-control" id="nombre" required="required" placeholder="Nombre">
+                  </div>
+                </div>
+                <div class="col-md-6"> 
+                  <div class="form-group">
+                    <label for="suplidor">Suplidor</label>
+                    <select class="form-control"  th:field="*{suplidor.id}" id="suplidor">
+					  	<option th:each="suplidor : ${suplidores}"
+								th:value="${suplidor.id}" 
+								th:text="${suplidor.nombre}">
+						</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+               
+              <hr style="border-top: 1px solid #D8D8D8;">
+              
+              <div class="row">
+                 <div class="col-md-4"> 
+                  <div class="form-group">
+                    <label for="valorImei">IMEI | Serial</label>
+                    <input type="text" class="form-control" th:field="*{serial}" id="valorImei" placeholder="IMEI" required="required">
+                  </div>  
+                </div>
+                <div class="col-md-4"> 
+                  <div class="form-group">
+                    <label for="factura">Factura</label>
+                    <input type="text" class="form-control" th:field="*{no_factura}" id="factura" placeholder="Factura" required="required">
+                  </div>
+                </div>
+                 <div class="col-md-4"> 
+                  <div class="form-group">
+                    <label for="fecha">Costo</label>
+                    <input type="text" class="form-control" th:field="${articulo.costo}" id="costo" placeholder="Costo" required="required">
+                  </div>  
+                </div>
+              </div>
+              
+              <div class="row">
+              	<div class="col-md-5">
+                  <div class="form-group">
+                    <label for="ultimosImei">Ultimos IMEI</label> 
+					<select class="form-control"  id="ultimosImei" style="font-size: 18px;" multiple>
+                   		 <option th:fragment="listaUltimosSeriales" 
+                   		 th:each="cat : ${listaUltimosSeriales}" 
+                   		 th:value="${cat.id}" 
+                   		 th:text="${cat.serial}" />
+                    </select><!-- th:field="*{categoria.id}" -->
+                  </div>
+                </div>
+              </div> 
+              
+              <input type="submit" class="btn btn-lg btn-primary" value="Guardar"> 
+            </form>	
+            </div>
+			<a class="card-link" href="#"></a>
+		</div>	
+	</div>
+	
+	<span id="test" th:fragments="test"></span>
+	<script th:src="@{/js/jquery.min.js}"></script>
+    <script th:src="@{/bootstrap/js/bootstrap.min.js}"></script>
+	<span th:if="${msg != null}" class="alert alert-success" role="alert">
+		<script type="text/javascript">
+		Swal.fire({
+			  title: 'Muy bien!',
+			  text: 'Registro guardado',
+			  icon: 'success',
+			  confirmButtonText: 'Cool'
+			})
+		</script>
+	</span>
+	<span th:if="${msg2 != null}" class="alert alert-success" role="alert">
+		<script type="text/javascript">
+		Swal.fire({
+			  title: 'Muy bien!',
+			  text: 'Registro Modificado',
+			  icon: 'success',
+			  confirmButtonText: 'Cool'
+			})
+		</script>
+	</span>
+	<script type="text/javascript">
+		$('#ultimosImei').load("/articulosSeriales/ajax/getLast");
+		//clic en el formulario
+		$("#articuloSerial").submit(function(e) {
+			 e.preventDefault();
+			 var $form = $("#articuloSerial");
+			 $('#ultimosImei').load("/articulosSeriales/ajax/serial", $form.serialize());
+			 limpiar();
+		});
+	</script>
+	<script type="text/javascript">
+		$("select#ultimosImei").change(function(){
+		     var seleccion = $('#ultimosImei').val();
+		     Swal.fire({
+		    	  title: 'Esta seguro?',
+		    	  text: "Desea eliminar el serial?",
+		    	  icon: 'warning',
+		    	  showCancelButton: true,
+		    	  confirmButtonColor: '#3085d6',
+		    	  cancelButtonColor: '#d33',
+		    	  confirmButtonText: 'Si, Puede borrarlo!'
+		    	}).then((result) => {
+		    	  if (result.value) {
+		 		    $('#ultimosImei').load("/articulosSeriales/ajax/serialDelete/"+seleccion);
+		 		   limpiar();
+		    	    Swal.fire(
+		    	      'Borrado!',
+		    	      'El Serial se ha borrado.',
+		    	      'success'
+		    	    )
+		    	  }
+		    	})
+		});
+	</script>
+	<script type="text/javascript">
+		function limpiar(){
+			$("#valorImei").val("");
+			$("#factura").val("");
+			$("#costo").val("");
+		}
+	</script>
+	 <span th:insert="fragments/footer :: footer"></span>  
+</body>
+</html>

@@ -74,7 +74,8 @@
 				                  <td></td>
 				                  <td>
 				                    <a th:href="@{/vacantes/edit/{id} (id=${articulo.id})}" class="btn btn-primary btn-sm" role="button" title="Editar el registro."><i class="fas fa-atlas" aria-hidden="true"></i></a>
-				                    <a th:href="@{/vacantes/edit/{id} (id=${articulo.id})}" class="btn btn-info btn-sm" data-toggle="tooltip" data-placement="top" title="Entrada y Salida" role="button"><i class="fas fa-exchange-alt" aria-hidden="true"></i></a>
+				                    <a th:if="${articulo.imei == 'SI'}" th:href="@{/articulos/inventario/serial/{id} (id=${articulo.id})}" class="btn btn-info btn-sm" data-toggle="tooltip" data-placement="top" title="Entrada y Salida" role="button"><i class="fas fa-exchange-alt" aria-hidden="true"></i></a>
+				                   	<a th:unless="${articulo.imei == 'SI'}" th:href="@{/articulos/inventario/{id} (id=${articulo.id})}" class="btn btn-info btn-sm" data-toggle="tooltip" data-placement="top" title="Entrada y Salida" role="button"><i class="fas fa-exchange-alt" aria-hidden="true"></i></a>
 				                    <a th:href="@{/articulos/edit/{id} (id=${articulo.id})}" class="btn btn-success btn-sm" data-toggle="tooltip" data-placement="top" title="Modificar" role="button"><i class="fa fa-edit" aria-hidden="true"></i></a>
 				                  	<a th:href="@{/vacantes/delete/{id} (id=${articulo.id})}" onclick="return confirm('¿Estas seguro?')" class="btn btn-danger btn-sm" data-toggle="tooltip" data-placement="top" title="Eliminar" role="button"><i class="fa fa-trash" aria-hidden="true"></i></a>
 				                  </td>

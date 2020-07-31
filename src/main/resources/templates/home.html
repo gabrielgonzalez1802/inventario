@@ -198,23 +198,7 @@
                 <h6 class="text-right card-subtitle mb-2" id="usuario_actual" style="font-size: 14px;" th:text="${usuario.username}">usuario</h6>
                 <h6 class="text-righttext-danger card-subtitle mb-2" id="privilegio" style="font-size: 13px;" th:text="${usuario.privilegio.perfil}">Privilegio</h6>
                 <h6 class="text-right text-danger card-subtitle mb-2" id="vencimiento_sistema" style="font-size: 12px;" th:text="'Vence : ' + ${#dates.format(usuario.almacen.vencimiento, 'dd-MM-yyyy')}">Vence</h6>
-<!--                 <h6 class="text-right text-danger card-subtitle mb-2" id="vencimiento_fecha" style="font-size: 12px;">Vence</h6> -->
                 <div class="row pv2 pv3 pv4 pv5 pv6 pv7 pv8">
-<!--                     <div class="col-md-9 col-lg-6 col-xl-5"> -->
-<!-- 						<form class="bg-primary border rounded" id="frm_cambiar_sucursal" -->
-<!-- 							style="padding: 17px;"> -->
-<!-- 							<label class="text-white"><strong>Cambiar de -->
-<!-- 									Sucursal</strong></label> -->
-<!-- 							<select th:field="${almacenAcct.id}" class="custom-select custom-select-sm" id="id_almacen_menu"> -->
-<!-- 								<option th:each="almacen : ${almacenes}" -->
-<!-- 									th:value="${almacen.id}"  -->
-<!-- 									th:text="${almacen.nombre}"> -->
-<!-- 								</option> -->
-<!-- 							</select> -->
-<!-- 							<button class="btn btn-success btn-sm border rounded" -->
-<!-- 								type="submit" style="margin-top: 8px;">Cambiar</button> -->
-<!-- 						</form> -->
-<!-- 					</div> -->
                 </div><a class="card-link" href="#"></a></div>
         </div>
     </div>

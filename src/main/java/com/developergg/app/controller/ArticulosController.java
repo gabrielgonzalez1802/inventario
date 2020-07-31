@@ -1,6 +1,7 @@
 package com.developergg.app.controller;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpSession;
 
@@ -19,11 +20,14 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.developergg.app.model.Almacen;
 import com.developergg.app.model.Articulo;
+import com.developergg.app.model.ArticuloSerial;
 import com.developergg.app.model.Categoria;
 import com.developergg.app.model.Propietario;
+import com.developergg.app.model.Suplidor;
 import com.developergg.app.model.Usuario;
 import com.developergg.app.service.IArticulosService;
 import com.developergg.app.service.ICategoriasService;
+import com.developergg.app.service.ISuplidoresService;
 import com.developergg.app.util.Utileria;
 
 @Controller
@@ -31,10 +35,13 @@ import com.developergg.app.util.Utileria;
 public class ArticulosController {
 	
 	@Autowired
-	IArticulosService serviceArticulos;
+	private IArticulosService serviceArticulos;
 	
 	@Autowired
-	ICategoriasService serviceCategorias;
+	private ICategoriasService serviceCategorias;
+	
+	@Autowired
+	private ISuplidoresService serviceSuplidores;
 	
 	@Value("${inventario.ruta.imagenes}")
 	private String ruta;
@@ -44,7 +51,9 @@ public class ArticulosController {
 	@GetMapping("/")
 	public String mostrarArticulos(Model model, HttpSession session) {
 		Usuario usuario = (Usuario) session.getAttribute("usuario");
-		lista = serviceArticulos.buscarPorTienda(usuario.getAlmacen().getPropietario());
+		//articulos por tienda que no esten eliminados
+		lista = serviceArticulos.buscarPorTienda(usuario.getAlmacen().getPropietario())
+				.stream().filter(p -> p.getEliminado() == 0).collect(Collectors.toList());
 		model.addAttribute("articulos", lista);
 		return "articulos/listaArticulos";
 	}
@@ -119,7 +128,6 @@ public class ArticulosController {
 		return "redirect:/articulos/create";
 	}
 	
-	
 	@GetMapping("/edit/{id}")
 	public String edit(@PathVariable(name = "id") Integer idArticulo, Model model, HttpSession session) {
 		Usuario usuario = (Usuario) session.getAttribute("usuario");
@@ -129,6 +137,38 @@ public class ArticulosController {
 		model.addAttribute("articulos", lista);
 		model.addAttribute("articulo", articulo);
 		return "articulos/formularioEdit";
+	}
+	
+	@GetMapping("/inventario/serial/{id}")
+	public String entradaSalida(@PathVariable(name = "id") Integer idArticulo, RedirectAttributes attributes,
+			Model model, HttpSession session) {
+		Articulo articulo = serviceArticulos.buscarPorId(idArticulo);
+		// si el articulo no existe o esta en eliminado (eliminado logico) retornara al
+		// formulario de crear con un error
+		if(articulo==null || articulo.getEliminado() == 1) {
+			attributes.addFlashAttribute("msg3", "No existe");
+			return "redirect:/articulos/create";
+		}
+		//buscamos la lista de suplidores por almacen que no esten eliminados
+		Usuario usuario = (Usuario) session.getAttribute("usuario");
+		List<Suplidor> suplidores = serviceSuplidores.buscarPorAlmacenDisponible(usuario.getAlmacen())
+				.stream().filter(s -> s.getEliminado() == 0).collect(Collectors.toList());
+		Suplidor suplidor = new Suplidor();
+		ArticuloSerial articuloSerial = new ArticuloSerial();
+		articuloSerial.setArticulo(articulo);
+		suplidor.setAlmacen(usuario.getAlmacen());
+		model.addAttribute("articulo", articulo);
+		model.addAttribute("suplidor", suplidor);
+		model.addAttribute("articuloSerial",articuloSerial);
+		model.addAttribute("suplidores", suplidores);
+		return "articulos/formularioSerial";
+	}
+	
+	@PostMapping("/inventario/serial/save")
+	public String guardarInventarioConSertial(ArticuloSerial articuloSerial, 
+			@RequestParam("factura") String factura, @RequestParam("ultimosImei") String ultimosImei) {
+		System.out.println("estoy aqui");
+		return "redirect:/";
 	}
 	
 	@ModelAttribute
