@@ -12,4 +12,5 @@ public interface IArticulosService {
 	void eliminar(Integer idArticulo);
 	List<Articulo> buscarPorTienda(Propietario tienda);
 	void save(Articulo articulo);
+	List<Articulo> buscarPorNombreOrCodigo(String txt, Propietario tienda);
 }

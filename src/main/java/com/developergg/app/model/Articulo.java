@@ -15,10 +15,12 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 @Entity
 @Table(name = "articulos")
 public class Articulo {
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id_articulo")
@@ -40,6 +42,9 @@ public class Articulo {
 	private String itbis;
 	private String gama;
 	private String imagen = "no-image.png";
+	
+	@Transient
+	private Integer cantidad = 0;
 	
 	private Integer rango_precio_maximo_desde;
 	private Integer rango_precio_maximo_hasta;
@@ -222,6 +227,13 @@ public class Articulo {
 	public void setArticulos(List<Articulo> articulos) {
 		this.articulos = articulos;
 	}
+	public Integer getCantidad() {
+		return cantidad;
+	}
+	public void setCantidad(Integer cantidad) {
+		this.cantidad = cantidad;
+	}
+	
 	@Override
 	public String toString() {
 		return "Articulo [id=" + id + ", nombre=" + nombre + ", codigo=" + codigo + ", codigo_barras=" + codigo_barras

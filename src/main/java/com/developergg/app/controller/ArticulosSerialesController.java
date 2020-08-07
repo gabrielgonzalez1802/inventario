@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.developergg.app.model.ArticuloSerial;
-import com.developergg.app.model.Propietario;
 import com.developergg.app.model.Usuario;
 import com.developergg.app.service.IArticulosSeriales;
 
@@ -46,7 +45,6 @@ public class ArticulosSerialesController {
 	@GetMapping("/ajax/serial")
 	public String listaCategoriasAjax(Model model, @ModelAttribute("articuloSerial") ArticuloSerial articuloSerial, HttpSession session) {
 		Usuario usuario = (Usuario) session.getAttribute("usuario");
-		Propietario tienda = usuario.getAlmacen().getPropietario();
 		List<ArticuloSerial> lista = serviceArticulosSeriales
 				.buscarPorIdAlmacenDesc(usuario.getAlmacen().getId())
 				.stream().filter(s -> s.getEliminado() == 0).
@@ -79,6 +77,7 @@ public class ArticulosSerialesController {
 		}else {
 			articuloSerial.setEliminado(1);
 			articuloSerial.setId_usuario_eliminar(usuario.getId());
+			articuloSerial.setEstado("Eliminado");
 			articuloSerial.setFecha_eliminado(new Date());
 			serviceArticulosSeriales.guardar(articuloSerial);
 		}

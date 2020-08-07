@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.developergg.app.model.Almacen;
+import com.developergg.app.model.Articulo;
 import com.developergg.app.model.ArticuloSerial;
 import com.developergg.app.repository.ArticulosSerialesRepository;
 import com.developergg.app.service.IArticulosSeriales;
@@ -44,5 +45,20 @@ public class ArticulosSerialesService implements IArticulosSeriales {
 	@Override
 	public void guardar(ArticuloSerial articuloSerial) {
 		repo.save(articuloSerial);
+	}
+
+	@Override
+	public List<ArticuloSerial> buscarPorArticuloAlmacen(Articulo articulo, Almacen almacen) {
+		return repo.findByArticuloAndAlmacen(articulo, almacen);
+	}
+
+	@Override
+	public ArticuloSerial buscarPorSerial(String serial) {
+		return repo.findBySerial(serial);
+	}
+
+	@Override
+	public List<ArticuloSerial> buscarPorSerialAndAlmacen(String serial, Almacen almacen) {
+		return repo.findBySerialAndAlmacen(serial, almacen);
 	}
 }

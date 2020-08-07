@@ -36,7 +36,7 @@ public class Usuario {
 	@OneToOne
 	@JoinColumn(name = "id_almacen")
 	private Almacen almacen;
-	
+
 	public Integer getId() {
 		return id;
 	}

@@ -56,5 +56,11 @@ public class ArticulosServiceJpa implements IArticulosService{
 		repo.save(articulo);
 	}
 
+	@Override
+	public List<Articulo> buscarPorNombreOrCodigo(String txt, Propietario tienda) {
+		System.out.println("tienda: "+tienda);
+		return repo.findByTiendaAndNombreContainingOrCodigoContaining(tienda,txt,txt);
+	}
+
 
 }

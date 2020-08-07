@@ -71,13 +71,13 @@
 				                  <td th:text="${articulo.nombre}"></td>  
 				                  <td th:text="${articulo.precio_maximo}"></td>
 				                  <td th:text="${articulo.precio_minimo}"></td>
-				                  <td></td>
+				                  <td th:text="${articulo.cantidad}"></td>
 				                  <td>
 				                    <a th:href="@{/vacantes/edit/{id} (id=${articulo.id})}" class="btn btn-primary btn-sm" role="button" title="Editar el registro."><i class="fas fa-atlas" aria-hidden="true"></i></a>
 				                    <a th:if="${articulo.imei == 'SI'}" th:href="@{/articulos/inventario/serial/{id} (id=${articulo.id})}" class="btn btn-info btn-sm" data-toggle="tooltip" data-placement="top" title="Entrada y Salida" role="button"><i class="fas fa-exchange-alt" aria-hidden="true"></i></a>
-				                   	<a th:unless="${articulo.imei == 'SI'}" th:href="@{/articulos/inventario/{id} (id=${articulo.id})}" class="btn btn-info btn-sm" data-toggle="tooltip" data-placement="top" title="Entrada y Salida" role="button"><i class="fas fa-exchange-alt" aria-hidden="true"></i></a>
+				                   	<a th:unless="${articulo.imei == 'SI'}" th:href="@{/articulos/inventario/sinSerial/{id} (id=${articulo.id})}" class="btn btn-info btn-sm" data-toggle="tooltip" data-placement="top" title="Entrada y Salida" role="button"><i class="fas fa-exchange-alt" aria-hidden="true"></i></a>
 				                    <a th:href="@{/articulos/edit/{id} (id=${articulo.id})}" class="btn btn-success btn-sm" data-toggle="tooltip" data-placement="top" title="Modificar" role="button"><i class="fa fa-edit" aria-hidden="true"></i></a>
-				                  	<a th:href="@{/vacantes/delete/{id} (id=${articulo.id})}" onclick="return confirm('¿Estas seguro?')" class="btn btn-danger btn-sm" data-toggle="tooltip" data-placement="top" title="Eliminar" role="button"><i class="fa fa-trash" aria-hidden="true"></i></a>
+				                  	<a th:if="${articulo.cantidad == 0}" th:href="@{/articulos/delete/{id} (id=${articulo.id})}" onclick="return confirm('¿Estas seguro?')" class="btn btn-danger btn-sm" data-toggle="tooltip" data-placement="top" title="Eliminar" role="button"><i class="fa fa-trash" aria-hidden="true"></i></a>
 				                  </td>
 				                </tr>
 							</tbody>
@@ -89,13 +89,87 @@
 	<script th:src="@{/js/jquery.min.js}"></script>
     <script th:src="@{/bootstrap/js/bootstrap.min.js}"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
 	<script type="text/javascript">
-		$(document).ready(function() {
-			$('#tabla').DataTable({
-				"scrollY": "400px"
-			});
+	$(document).ready(function() {
+		$('#tabla').DataTable({
+			"scrollY": "400px",
+			    "language": {
+			        "sProcessing":    "Procesando...",
+			        "sLengthMenu":    "Mostrar _MENU_ registros",
+			        "sZeroRecords":   "No se encontraron resultados",
+			        "sEmptyTable":    "Ningún dato disponible en esta tabla",
+			        "sInfo":          "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+			        "sInfoEmpty":     "Mostrando registros del 0 al 0 de un total de 0 registros",
+			        "sInfoFiltered":  "(filtrado de un total de _MAX_ registros)",
+			        "sInfoPostFix":   "",
+			        "sSearch":        "Buscar:",
+			        "sUrl":           "",
+			        "sInfoThousands":  ",",
+			        "sLoadingRecords": "Cargando...",
+			        "oPaginate": {
+			            "sFirst":    "Primero",
+			            "sLast":    "Último",
+			            "sNext":    "Siguiente",
+			            "sPrevious": "Anterior"
+			        },
+			        "oAria": {
+			            "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+			        }
+			    }
 		});
+	});
 	</script>
+	<span th:if="${msg != null}" class="alert alert-success" role="alert">
+		<script type="text/javascript">
+		Swal.fire({
+			  title: 'Muy bien!',
+			  text: 'Registro guardado',
+			  icon: 'success',
+			  confirmButtonText: 'Cool'
+			})
+		</script>
+	</span>
+	<span th:if="${msg3 != null}" class="alert alert-success" role="alert">
+		<script type="text/javascript">
+		Swal.fire({
+			  title: 'Error!',
+			  text: 'El registro no pudo ser creado',
+			  icon: 'error',
+			  confirmButtonText: 'Cool'
+			})
+		</script>
+	</span>
+	<span th:if="${msg4 != null}" class="alert alert-success" role="alert">
+		<script type="text/javascript">
+		Swal.fire({
+			  title: 'Alerta!',
+			  text: 'El registro no pudo ser creado, no cuenta con el inventario suficiente para realizar la salida',
+			  icon: 'warning',
+			  confirmButtonText: 'Cool'
+			})
+		</script>
+	</span>
+	<span th:if="${msg5 != null}" class="alert alert-success" role="alert">
+		<script type="text/javascript">
+		Swal.fire({
+			  title: 'Muy bien!',
+			  text: 'Registro eliminado',
+			  icon: 'success',
+			  confirmButtonText: 'Cool'
+			})
+		</script>
+	</span>
+		<span th:if="${msg6!= null}" class="alert alert-success" role="alert">
+		<script type="text/javascript">
+		Swal.fire({
+			  title: 'Alerta!',
+			  text: 'El registro no se puede eliminar',
+			  icon: 'warning',
+			  confirmButtonText: 'Cool'
+			})
+		</script>
+	</span>	
 	 <span th:insert="fragments/footer :: footer"></span>  
 </body>
 </html>

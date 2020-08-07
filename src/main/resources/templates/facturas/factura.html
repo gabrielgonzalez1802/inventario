@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <title>Sistema Celulares</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" sizes="64x64" th:href="@{/img/icon.png}">
+<!--     <link rel="stylesheet" type="text/css" th:href="@{/bootstrap/css/bootstrap.min.css}"> -->
+<!-- 	<link rel="stylesheet" type="text/css" th:href="@{/css/sticky-dark-top-nav.css}"> -->
+    <!-- Font-icon css-->
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap" rel="stylesheet">
+ 	<link rel="stylesheet" type="text/css" th:href="@{/css/Minimal-tabs.css}">
+<!--  	<link rel="stylesheet" type="text/css" th:href="@{/css/bootstrap-duallistbox.css}"> -->
+ 	<link rel="stylesheet" type="text/css" th:href="@{/css/dashboard.css}">
+ 	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap" rel="stylesheet">
+<!--  	<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet" /> -->
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+<!-- <script src="//code.jquery.com/jquery-1.11.1.min.js"></script> -->
+ 	
+ 	<style type="text/css">
+ 	        .dual-list .list-group {
+            margin-top: 8px;
+        }
+
+        .list-left li, .list-right li {
+            cursor: pointer;
+        }
+
+        .list-arrows {
+            padding-top: 100px;
+        }
+
+       .list-arrows button {
+                margin-bottom: 20px;
+        }
+        .list-group-item.active, .list-group-item.active:focus, .list-group-item.active:hover {
+		    z-index: 2;
+		    color: #fff;
+		    background-color: #17a2b8;
+		    border-color: #17a2b8;
+		}
+		.btn-standar {
+		    color: #fff;
+		    background-color: #17a2b8;
+		    border-color: #17a2b8;
+		}
+		.list-group-item:hover{
+			 background-color:#17a2b882;
+			 border-color: #17a2b882;
+		}
+ 	</style>
+ 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+ 	<style>
+	  	.table-primary, .table-primary>th, .table-primary>td {
+	   		 background-color: #25396d;
+	   		 color:#ffff;
+		}
+		.table-primary th, .table-primary td, .table-primary thead th, .table-primary tbody+tbody {
+		    border-color: #25396d;
+		}
+		.table-hover tbody tr:hover td, .table-hover tbody tr:hover th {
+		  background-color: #085865;
+		}
+  </style>
+  </head>
+  <body>
+<!--      <span th:insert="fragments/topMenu :: menu-principal"></span>  -->
+     <br>
+	<div class="container">
+		<div class="panel panel-default">
+		<div class="panel-heading all" style="border-bottom: 0px;"><h4 style="color: #fff;">Facturaci&oacute;n
+		<button class="btn btn-primary pull-right" id="btnServiceModal">Servicio</button>
+		</h4></div>
+		  <div class="panel-body all">
+		     <form  method="post" action="#" id="formCreateInvoice">            
+              <div class="row">
+                <div class="col-md-4"> 
+                  <div class="form-group">
+                    <input type="hidden" id="tipoArticulo" th:value="${tipoArticulo}">
+                    <label for="nombre">Lista de Productos</label>
+                    <input type="text" class="form-control" name="artuculo" id="articulo" placeholder="Buscar por Imei, Art&iacute;culo y C&oacute;digo">
+                     <select class="form-control" id="articulos" onclick="javascript:seleccionado(this.options[this.selectedIndex].text,this.options[this.selectedIndex].value);">
+                   		 <option th:fragment="listaArticulos" 
+                   		 th:each="art : ${listaArticulos}" 
+                   		 th:value="${art.id}" 
+                   		 th:text="${art.nombre}" />
+                    </select>
+                  </div>
+                </div>
+                <div class="col-md-2"> 
+                	<label for="cantidad">Cantidad</label>
+                	<input type="number" class="form-control" min="1" value="0" name="cantidad" id="cantidadProducto">
+                </div>
+                 <div class="col-md-2"> 
+                	<label for="cantidad">Precio</label>
+                	<input type="number" class="form-control" id="precioRango" name="precio" th:value="${precioArticulo}" disabled="disabled">
+                </div>
+                <div class="col-md-3"> 
+                	 <br>
+               		 <button class="btn btn-standar" style="margin-top: 5px;"> + </button>
+                </div>  
+              </div>                                                  
+            </form>
+
+				<div class="col-lg-12 col-md-12 col-sm-12">
+					<div class="table-responsive">
+						<table class="table table-hover">
+							<thead>
+								<tr style="background-color: #17a2b8;">
+									<th class="text-center">Descripci&oacute;n</th>
+									<th>Cantidad</th>
+									<th class="text-center">Precio</th>
+									<th class="text-right">Itbis</th>
+									<th class="text-right">SubTotal</th>
+									<th class="text-right"></th>
+								</tr>
+							</thead>
+							<tbody class="items">
+								<tr>
+									<td class="text-center">Templado de Tablet de 8 Pulgadas</td>
+									<td>1</td>
+									<td class="text-center">1000.00</td>
+									<td class="text-right">180.00</td>
+									<td class="text-right">1180.00</td>
+									<td class="text-right"><a href="#"
+										onclick="eliminar_item('4')"> <svg
+												class="svg-inline--fa fa-trash fa-w-14 icono text-danger"
+												aria-hidden="true" focusable="false" data-prefix="fas"
+												data-icon="trash" role="img"
+												xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"
+												data-fa-i2svg="">
+												<path fill="currentColor"
+													d="M432 32H312l-9.4-18.7A24 24 0 0 0 281.1 0H166.8a23.72 23.72 0 0 0-21.4 13.3L136 32H16A16 16 0 0 0 0 48v32a16 16 0 0 0 16 16h416a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16zM53.2 467a48 48 0 0 0 47.9 45h245.8a48 48 0 0 0 47.9-45L416 128H32z"></path></svg>
+											<!-- <i class="icono fas fa-trash text-danger"></i> -->
+									</a></td>
+								</tr>
+								<tr>
+									<td class="text-center">Forro Xiaomi 8 Note Pro</td>
+									<td>1</td>
+									<td class="text-center">500.00</td>
+									<td class="text-right">90.00</td>
+									<td class="text-right">590.00</td>
+									<td class="text-right"><a href="#"
+										onclick="eliminar_item('5')"> <svg
+												class="svg-inline--fa fa-trash fa-w-14 icono text-danger"
+												aria-hidden="true" focusable="false" data-prefix="fas"
+												data-icon="trash" role="img"
+												xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"
+												data-fa-i2svg="">
+												<path fill="currentColor"
+													d="M432 32H312l-9.4-18.7A24 24 0 0 0 281.1 0H166.8a23.72 23.72 0 0 0-21.4 13.3L136 32H16A16 16 0 0 0 0 48v32a16 16 0 0 0 16 16h416a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16zM53.2 467a48 48 0 0 0 47.9 45h245.8a48 48 0 0 0 47.9-45L416 128H32z"></path></svg>
+											<!-- <i class="icono fas fa-trash text-danger"></i> -->
+									</a></td>
+								</tr>
+<!-- 								<tr> -->
+<!-- 									<td colspan="4" class="text-right">NETO</td> -->
+<!-- 									<th class="text-right">3,500.00</th> -->
+<!-- 									<td></td> -->
+<!-- 								</tr> -->
+
+<!-- 								<tr> -->
+<!-- 									<td colspan="4" class="text-right">IMPUESTO</td> -->
+<!-- 									<th class="text-right">280.00</th> -->
+<!-- 									<td></td> -->
+<!-- 								</tr> -->
+
+								<tr>
+									<td colspan="4" class="text-right">TOTAL</td>
+									<th class="text-right">1,770.00</th>
+									<td></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+
+			</div> <!--  Fin del panel body -->
+		</div>
+
+<!-- Modal Add Seriales-->
+<div id="serialesModal" class="modal fade" role="dialog">
+  <div class="modal-dialog modal-lg">
+
+    <!-- Modal content-->
+    <div class="modal-content all">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Seriales Disponibles</h4>
+      </div>
+      <div class="modal-body">
+       	<div class="row">
+
+        <div class="dual-list list-left col-md-5">
+            <div class="well text-right">
+                <div class="row">
+                    <div class="col-md-10">
+                        <div class="input-group">
+                            <span class="input-group-addon glyphicon glyphicon-search"></span>
+                            <input type="text" name="SearchDualList" class="form-control" placeholder="buscar" />
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="btn-group">
+                            <a class="btn btn-primary selector" title="select all"><i class="glyphicon glyphicon-unchecked"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <ul class="list-group" id="addMultiSerial">
+                    <li class="list-group-item text-left" style="color: black;" th:fragment="listaMultiSerial" 
+	                    th:each="serial : ${listaMultiSerial}"
+	                    th:text="${serial.serial}" ></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="list-arrows col-md-1 text-center">
+        	<button class="btn btn-standar btn-sm move-right">
+                <span class="glyphicon glyphicon-chevron-right"></span>
+            </button>
+            <button class="btn btn-standar btn-sm move-left">
+                <span class="glyphicon glyphicon-chevron-left"></span>
+            </button>
+        </div>
+
+        <div class="dual-list list-right col-md-6">
+            <div class="well">
+                <div class="row">
+                    <div class="col-md-2">
+                        <div class="btn-group">
+                            <a class="btn btn-primary selector" title="select all"><i class="glyphicon glyphicon-unchecked"></i></a>
+                        </div>
+                    </div>
+                    <div class="col-md-10">
+                        <div class="input-group">
+                            <input type="text" name="SearchDualList" class="form-control" placeholder="buscar" />
+                            <span class="input-group-addon glyphicon glyphicon-search"></span>
+                        </div>
+                    </div>
+                </div>
+                <ul class="list-group"> </ul>
+            </div>
+        </div>
+
+	</div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-standar" data-dismiss="modal">Guardar</button>
+      </div>
+    </div>
+
+  </div>
+</div>	
+
+<!-- Modal Información del articulo-->
+<div id="articuloModal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content all">
+      <div class="modal-header bg-primary">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h3 class="modal-title">Informaci&oacute;n del art&iacute;culo</h3>
+      </div>
+      <div class="modal-body">
+			<div id="articuloBuscado">
+				<form>
+					<div class="row">
+						<div class="col col-md-12">
+							<input type="hidden" th:value="${idArticuloBuscado}" id="idArticuloBuscado">
+							<div class="form-group">
+								 <label>Nombre</label>
+								 <input th:value="${nombreArticuloBuscado}" class="form-control" type="text" disabled="disabled">
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col col-md-3">
+							<div class="form-group">
+								<label>Disponible</label>
+	                       		<input th:value="${existencia}" id="disponibleModal" class="form-control" type="number" disabled="disabled">
+							</div>
+						</div>
+						<div class="col col-md-3">
+							<div class="form-group">
+								 <label>Precio M&aacute;ximo</label>
+	                      		 <input th:value="${precioMaximo}" id="precioMaximo" class="form-control" type="number" disabled="disabled">
+							</div>
+						</div>
+						<div class="col col-md-3">
+							<div class="form-group">
+								<label>Precio M&iacute;nimo:</label>
+	                      		<input th:value="${precioMinimo}" id="precioMinimo" class="form-control" type="number" disabled="disabled">
+							</div>
+						</div>
+						<div class="col col-md-3">
+							<div class="form-group">
+								 <label>Precio x Mayor:</label>
+	                      		 <input th:value="${precioMayor}" id="precioMayor" class="form-control" type="number" disabled="disabled">
+							</div>
+							<!-- Rangos -->
+							<input th:value="${minMax}" id="minMax" type="hidden">
+							<input th:value="${maxMax}" id="maxMax" type="hidden">
+							<input th:value="${minMin}" id="minMin" type="hidden">
+							<input th:value="${maxMin}" id="maxMin" type="hidden">
+							<input th:value="${minMay}" id="minMay" type="hidden">
+							<input th:value="${maxMay}" id="maxMay" type="hidden">
+						</div>
+					</div>
+           		 </form>
+		</div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-standar" data-dismiss="modal">Regresar</button>
+      </div>
+    </div>
+
+  </div>
+</div>			
+		
+
+<!-- Modal de agregar servicios -->
+<!-- Modal Información del articulo-->
+<div id="servicioModal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <!-- Modal content-->
+    <div class="modal-content all">
+      <div class="modal-header bg-primary">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h3 class="modal-title">Agregar Servicio</h3>
+      </div>
+      <div class="modal-body">
+			<div id="nuevoServicio">
+				<form>
+					<div class="row">
+						<div class="col col-md-12">
+							<div class="form-group">
+								 <label>Descripci&oacute;n</label>
+								 <input class="form-control" id="descripcionServicio" type="text" placeholder="Descripci&oacute;n del Servicio">
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col col-md-4">
+							<div class="form-group">
+								<label>Cantidad</label>
+	                       		<input id="cantidadServicio" min="1" class="form-control" type="number">
+							</div>
+						</div>
+						<div class="col col-md-4">
+							<div class="form-group">
+								 <label>Costo</label>
+	                      		 <input id="costoServicio" min="0" class="form-control" type="number">
+							</div>
+						</div>
+						<div class="col col-md-4">
+							<div class="form-group">
+								<label>Precio de venta:</label>
+	                      		<input id="precioServicio" min="0" class="form-control" type="number">
+							</div>
+						</div>
+					</div>
+           		 </form>
+		</div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-warning" data-dismiss="modal">Regresar</button>
+        <button type="button" class="btn btn-standar" id="btnAddService">Agregar</button>
+      </div>
+    </div>
+
+  </div>
+</div>							
+		
+	</div>
+	<script th:src="@{/js/jquery.min.js}"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script>
+	<span th:if="${msg != null}" class="alert alert-success" role="alert">
+		<script type="text/javascript">
+		Swal.fire({
+			  title: 'Muy bien!',
+			  text: 'Registro Creado',
+			  icon: 'success',
+			  confirmButtonText: 'Cool'
+			})
+		</script>
+	</span>
+	<span th:if="${msg2 != null}" class="alert alert-success" role="alert">
+		<script type="text/javascript">
+		Swal.fire({
+			  title: 'Muy bien!',
+			  text: 'Registro Modificado',
+			  icon: 'success',
+			  confirmButtonText: 'Cool'
+			})
+		</script>
+	</span>
+	<script th:src="@{/js/facturacion.js}"></script>
+	<script th:src="@{/js/dualList.js}"></script>
+	<span th:insert="fragments/footer :: footer"></span>  
+</body>
+</html>

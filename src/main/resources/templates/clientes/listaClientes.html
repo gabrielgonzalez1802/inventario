@@ -45,29 +45,27 @@
 	<div class="container text-white">
 		<div class="card text-primary border rounded">
 			<div class="card-body" style="margin-top: 0px;">
-				<h1 class="card-title" id="nombre_negocio" style="font-size: 16px;">Lista de Usuarios
-					<a class="btn btn-primary" style="float: right;" th:href="@{/usuarios/create}">Agregar</a>
+				<h1 class="card-title" id="nombre_negocio" style="font-size: 16px;">Lista de Clientes
+					<a class="btn btn-primary" style="float: right;" th:href="@{/clientes/create}">Agregar</a>
 				</h1>
 				<br>
 					<table class="table table-striped" id="tabla">
 							<thead>
 								<tr class="table-primary">
 									<th>Nombre</th>
-									<th>Usuario</th>
-									<th>Privilegio</th>
+									<th>Telefono</th>
+									<th>Rnc</th>
 									<th></th>
 								</tr>
 							</thead>
 							<tbody>
-								 <tr th:each="usuario:${usuarios}">
-				                  <td th:text="${usuario.nombre}"></td>
-				                  <td th:text="${usuario.username}"></td>  
+								 <tr th:each="cliente:${clientes}">
+				                  <td th:text="${cliente.nombre}"></td>
+				                   <td th:text="${cliente.telefono}"></td> 
+				                   <td th:text="${cliente.rnc}"></td> 
 				                  <td>
-				                  		<span th:each="perfil : ${usuario.perfiles}" th:if="${perfil.perfil!=null}" th:text="${perfil.perfil}"></span>
-				                  </td>
-				                  <td>
-				                    <a th:href="@{/usuarios/edit/{id} (id=${usuario.id})}" class="btn btn-primary btn-sm" role="button" title="Editar el registro."><i class="fa fa-edit" aria-hidden="true"></i></a>
-				                 	<a th:href="@{/usuarios/delete/{id} (id=${usuario.id})}" onclick="return confirm('¿Estas seguro de eliminar el registro?')" class="btn btn-danger btn-sm" role="button" title="Eliminar el registro."><i class="fa fa-trash" aria-hidden="true"></i></a>
+				                    <a th:href="@{/clientes/edit/{id} (id=${cliente.id})}" class="btn btn-primary btn-sm" role="button" title="Editar el registro."><i class="fa fa-edit" aria-hidden="true"></i></a>
+				                 	<a th:href="@{/clientes/delete/{id} (id=${cliente.id})}" onclick="return confirm('¿Estas seguro de eliminar el registro?')" class="btn btn-danger btn-sm" role="button" title="Eliminar el registro."><i class="fa fa-trash" aria-hidden="true"></i></a>
 				                  </td>
 				                </tr>
 							</tbody>
@@ -79,13 +77,67 @@
 	<script th:src="@{/js/jquery.min.js}"></script>
     <script th:src="@{/bootstrap/js/bootstrap.min.js}"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
 	<script type="text/javascript">
 		$(document).ready(function() {
 			$('#tabla').DataTable({
-				"scrollY": "400px"
+				"scrollY": "400px",
+				    "language": {
+				        "sProcessing":    "Procesando...",
+				        "sLengthMenu":    "Mostrar _MENU_ registros",
+				        "sZeroRecords":   "No se encontraron resultados",
+				        "sEmptyTable":    "Ningún dato disponible en esta tabla",
+				        "sInfo":          "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+				        "sInfoEmpty":     "Mostrando registros del 0 al 0 de un total de 0 registros",
+				        "sInfoFiltered":  "(filtrado de un total de _MAX_ registros)",
+				        "sInfoPostFix":   "",
+				        "sSearch":        "Buscar:",
+				        "sUrl":           "",
+				        "sInfoThousands":  ",",
+				        "sLoadingRecords": "Cargando...",
+				        "oPaginate": {
+				            "sFirst":    "Primero",
+				            "sLast":    "Último",
+				            "sNext":    "Siguiente",
+				            "sPrevious": "Anterior"
+				        },
+				        "oAria": {
+				            "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+				        }
+				    }
 			});
 		});
 	</script>
+	 <span th:if="${msg != null}" class="alert alert-success" role="alert">
+		<script type="text/javascript">
+		Swal.fire({
+			  title: 'Muy bien!',
+			  text: 'Registro guardado',
+			  icon: 'success',
+			  confirmButtonText: 'Cool'
+			})
+		</script>
+	</span>
+	 <span th:if="${msg2 != null}" class="alert alert-success" role="alert">
+		<script type="text/javascript">
+		Swal.fire({
+			  title: 'Muy bien!',
+			  text: 'Registro Modificado',
+			  icon: 'success',
+			  confirmButtonText: 'Cool'
+			})
+		</script>
+	</span>
+	<span th:if="${msg4 != null}" class="alert alert-success" role="alert">
+		<script type="text/javascript">
+		Swal.fire({
+			  title: 'Muy bien!',
+			  text: 'Registro Eliminado',
+			  icon: 'success',
+			  confirmButtonText: 'Cool'
+			})
+		</script>
+	</span>
 	 <span th:insert="fragments/footer :: footer"></span>  
 </body>
 </html>
