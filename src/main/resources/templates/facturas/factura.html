@@ -32,14 +32,14 @@
             padding-top: 100px;
         }
 
-       .list-arrows button {
+        .list-arrows button {
                 margin-bottom: 20px;
         }
         .list-group-item.active, .list-group-item.active:focus, .list-group-item.active:hover {
 		    z-index: 2;
-		    color: #fff;
 		    background-color: #17a2b8;
 		    border-color: #17a2b8;
+		    color:#fff;
 		}
 		.btn-standar {
 		    color: #fff;
@@ -49,6 +49,16 @@
 		.list-group-item:hover{
 			 background-color:#17a2b882;
 			 border-color: #17a2b882;
+		}
+		.table {
+		    background-color: #fff;
+		    color: black;
+		}
+		tr:hover {
+			 color: #fff;
+		}
+		.table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th {
+		    border-top: 1px solid #68c5ca;
 		}
  	</style>
  	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
@@ -62,6 +72,9 @@
 		}
 		.table-hover tbody tr:hover td, .table-hover tbody tr:hover th {
 		  background-color: #085865;
+		}
+		.swal2-container.swal2-backdrop-show, .swal2-container.swal2-noanimation {
+		    background: rgb(0 0 0 / 92%);
 		}
   </style>
   </head>
@@ -78,6 +91,16 @@
               <div class="row">
                 <div class="col-md-4"> 
                   <div class="form-group">
+                  	<div id="responseAddSerial">
+                  		  <input type="hidden" id="AddSerialStatus" th:value="${response}">
+              		</div>
+              		<div id="responseDeleteArticulo">
+                  		  <input type="hidden" id="DeleteArticuloStatus" th:value="${response}">
+              		</div>
+                 	<input type="hidden" id="responseDeleteSerial">
+                  	<input type="hidden" id="responseDeleteService">
+                    <input type="hidden" id="responseAddArticuloConSerial">
+                    <input type="hidden" id="responseAddArticuloSinSerial">
                     <input type="hidden" id="tipoArticulo" th:value="${tipoArticulo}">
                     <label for="nombre">Lista de Productos</label>
                     <input type="text" class="form-control" name="artuculo" id="articulo" placeholder="Buscar por Imei, Art&iacute;culo y C&oacute;digo">
@@ -89,90 +112,28 @@
                     </select>
                   </div>
                 </div>
-                <div class="col-md-2"> 
-                	<label for="cantidad">Cantidad</label>
-                	<input type="number" class="form-control" min="1" value="0" name="cantidad" id="cantidadProducto">
-                </div>
-                 <div class="col-md-2"> 
-                	<label for="cantidad">Precio</label>
-                	<input type="number" class="form-control" id="precioRango" name="precio" th:value="${precioArticulo}" disabled="disabled">
+                <div id="cantidadYprecio">
+	                <div class="col-md-2"> 
+	                	<label for="cantidad">Cantidad</label>
+	                	<input type="number" th:value="${cantidad}" class="form-control" min="1" name="cantidad" id="cantidadProducto">
+	                </div>
+	                 <div class="col-md-2"> 
+	                	<label for="cantidad">Precio</label>
+	                	<input type="number" class="form-control" id="precioRango" name="precio" th:value="${precioArticulo}" disabled="disabled">
+	                </div>
                 </div>
                 <div class="col-md-3"> 
                 	 <br>
-               		 <button class="btn btn-standar" style="margin-top: 5px;"> + </button>
+               		 <button id="agregarArticuloFactura" class="btn btn-standar" style="margin-top: 5px;"> + </button>
                 </div>  
               </div>                                                  
             </form>
 
 				<div class="col-lg-12 col-md-12 col-sm-12">
 					<div class="table-responsive">
-						<table class="table table-hover">
-							<thead>
-								<tr style="background-color: #17a2b8;">
-									<th class="text-center">Descripci&oacute;n</th>
-									<th>Cantidad</th>
-									<th class="text-center">Precio</th>
-									<th class="text-right">Itbis</th>
-									<th class="text-right">SubTotal</th>
-									<th class="text-right"></th>
-								</tr>
-							</thead>
-							<tbody class="items">
-								<tr>
-									<td class="text-center">Templado de Tablet de 8 Pulgadas</td>
-									<td>1</td>
-									<td class="text-center">1000.00</td>
-									<td class="text-right">180.00</td>
-									<td class="text-right">1180.00</td>
-									<td class="text-right"><a href="#"
-										onclick="eliminar_item('4')"> <svg
-												class="svg-inline--fa fa-trash fa-w-14 icono text-danger"
-												aria-hidden="true" focusable="false" data-prefix="fas"
-												data-icon="trash" role="img"
-												xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"
-												data-fa-i2svg="">
-												<path fill="currentColor"
-													d="M432 32H312l-9.4-18.7A24 24 0 0 0 281.1 0H166.8a23.72 23.72 0 0 0-21.4 13.3L136 32H16A16 16 0 0 0 0 48v32a16 16 0 0 0 16 16h416a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16zM53.2 467a48 48 0 0 0 47.9 45h245.8a48 48 0 0 0 47.9-45L416 128H32z"></path></svg>
-											<!-- <i class="icono fas fa-trash text-danger"></i> -->
-									</a></td>
-								</tr>
-								<tr>
-									<td class="text-center">Forro Xiaomi 8 Note Pro</td>
-									<td>1</td>
-									<td class="text-center">500.00</td>
-									<td class="text-right">90.00</td>
-									<td class="text-right">590.00</td>
-									<td class="text-right"><a href="#"
-										onclick="eliminar_item('5')"> <svg
-												class="svg-inline--fa fa-trash fa-w-14 icono text-danger"
-												aria-hidden="true" focusable="false" data-prefix="fas"
-												data-icon="trash" role="img"
-												xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"
-												data-fa-i2svg="">
-												<path fill="currentColor"
-													d="M432 32H312l-9.4-18.7A24 24 0 0 0 281.1 0H166.8a23.72 23.72 0 0 0-21.4 13.3L136 32H16A16 16 0 0 0 0 48v32a16 16 0 0 0 16 16h416a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16zM53.2 467a48 48 0 0 0 47.9 45h245.8a48 48 0 0 0 47.9-45L416 128H32z"></path></svg>
-											<!-- <i class="icono fas fa-trash text-danger"></i> -->
-									</a></td>
-								</tr>
-<!-- 								<tr> -->
-<!-- 									<td colspan="4" class="text-right">NETO</td> -->
-<!-- 									<th class="text-right">3,500.00</th> -->
-<!-- 									<td></td> -->
-<!-- 								</tr> -->
-
-<!-- 								<tr> -->
-<!-- 									<td colspan="4" class="text-right">IMPUESTO</td> -->
-<!-- 									<th class="text-right">280.00</th> -->
-<!-- 									<td></td> -->
-<!-- 								</tr> -->
-
-								<tr>
-									<td colspan="4" class="text-right">TOTAL</td>
-									<th class="text-right">1,770.00</th>
-									<td></td>
-								</tr>
-							</tbody>
-						</table>
+						<div id="cuerpoFactura">
+							
+						</div>
 					</div>
 				</div>
 
@@ -239,14 +200,14 @@
                         </div>
                     </div>
                 </div>
-                <ul class="list-group"> </ul>
+                <ul class="list-group" id="serialesSeleccionados"> </ul>
             </div>
         </div>
 
 	</div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-standar" data-dismiss="modal">Guardar</button>
+        <button type="button" class="btn btn-standar" id="guardarSerialesDelProducto" data-dismiss="modal">Guardar</button>
       </div>
     </div>
 
@@ -269,9 +230,10 @@
 					<div class="row">
 						<div class="col col-md-12">
 							<input type="hidden" th:value="${idArticuloBuscado}" id="idArticuloBuscado">
+							<input type="hidden" th:value="${conItbis}" id="conItbis">
 							<div class="form-group">
 								 <label>Nombre</label>
-								 <input th:value="${nombreArticuloBuscado}" class="form-control" type="text" disabled="disabled">
+								 <input th:value="${nombreArticuloBuscado}" id="nombreArticuloBuscado" class="form-control" type="text" disabled="disabled">
 							</div>
 						</div>
 					</div>
@@ -319,9 +281,7 @@
   </div>
 </div>			
 		
-
 <!-- Modal de agregar servicios -->
-<!-- Modal Información del articulo-->
 <div id="servicioModal" class="modal fade" role="dialog">
   <div class="modal-dialog">
     <!-- Modal content-->
@@ -360,6 +320,7 @@
 	                      		<input id="precioServicio" min="0" class="form-control" type="number">
 							</div>
 						</div>
+						<input type="hidden" id="responseAddService">
 					</div>
            		 </form>
 		</div>
@@ -369,10 +330,65 @@
         <button type="button" class="btn btn-standar" id="btnAddService">Agregar</button>
       </div>
     </div>
-
   </div>
-</div>							
-		
+</div>		
+
+<!-- Modal de agregar servicios -->
+		<div id="serialesAcctModal" class="modal fade" role="dialog">
+			<div class="modal-dialog">
+				<!-- Modal content-->
+				<div class="modal-content all">
+					<div class="modal-header bg-primary">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+						<h3 class="modal-title">Seriales</h3>
+					</div>
+					<div class="modal-body">
+						<div id="serialesAcct">
+							<div th:fragment="infoSeriales">
+								<div class="row">
+									<div class="col col-md-12">
+										<div class="form-group">
+											<input type="hidden" id="detalleArticuloId" th:value="${idDetalleArticulo}">
+											<label>Nombre del art&iacute;culo</label> <input
+												th:value="${detalleArticulo}" class="form-control"
+												id="detalleArticulo" type="text"
+												placeholder="Nombre del art&iacute;culo" disabled="disabled">
+										</div>
+									</div>
+								</div>
+								<div class="row" id="rowAddSerial"></div>
+								<div class="row">
+									<div class="col col-md-12">
+										<div class="table-responsive">
+											<table class="table table-hover">
+												<thead>
+													<tr style="background-color: #17a2b8; color: #fff">
+														<th class="text-center">Serial</th>
+														<th></th>
+													</tr>
+												</thead>
+												<tbody class="items">
+													<tr th:each="serial: ${listaSeriales}">
+														<td th:text="${serial.id_serial}" class="text-center">Serial</td>
+														<td class='text-right'><a href="#" th:onclick="'eliminarSerialFactura(\'' + ${serial.id} + '\');'"> <i class="icono fa fa-trash text-danger"></i> </a></td>			
+													</tr>
+												</tbody>
+											</table>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-warning"
+								data-dismiss="modal">Regresar</button>
+							<button type="button" class="btn btn-standar" id="btnAddSerial">Agregar</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
 	</div>
 	<script th:src="@{/js/jquery.min.js}"></script>
 	<script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script>
@@ -394,7 +410,7 @@
 			  icon: 'success',
 			  confirmButtonText: 'Cool'
 			})
-		</script>
+		</script>	
 	</span>
 	<script th:src="@{/js/facturacion.js}"></script>
 	<script th:src="@{/js/dualList.js}"></script>

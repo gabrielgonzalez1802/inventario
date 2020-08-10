@@ -24,6 +24,9 @@ import com.developergg.app.model.Articulo;
 import com.developergg.app.model.ArticuloAjuste;
 import com.developergg.app.model.ArticuloSerial;
 import com.developergg.app.model.Categoria;
+import com.developergg.app.model.FacturaDetalleTemp;
+import com.developergg.app.model.FacturaSerialTemp;
+import com.developergg.app.model.FacturaServicioTemp;
 import com.developergg.app.model.Propietario;
 import com.developergg.app.model.Suplidor;
 import com.developergg.app.model.Usuario;
@@ -31,6 +34,9 @@ import com.developergg.app.service.IArticulosAjustesService;
 import com.developergg.app.service.IArticulosSeriales;
 import com.developergg.app.service.IArticulosService;
 import com.developergg.app.service.ICategoriasService;
+import com.developergg.app.service.IFacturasDetallesTempService;
+import com.developergg.app.service.IFacturasSerialesTempService;
+import com.developergg.app.service.IFacturasServiciosTempService;
 import com.developergg.app.service.ISuplidoresService;
 import com.developergg.app.util.Utileria;
 
@@ -53,10 +59,21 @@ public class ArticulosController {
 	@Autowired
 	private IArticulosSeriales serviceArticulosSeriales;
 	
+	@Autowired
+	private IFacturasServiciosTempService serviceServiciosTemp;
+	
+	@Autowired
+	private IFacturasDetallesTempService serviceFacturasDetallesTemp;
+	
+	@Autowired
+	private IFacturasSerialesTempService serviceSerialesTemp;
+	
 	@Value("${inventario.ruta.imagenes}")
 	private String ruta;
 	
 	private List<Articulo> lista;
+	
+	private final double impuestoTemp = 0.18;
 		
 	@GetMapping("/")
 	public String mostrarArticulos(Model model, HttpSession session) {
@@ -395,7 +412,7 @@ public class ArticulosController {
 		return "facturas/factura :: listaMultiSerial";
 	}
 	
-	@GetMapping("/ajax/getArticuloSinserial/{id}")
+	@GetMapping("/ajax/getInfoArticulo/{id}")
 	public String obtenerArticuloWhitIdAjax(@PathVariable("id") Integer idArticulo, Model model, HttpSession session) {
 		Usuario usuario = (Usuario) session.getAttribute("usuario");
 		//Buscamos el articulo a partir del id
@@ -410,6 +427,7 @@ public class ArticulosController {
 			}
 		}
 		model.addAttribute("idArticuloBuscado", articulo.getId());
+		model.addAttribute("conItbis", articulo.getItbis());
 		model.addAttribute("nombreArticuloBuscado", articulo.getNombre());
 		model.addAttribute("existencia", articulo.getCantidad());
 		model.addAttribute("precioMaximo", articulo.getPrecio_maximo());
@@ -444,9 +462,287 @@ public class ArticulosController {
 	@PostMapping("/ajax/addService/")	
 	public String agregarServicio(HttpSession session, @RequestParam("descripcion") String descripcion, @RequestParam("costo") Double costo,
 			@RequestParam("precio") Double precio, @RequestParam("cantidad") Integer cantidad) {
-//		Usuario usuario = (Usuario) session.getAttribute("usuario");
+		Usuario usuario = (Usuario) session.getAttribute("usuario");
+		FacturaServicioTemp servicioFac = new FacturaServicioTemp();
+		servicioFac.setUsuario(usuario);
+		servicioFac.setAlmacen(usuario.getAlmacen()); //redundante por el usuario. validar
+		servicioFac.setDescripcion(descripcion);
+		servicioFac.setCosto(costo);
+		servicioFac.setPrecio(precio);
+		servicioFac.setCantidad(cantidad);
+		serviceServiciosTemp.guardar(servicioFac);
+		return "facturas/factura :: #responseAddService";
+	}
+	
+	@PostMapping("/ajax/addArticuloSinSerial/")	
+	public String agregarArticuloSinSerial(HttpSession session, @RequestParam("idArticulo") Integer idArticulo,
+			@RequestParam("cantidad") Integer cantidad, @RequestParam("precio") Double precio,
+			@RequestParam("conItbis") String conItbis, @RequestParam("disponible") Integer disponible,
+			@RequestParam("maximo") Double maximo) {
+		Double itBis = 0.0;
+		Usuario usuario = (Usuario) session.getAttribute("usuario");
+		//Buscamos el articulo
+		Articulo articulo = serviceArticulos.buscarPorId(idArticulo);
+		FacturaDetalleTemp facturaTemp = new FacturaDetalleTemp();
+		facturaTemp.setArticulo(articulo);
+		facturaTemp.setUsuario(usuario);
+		facturaTemp.setAlmacen(usuario.getAlmacen());
+		facturaTemp.setCantidad(cantidad);
+		facturaTemp.setConItbis(conItbis.equals("SI")?"1":"0");
 		
-		return "facturas/factura :: #precioRango";
+		double newPrecio = precio*cantidad;
+		
+		if(conItbis.equals("SI")) {
+			itBis= newPrecio * impuestoTemp; 
+		}
+				
+		facturaTemp.setPrecio(newPrecio);
+		facturaTemp.setExistencia(disponible);
+		facturaTemp.setItbis(itBis);
+		facturaTemp.setPrecio_maximo(maximo);
+		facturaTemp.setSubtotal(newPrecio+itBis);
+		serviceFacturasDetallesTemp.guardar(facturaTemp);
+		return "facturas/factura :: #responseAddArticuloSinSerial";
+	}
+	
+	@PostMapping("/ajax/addArticuloConSerial/")	
+	public String agregarArticuloConSerial(HttpSession session, @RequestParam("idArticulo") Integer idArticulo,
+			@RequestParam("cantidad") Integer cantidad, @RequestParam("precio") Double precio,
+			@RequestParam("seriales") String seriales) {
+		Double itBis = 0.0;
+		precio = 0.0;
+		Usuario usuario = (Usuario) session.getAttribute("usuario");
+		//Buscamos el articulo
+		Articulo articulo = serviceArticulos.buscarPorId(idArticulo);
+		
+		String[] serialesArray = seriales.split(",");
+		
+		//Validacion para articulos con serial
+		List<ArticuloSerial> articuloSerials = serviceArticulosSeriales
+				.buscarPorArticuloAlmacen(articulo, usuario.getAlmacen()).stream()
+				.filter(s -> s.getEstado().equalsIgnoreCase("Disponible"))
+				.collect(Collectors.toList());
+		if(!articuloSerials.isEmpty()) {
+			articulo.setCantidad(articuloSerials.size());
+		}else {
+			articulo.setCantidad(0);
+		}
+
+		FacturaDetalleTemp facturaTemp = new FacturaDetalleTemp();
+		facturaTemp.setArticulo(articulo);
+		facturaTemp.setUsuario(usuario);
+		facturaTemp.setAlmacen(usuario.getAlmacen());
+		facturaTemp.setCantidad(serialesArray.length);
+		
+		for (ArticuloSerial articuloSerial : articuloSerials) {
+			for (String serial : serialesArray) {
+				if(serial.equals(articuloSerial.getSerial())) {
+					precio+=articuloSerial.getCosto();
+				}
+			}
+		}
+		
+		facturaTemp.setConItbis(articulo.getItbis().equals("SI")?"1":"0");
+		facturaTemp.setImei(articulo.getImei().equals("SI")?"1":"0");
+		
+		if(articulo.getItbis().equals("SI")) {
+			itBis= precio * impuestoTemp; 
+		}
+		
+		facturaTemp.setPrecio(precio);
+		facturaTemp.setExistencia(articulo.getCantidad());
+		facturaTemp.setItbis(itBis);
+		facturaTemp.setPrecio_maximo(articulo.getPrecio_maximo());
+		facturaTemp.setSubtotal(precio+itBis);
+		serviceFacturasDetallesTemp.guardar(facturaTemp);
+		
+		if(facturaTemp.getId()!=null) {
+			for (String serial : serialesArray) {
+				FacturaSerialTemp serialTemp = new FacturaSerialTemp();
+				serialTemp.setId_serial(Integer.parseInt(serial));
+				serialTemp.setIdDetalle(facturaTemp);
+				serviceSerialesTemp.guardar(serialTemp);
+			}
+		}
+		return "facturas/factura :: #responseAddArticuloConSerial";
+	}
+	
+	@GetMapping("/ajax/loadCuerpoFactura/")
+	public String getCuerpoFacturaTemp(Model model, HttpSession session) {
+		Usuario usuario = (Usuario) session.getAttribute("usuario");
+		//Buscamos los detalles en la factura
+		List<FacturaDetalleTemp> facturaDetallesTemp = serviceFacturasDetallesTemp.buscarPorUsuarioAlmacen(usuario, usuario.getAlmacen());
+		//Buscamos los servicios en la factura
+		List<FacturaServicioTemp> facturaServiciosTemp = serviceServiciosTemp.buscarPorUsuarioAlmacen(usuario, usuario.getAlmacen());
+		Double total = 0.0;
+		//Calculamos el total
+		for (FacturaDetalleTemp facturaDetalleTemp : facturaDetallesTemp) {
+			total+=facturaDetalleTemp.getSubtotal();
+			List<FacturaSerialTemp> facturaSerialesTemp = serviceSerialesTemp.buscarPorDetalleTemp(facturaDetalleTemp);
+			if(!facturaSerialesTemp.isEmpty()) {
+				for (FacturaSerialTemp facturaSerialTemp : facturaSerialesTemp) {
+					facturaDetalleTemp.agregar(facturaSerialTemp);
+				}
+			}
+		}
+		for (FacturaServicioTemp facturaServicioTemp : facturaServiciosTemp) {
+			total+=facturaServicioTemp.getPrecio();
+		}
+		model.addAttribute("facturaDetalles", facturaDetallesTemp);
+		model.addAttribute("facturaServicios", facturaServiciosTemp);
+		model.addAttribute("total", total);
+		return "facturas/cuerpoFactura :: cuerpoFactura";
+	}
+	
+	@PostMapping("/ajax/deleteService/")
+	public String quitarServicioFactura(Model model, @RequestParam("idServicio") Integer idServicio) {
+		serviceServiciosTemp.eliminar(idServicio);
+		return "facturas/factura :: #responseDeleteService";
+	}
+	
+	@GetMapping("/ajax/obtenerSeriales/{id}")
+	public String obtenerSeriales(Model model, @PathVariable("id") Integer idFacturaDetalle) {
+		FacturaDetalleTemp detalle = serviceFacturasDetallesTemp.buscarPorId(idFacturaDetalle);
+		List<FacturaSerialTemp> seriales = serviceSerialesTemp.buscarPorDetalleTemp(detalle);
+		model.addAttribute("listaSeriales", seriales);
+		model.addAttribute("idDetalleArticulo", detalle.getId());
+		model.addAttribute("detalleArticulo", detalle.getArticulo().getNombre());
+		return "facturas/factura :: infoSeriales";
+	}
+	
+	@PostMapping("/ajax/deleteSerial/")
+	public String quitarSerialFactura(Model model, @RequestParam("idSerial") Integer idSerial, HttpSession session) {
+		Usuario usuario = (Usuario) session.getAttribute("usuario");
+		//actualizar detalle
+		FacturaSerialTemp serialTemp = serviceSerialesTemp.buscarPorId(idSerial);
+		FacturaDetalleTemp detalleTemp = serialTemp.getIdDetalle();
+		//Obtenemos la lista de los seriales que pertenecen al articulo
+		ArticuloSerial articuloSerial = serviceArticulosSeriales.buscarPorArticuloAlmacen(detalleTemp.getArticulo(), usuario.getAlmacen()).
+				stream().filter(a -> 
+						(a.getEstado().equalsIgnoreCase("Disponible") && 
+						a.getSerial().equalsIgnoreCase(String.valueOf(serialTemp.getId_serial())))).
+				collect(Collectors.toList()).get(0);
+				
+		//Obtenemos los valores reales del serial
+		Double precioRealSerial = articuloSerial.getCosto();
+		int tempCantidad = detalleTemp.getCantidad();
+		double tempPrecio = detalleTemp.getPrecio();
+		detalleTemp.setCantidad(tempCantidad-1);
+		detalleTemp.setPrecio(tempPrecio-precioRealSerial);
+		if(detalleTemp.getConItbis().equalsIgnoreCase("1") || detalleTemp.getConItbis().equalsIgnoreCase("SI")) {
+			detalleTemp.setItbis(detalleTemp.getPrecio()*impuestoTemp); 
+			detalleTemp.setSubtotal(detalleTemp.getPrecio()+detalleTemp.getItbis());
+		}else {
+			detalleTemp.setItbis(0.0);
+			detalleTemp.setSubtotal(detalleTemp.getPrecio());
+		}
+		serviceFacturasDetallesTemp.guardar(detalleTemp);
+		serviceSerialesTemp.eliminar(idSerial);
+		return "facturas/factura :: #responseDeleteSerial";
+	}
+	
+	@PostMapping("/ajax/addSerialArticuloFactura/")
+	public String agregarSerialFactura(Model model, @RequestParam("idDetalle") Integer idDetalle,
+			 @RequestParam("serial") Integer serial, HttpSession session) {
+		Usuario usuario = (Usuario) session.getAttribute("usuario");
+		FacturaDetalleTemp detalleTemp = serviceFacturasDetallesTemp.buscarPorId(idDetalle);
+		//Buscamos si el articulo ya tiene el serial incluido
+		Articulo articulo = detalleTemp.getArticulo();
+		
+		//Buscamos los seriales originales disponibles del articulo que esten disponibles
+		List<ArticuloSerial> serialesOriginl = serviceArticulosSeriales.buscarPorArticuloAlmacen(articulo, usuario.getAlmacen()).
+				stream().filter(s -> 
+				(s.getEliminado() == 0 && s.getEstado().equalsIgnoreCase("Disponible"))).
+				collect(Collectors.toList());
+		
+		boolean existeEnOriginal = false;
+		
+		//Verificamos que el serial que ingrese el usuario pertenezca al articulo
+		for (ArticuloSerial articuloSerial : serialesOriginl) {
+			if(articuloSerial.getSerial().replace(" ", "").equalsIgnoreCase(String.valueOf(serial))) {
+				existeEnOriginal = true;
+				break;
+			}
+		}
+				
+		//Si el serial esta dispoponible y conincide con los seriales del articulo verificamos que no este asociado en el detalle
+		if(existeEnOriginal) {
+			List<FacturaSerialTemp> listaSerialesFactura = serviceSerialesTemp.buscarPorDetalleTemp(detalleTemp);
+			boolean existeEnDetalle = false;
+			for (FacturaSerialTemp facturaSerialTemp : listaSerialesFactura) {
+				if(facturaSerialTemp.getId_serial().equals(serial)) {
+					existeEnDetalle = true;
+					break;
+				}
+			}
+			//Si no existe en el detalle lo agregamos
+			if(!existeEnDetalle) {
+				FacturaSerialTemp newSerial = new FacturaSerialTemp();
+				newSerial.setId_serial(serial);
+				newSerial.setIdDetalle(detalleTemp);
+				serviceSerialesTemp.guardar(newSerial);
+				if(newSerial.getId()!=null) {
+					//Obtenemos los datos del serial original
+					ArticuloSerial serialOriginal = serviceArticulosSeriales.buscarPorSerial(String.valueOf(serial));
+					//Actualizamos el detalle del articulo en la factura
+					detalleTemp.setCantidad(detalleTemp.getCantidad()+1);
+					detalleTemp.setPrecio(detalleTemp.getPrecio()+serialOriginal.getCosto());
+					if(detalleTemp.getConItbis().equalsIgnoreCase("1") || detalleTemp.getConItbis().equalsIgnoreCase("SI")) {
+						detalleTemp.setItbis(detalleTemp.getPrecio()*impuestoTemp); 
+						detalleTemp.setSubtotal(detalleTemp.getPrecio()+detalleTemp.getItbis());
+					}else {
+						detalleTemp.setItbis(0.0);
+						detalleTemp.setSubtotal(detalleTemp.getPrecio());
+					}
+					serviceFacturasDetallesTemp.guardar(detalleTemp);
+					model.addAttribute("response","GUARDADO");
+				}
+			}else {
+				model.addAttribute("response","EXISTE EN DETALLE");
+			}
+		}else {
+			model.addAttribute("response","NO EXISTE EN ORIGINAL");
+		}
+		return "facturas/factura :: #AddSerialStatus";
+	}
+	
+	@PostMapping("/ajax/deleteArticuloFactura/")
+	public String borrarArticuloFactura(Model model, @RequestParam("idDetalle") Integer idDetalle, 
+			HttpSession session) {
+		FacturaDetalleTemp detalleTemp = serviceFacturasDetallesTemp.buscarPorId(idDetalle);
+		//validacion para articulos con imei
+		Articulo articulo = detalleTemp.getArticulo();
+		if(articulo.getImei().equalsIgnoreCase("SI")) {
+			//obtenemos los seriales asociados al articulo en la factura
+			List<FacturaSerialTemp> seriales = serviceSerialesTemp.buscarPorDetalleTemp(detalleTemp);
+			//recorremos todos los seriales
+			serviceSerialesTemp.eliminarListaSeriales(seriales);
+			//borramos el detalle en la factura
+			serviceFacturasDetallesTemp.eliminar(idDetalle);
+			model.addAttribute("response", 1);
+		}else {
+			//Articulos sin imei
+			serviceFacturasDetallesTemp.eliminar(idDetalle);
+			model.addAttribute("response", 1);
+		}
+		return "facturas/factura :: #responseDeleteArticulo";
+	}
+	
+	@PostMapping("/ajax/obtenerInfoDeSeriales/")
+	public String obtenerInfoDeSeriales(Model model, @RequestParam("seriales") String seriales, 
+			HttpSession session) {
+		Usuario usuario = (Usuario) session.getAttribute("usuario");
+		Double precio = 0.0;
+		String[] serialesArray = seriales.split(",");
+		for (String serial : serialesArray) {
+			ArticuloSerial articuloSerial = serviceArticulosSeriales.buscarPorSerialAndAlmacen(serial, usuario.getAlmacen()).get(0);
+			if(articuloSerial!=null) {
+				precio+=articuloSerial.getCosto();
+			}
+		}
+		model.addAttribute("precioArticulo", precio);
+		model.addAttribute("cantidad", serialesArray.length);
+		return "facturas/factura :: #cantidadYprecio";
 	}
 		
 	@ModelAttribute

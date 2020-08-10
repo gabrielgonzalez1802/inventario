@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
+<head>
+</head>
+
+<body>
+	<div th:fragment="cuerpoFactura">
+		<table class="table table-hover">
+			<thead>
+				<tr style="background-color: #17a2b8;color:#fff">
+					<th class="text-center">Descripci&oacute;n</th>
+					<th>Cantidad</th>
+					<th class="text-center">Precio</th>
+					<th class="text-right">Itbis</th>
+					<th class="text-right">SubTotal</th>
+					<th class="text-right"></th>
+				</tr>
+			</thead>
+			<tbody class="items">
+				<!-- detalles  -->
+				<tr th:each="detalles:${facturaDetalles}">
+					<td th:if="${detalles.articulo.imei == 'SI'}" style="cursor: pointer;" class="text-center" th:onclick="'modalSerialesDetalleFactura(\'' + ${detalles.id} + '\');'" th:text="${detalles.articulo.nombre}">Descripcion del articulo</td>
+					<td th:unless="${detalles.articulo.imei == 'SI'}" class="text-center" th:text="${detalles.articulo.nombre}">Descripcion del articulo</td>
+					<td th:text="${detalles.cantidad}">Cantidad de articulo</td>
+					<td th:text="${detalles.precio}" class="text-center">Precio</td>
+					<td th:text="${detalles.itbis}" class="text-right">Itbis</td>
+					<td th:text="${detalles.subtotal}" class="text-right">Subtotal</td>
+					<td class='text-right'><a href="#" th:onclick="'eliminarArticuloFactura(\'' + ${detalles.id} + '\');'"> <i class="icono fa fa-trash text-danger"></i> </a></td>			
+				</tr><!--  Fin detalles -->
+				<!--  Servicios  -->
+				<tr th:each="servicio : ${facturaServicios}">
+					<td th:text="${servicio.descripcion}" class="text-center">Nombre del Servicio</td>
+					<td th:text="${servicio.cantidad}">Cantidad del Servicio</td>
+					<td th:text="${servicio.precio}" class="text-center">Precio del Servicio</td>
+					<td class="text-right">0.00</td>
+					<td th:text="${servicio.precio}" class="text-right">SubTotal</td>
+					<td class='text-right'><a href="#" th:onclick="'eliminarServicioFactura(\'' + ${servicio.id} + '\');'"> <i class="icono fa fa-trash text-danger"></i> </a></td>			
+				</tr>
+				<tr>
+					<td colspan="4" class="text-right">TOTAL</td>
+					<th th:text="${total}" class="text-right">precio total</th>
+					<td></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</body>
+</html>

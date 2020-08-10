@@ -30,7 +30,7 @@ public class FacturaServicioTemp {
 	@JoinColumn(name = "id_almacen")
 	private Almacen almacen;
 	
-	private Integer taller;
+	private Integer taller = 0;
 
 	public Integer getId() {
 		return id;
