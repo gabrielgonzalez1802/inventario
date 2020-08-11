@@ -24,6 +24,7 @@ import com.developergg.app.model.Articulo;
 import com.developergg.app.model.ArticuloAjuste;
 import com.developergg.app.model.ArticuloSerial;
 import com.developergg.app.model.Categoria;
+import com.developergg.app.model.Cliente;
 import com.developergg.app.model.FacturaDetalleTemp;
 import com.developergg.app.model.FacturaSerialTemp;
 import com.developergg.app.model.FacturaServicioTemp;
@@ -34,6 +35,7 @@ import com.developergg.app.service.IArticulosAjustesService;
 import com.developergg.app.service.IArticulosSeriales;
 import com.developergg.app.service.IArticulosService;
 import com.developergg.app.service.ICategoriasService;
+import com.developergg.app.service.IClientesService;
 import com.developergg.app.service.IFacturasDetallesTempService;
 import com.developergg.app.service.IFacturasSerialesTempService;
 import com.developergg.app.service.IFacturasServiciosTempService;
@@ -67,6 +69,9 @@ public class ArticulosController {
 	
 	@Autowired
 	private IFacturasSerialesTempService serviceSerialesTemp;
+	
+	@Autowired
+	private IClientesService serviceClientes;
 	
 	@Value("${inventario.ruta.imagenes}")
 	private String ruta;
@@ -459,6 +464,25 @@ public class ArticulosController {
 		return "facturas/factura :: #precioRango";
 	}
 	
+	@GetMapping("/ajax/getPriceWhitClient/{id}/{cant}/{idCliente}")
+	public String obtenerPrecioArticuloWhitClienteAjax(@PathVariable("id") Integer idArticulo,
+			@PathVariable("cant") Integer cantidad, Model model,
+			@PathVariable("idCliente") Integer idCliente, HttpSession session) {
+		//Buscamos el articulo a partir del id
+		Double precio = 0.0;
+		Articulo articulo = serviceArticulos.buscarPorId(idArticulo);
+		Cliente cliente = serviceClientes.buscarPorIdCliente(idCliente);
+		if(cliente.getPrecio().equalsIgnoreCase("precio_1")) {
+			precio = articulo.getPrecio_maximo();
+		}else if(cliente.getPrecio().equalsIgnoreCase("precio_2")) {
+			precio = articulo.getPrecio_minimo();
+		}else if(cliente.getPrecio().equalsIgnoreCase("precio_3")) {
+			precio = articulo.getPrecio_mayor();
+		}
+		model.addAttribute("precioArticulo", precio);
+		return "facturas/factura :: #precioRango";
+	}
+	
 	@PostMapping("/ajax/addService/")	
 	public String agregarServicio(HttpSession session, @RequestParam("descripcion") String descripcion, @RequestParam("costo") Double costo,
 			@RequestParam("precio") Double precio, @RequestParam("cantidad") Integer cantidad) {
@@ -743,6 +767,24 @@ public class ArticulosController {
 		model.addAttribute("precioArticulo", precio);
 		model.addAttribute("cantidad", serialesArray.length);
 		return "facturas/factura :: #cantidadYprecio";
+	}
+	
+	@GetMapping("/ajax/listaClientes/")
+	public String obtenerClientes(Model model, HttpSession session) {
+		Usuario usuario = (Usuario) session.getAttribute("usuario");
+		List<Cliente> clientes = serviceClientes.buscarPorAlmacen(usuario.getAlmacen());
+		model.addAttribute("clientes", clientes);
+		return "facturas/factura :: #seleccionCliente";
+	}
+	
+	@GetMapping("/ajax/getInfoCliente/{id}")
+	public String obtenerInformacionClienteAjax(@PathVariable("id") Integer idCliente, Model model, HttpSession session) {
+		//Buscamos el cliente a partir del id
+		Cliente cliente = serviceClientes.buscarPorIdCliente(idCliente);
+		model.addAttribute("idCliente", cliente.getId());
+		model.addAttribute("rncCliente", cliente.getRnc());
+		model.addAttribute("precioCliente", cliente.getPrecio());
+		return "facturas/factura :: #nuevoCliente";
 	}
 		
 	@ModelAttribute

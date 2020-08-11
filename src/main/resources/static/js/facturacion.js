@@ -1,4 +1,5 @@
 $('#articulos').load("/articulos/ajax/getAll");
+$("#seleccionCliente").load("/articulos/ajax/listaClientes/");
 
 var idArticuloBuscado;
 
@@ -50,7 +51,7 @@ $("#articulos").focusout(
 				//Mostramos el modal para agregar seriales
 				$('#serialesModal').modal('show');
 			} else {
-				$('#articuloModal').modal('show');
+//				$('#articuloModal').modal('show'); //Comentado a peticion del cliente
 			}
 		});
 
@@ -71,16 +72,62 @@ $("#cantidadProducto").on(
 			} else {
 				var idArticulo = $("#idArticuloBuscado").val();
 				//calculamos el precio del articulo según el rango
-				$.get("/articulos/ajax/getPrice/" + idArticulo + "/" + acct,
-						function(fragment) {
-							$('#precioRango').replaceWith(fragment);
-						});
+				//para el calculo del precio verificamos si hay algun cliente seleccionado
+				var idCliente = $("#selectCliente").val();
+				if(idCliente!=""){
+					//Si el cliente esta seleccionado verificamos el precio
+					$.get("/articulos/ajax/getPriceWhitClient/" + idArticulo + "/" + acct + "/" + idCliente,
+							function(fragment) {
+								$('#precioRango').replaceWith(fragment);
+							});
+					//activamos el input de precio para que se pueda modificar
+					alert("tiene cliente: "+idCliente);
+					$("#precioRango").removeAttr('disabled');
+				}else{
+					//desactivamos el input para que no se pueda modificar
+					$("#precioRango").attr('disabled','disabled');
+					$.get("/articulos/ajax/getPrice/" + idArticulo + "/" + acct,
+							function(fragment) {
+								$('#precioRango').replaceWith(fragment);
+							});
+				}
 			}
 		});
+
+//cuando seleccione algun cliente obtenemos toda su informacion
+function seleccionarCliente(){
+	var idCliente = $("#selectCliente").val();
+	if(idCliente==""){
+		$("#rncCliente").val("");
+	}else{
+		//obtenemos la informacion del cliente
+		$.get("/articulos/ajax/getInfoCliente/" + idCliente,
+				function(fragment) {
+				$('#nuevoCliente').replaceWith(fragment);
+		});
+		//actualizamos el precio
+		var articulo = $("#articulo").val();
+		if(articulo!=""){
+			//verificamos que el articulo no tenga serial
+			if ($("#tipoArticulo").val() != "SI") {
+				//Actualizamos precio
+				$.get("/articulos/ajax/getPriceWhitClient/" + idArticuloBuscado + "/" + 1 + "/" + idCliente,
+				function(fragment) {
+					$('#precioRango').replaceWith(fragment);
+				});
+			}
+		}
+	}
+}
 
 //accion para llamar al modal de agregar servicio
 $("#btnServiceModal").click(function() {
 	$('#servicioModal').modal('show');
+});
+
+//accion para llamar al modal de agregar cliente
+$("#btnClienteModal").click(function() {
+   $('#clienteModal').modal('show');
 });
 
 //Evento para agregar servicio
