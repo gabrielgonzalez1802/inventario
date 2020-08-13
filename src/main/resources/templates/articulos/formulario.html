@@ -16,6 +16,7 @@
  	<link rel="stylesheet" type="text/css" th:href="@{/css/dashboard.css}">
  	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap" rel="stylesheet">
  	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+ 	<link rel="stylesheet" type="text/css" th:href="@{/css/swal.css}">
   </head>
   <body>
      <span th:insert="fragments/topMenu :: menu-principal"></span> 
@@ -56,61 +57,61 @@
                 </div>
               </div>
               
-              <hr style="border-top: 1px solid #D8D8D8;">
+              <hr id="hrPrice" style="border-top: 1px solid #D8D8D8;">
                  
               <div class="row">
                 <div class="col-md-2"> 
                   <div class="form-group">
-                    <label for="precio_maximo">Precio M&aacute;ximo</label>
-                    <input type="text" th:field="*{precio_maximo}" class="form-control" id="precio_maximo" placeholder="Precio M&aacute;ximo" required="required" disabled="disabled">
+                    <label for="precio_maximo" id="lbl_precio_maximo">Precio M&aacute;ximo</label>
+                    <input type="text" th:field="*{precio_maximo}" class="form-control" id="precio_maximo" placeholder="Precio M&aacute;ximo" disabled="disabled">
                   </div>  
                 </div>
                  <div class="col-md-1"> 
                   <div class="form-group">
-                    <label for="min_precio_maximo">Min</label>
-                    <input type="number" th:field="*{rango_precio_maximo_desde}" class="form-control" min = "0" id="min_precio_maximo" required="required" disabled="disabled">
+                    <label for="min_precio_maximo" id="lbl_min_precio_maximo">Min</label>
+                    <input type="number" th:field="*{rango_precio_maximo_desde}" class="form-control" min = "0" id="min_precio_maximo" disabled="disabled">
                   </div>  
                 </div>
                  <div class="col-md-1"> 
                   <div class="form-group">
-                    <label for="max_precio_maximo">Max</label>
-                    <input type="number" th:field="*{rango_precio_maximo_hasta}"  class="form-control" min = "0" id="max_precio_maximo" required="required" disabled="disabled">
+                    <label for="max_precio_maximo" id="lbl_max_precio_maximo">Max</label>
+                    <input type="number" th:field="*{rango_precio_maximo_hasta}"  class="form-control" min = "0" id="max_precio_maximo" disabled="disabled">
                   </div>  
                 </div>
                  <div class="col-md-2"> 
                   <div class="form-group">
-                    <label for="precio_minimo">Precio Minimo</label>
-                    <input type="text" class="form-control" th:field="*{precio_minimo}" id="precio_minimo" placeholder="Precio Minimo" required="required" disabled="disabled">
+                    <label for="precio_minimo" id="lbl_precio_minimo">Precio Minimo</label>
+                    <input type="text" class="form-control" th:field="*{precio_minimo}" id="precio_minimo" placeholder="Precio Minimo" disabled="disabled">
                   </div>  
                 </div>
                  <div class="col-md-1"> 
                   <div class="form-group">
-                    <label for="min_precio_minimo">Min</label>
-                    <input type="number" class="form-control" th:field="*{rango_precio_minimo_desde}" min = "0" id="min_precio_minimo" required="required" disabled="disabled">
+                    <label for="min_precio_minimo" id="lbl_min_precio_minimo">Min</label>
+                    <input type="number" class="form-control" th:field="*{rango_precio_minimo_desde}" min = "0" id="min_precio_minimo" disabled="disabled">
                   </div>  
                 </div>
                  <div class="col-md-1"> 
                   <div class="form-group">
-                    <label for="max_precio_minimo">Max</label>
-                    <input type="number" th:field="*{rango_precio_minimo_hasta}" class="form-control" min = "0" id="max_precio_minimo" required="required" disabled="disabled">
+                    <label for="max_precio_minimo" id="lbl_max_precio_minimo">Max</label>
+                    <input type="number" th:field="*{rango_precio_minimo_hasta}" class="form-control" min = "0" id="max_precio_minimo" disabled="disabled">
                   </div>  
                 </div>
                 <div class="col-md-2"> 
                   <div class="form-group">
-                    <label for="precio_mayor">Precio x Mayor</label>
-                    <input type="text" class="form-control" th:field="*{precio_mayor}" id="precio_mayor" placeholder="Precio x Mayor" required="required" disabled="disabled">
+                    <label for="precio_mayor" id="lbl_precio_mayor">Precio x Mayor</label>
+                    <input type="text" class="form-control" th:field="*{precio_mayor}" id="precio_mayor" placeholder="Precio x Mayor" disabled="disabled">
                   </div>  
                 </div>
                 <div class="col-md-1"> 
                   <div class="form-group">
-                    <label for="min_precio_mayor">Min</label>
-                    <input type="number" th:field="*{rango_precio_mayor_desde}" class="form-control" min = "0" id="min_precio_mayor" required="required" disabled="disabled">
+                    <label for="min_precio_mayor" id="lbl_min_precio_mayor">Min</label>
+                    <input type="number" th:field="*{rango_precio_mayor_desde}" class="form-control" min = "0" id="min_precio_mayor" disabled="disabled">
                   </div>  
                 </div>
                  <div class="col-md-1"> 
                   <div class="form-group">
-                    <label for="max_precio_mayor">Max</label>
-                    <input type="number" th:field="*{rango_precio_mayor_hasta}" class="form-control" min = "0" id="max_precio_mayor" required="required" disabled="disabled">
+                    <label for="max_precio_mayor" id="lbl_max_precio_mayor">Max</label>
+                    <input type="number" th:field="*{rango_precio_mayor_hasta}" class="form-control" min = "0" id="max_precio_mayor" disabled="disabled">
                   </div>  
                 </div>
               </div>    
@@ -243,6 +244,118 @@
 	</span>
 	<script type="text/javascript">
 		$('#categoria').load("/categorias/ajax/getAll");
+		
+		//validacion para los input de precios cuando sea un articulo con serial
+		if($("#imei").val()=="SI"){
+			ocultarPrecios();
+		}
+		
+		function ocultarPrecios(){
+			$("#precio_mayor").val("0");
+			$('#precio_mayor').removeAttr('required');
+			$("#min_precio_mayor").val("0");
+			$('#min_precio_mayor').removeAttr('required');
+			$("#max_precio_mayor").val("0");
+			$('#max_precio_mayor').removeAttr('required');
+
+			$("#precio_maximo").val("0");
+			$('#precio_maximo').removeAttr('required');
+			$("#min_precio_maximo").val("0");
+			$('#min_precio_maximo').removeAttr('required');
+			$("#max_precio_maximo").val("0");	
+			$('#max_precio_maximo').removeAttr('required');
+	
+			$("#precio_minimo").val("0");
+			$('#precio_minimo').removeAttr('required');
+			$("#min_precio_minimo").val("0");
+			$('#min_precio_minimo').removeAttr('required');
+			$("#max_precio_minimo").val("0");	
+			$('#max_precio_minimo').removeAttr('required');
+			
+			$("#precio_mayor").hide();
+			$("#min_precio_mayor").hide();
+			$("#max_precio_mayor").hide();
+			
+			$("#precio_maximo").hide();
+			$("#min_precio_maximo").hide();
+			$("#max_precio_maximo").hide();
+			
+			$("#precio_minimo").hide();
+			$("#min_precio_minimo").hide();
+			$("#max_precio_minimo").hide();
+			
+			//labels
+			$("#lbl_precio_maximo").hide();
+			$("#lbl_min_precio_maximo").hide();
+			$("#lbl_max_precio_maximo").hide();
+			$("#lbl_precio_minimo").hide();
+			$("#lbl_min_precio_minimo").hide();
+			$("#lbl_max_precio_minimo").hide();
+			$("#lbl_precio_mayor").hide();
+			$("#lbl_min_precio_mayor").hide();
+			$("#lbl_max_precio_mayor").hide();
+			
+			//hr
+			$("#hrPrice").hide();
+		}
+		
+		$("#imei").change(function(){
+			if($("#imei").val()=="NO"){
+				mostrarPrecios();
+			}else{
+				ocultarPrecios();
+			}
+		});
+		
+		function mostrarPrecios(){
+			$("#precio_mayor").val("0");
+			$('#precio_mayor').prop('required',true);
+			$("#min_precio_mayor").val("0");
+			$('#min_precio_mayor').prop('required',true);
+			$("#max_precio_mayor").val("0");
+			$('#max_precio_mayor').prop('required',true);
+
+			$("#precio_maximo").val("0");
+			$('#precio_maximo').prop('required',true);
+			$("#min_precio_maximo").val("0");
+			$('#min_precio_maximo').prop('required',true);
+			$("#max_precio_maximo").val("0");	
+			$('#max_precio_maximo').prop('required',true);
+	
+			$("#precio_minimo").val("0");
+			$('#precio_minimo').prop('required',true);
+			$("#min_precio_minimo").val("0");
+			$('#min_precio_minimo').prop('required',true);
+			$("#max_precio_minimo").val("0");	
+			$('#max_precio_minimo').prop('required',true);
+			
+			$("#precio_mayor").show();
+			$("#min_precio_mayor").show();
+			$("#max_precio_mayor").show();
+			
+			$("#precio_maximo").show();
+			$("#min_precio_maximo").show();
+			$("#max_precio_maximo").show();
+			
+			$("#precio_minimo").show();
+			$("#min_precio_minimo").show();
+			$("#max_precio_minimo").show();
+			
+			//labels
+			$("#lbl_precio_maximo").show();
+			$("#lbl_min_precio_maximo").show();
+			$("#lbl_max_precio_maximo").show();
+			$("#lbl_precio_minimo").show();
+			$("#lbl_min_precio_minimo").show();
+			$("#lbl_max_precio_minimo").show();
+			$("#lbl_precio_mayor").show();
+			$("#lbl_min_precio_mayor").show();
+			$("#lbl_max_precio_mayor").show();
+			
+			//hr
+			$("#hrPrice").show();
+		}
+		
 		$("#btnModalAddCategory").click(function(){
 			$('#modalAddCategory').modal('show');
 		});
@@ -254,8 +367,9 @@
 		$("#guardarCategoria").click(function(){
 			var categoria = $("#nameCategory").val();
 			var url = "/categorias/ajax/create/"+categoria;
-			$('#categoria').load(url);
-			$('#modalAddCategory').modal('hide');
+			$('#categoria').load(url,function(){
+				$('#modalAddCategory').modal('hide');
+			});
 		});
 		
    		 var _mSelect2 = $("#js-example-basic-multiple").select2();
@@ -311,7 +425,7 @@
    				var precio_maximo = $("#precio_maximo").val();
    				var precio_minimo = $("#precio_minimo").val();
    				   				
-   				if(costo>precio_mayor || costo>precio_maximo || costo>precio_minimo){
+   				if((costo>precio_mayor || costo>precio_maximo || costo>precio_minimo) && $("#imei").val()!="SI"){
    					Swal.fire({
    						  title: 'Alerta!',
    						  text: 'El costo no puede ser mayor a ningun precio de venta',

@@ -1,0 +1,4 @@
+.swal2-container.swal2-backdrop-show, .swal2-container.swal2-noanimation
+{
+	background: rgb(0 0 0/ 92%);
+}

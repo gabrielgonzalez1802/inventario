@@ -55,6 +55,11 @@ public class ArticuloSerial {
 	
 	private Integer id_envio;
 	private Date fecha_envio;
+	
+	private Double precio_maximo;
+	private Double precio_minimo;
+	private Double precio_mayor;
+	
 	public Integer getId() {
 		return id;
 	}
@@ -169,13 +174,33 @@ public class ArticuloSerial {
 	public void setFecha_envio(Date fecha_envio) {
 		this.fecha_envio = fecha_envio;
 	}
+	public Double getPrecio_maximo() {
+		return precio_maximo;
+	}
+	public void setPrecio_maximo(Double precio_maximo) {
+		this.precio_maximo = precio_maximo;
+	}
+	public Double getPrecio_minimo() {
+		return precio_minimo;
+	}
+	public void setPrecio_minimo(Double precio_minimo) {
+		this.precio_minimo = precio_minimo;
+	}
+	public Double getPrecio_mayor() {
+		return precio_mayor;
+	}
+	public void setPrecio_mayor(Double precio_mayor) {
+		this.precio_mayor = precio_mayor;
+	}
+	
 	@Override
 	public String toString() {
-		return "ArticulosSeriales [id=" + id + ", articulo=" + articulo + ", almacen=" + almacen + ", serial=" + serial
+		return "ArticuloSerial [id=" + id + ", articulo=" + articulo + ", almacen=" + almacen + ", serial=" + serial
 				+ ", fecha=" + fecha + ", suplidor=" + suplidor + ", id_cliente=" + id_cliente + ", id_ajuste="
 				+ id_ajuste + ", id_compra=" + id_compra + ", id_factura=" + id_factura + ", estado=" + estado
 				+ ", id_usuario=" + id_usuario + ", costo=" + costo + ", no_factura=" + no_factura + ", eliminado="
 				+ eliminado + ", id_usuario_eliminar=" + id_usuario_eliminar + ", fecha_eliminado=" + fecha_eliminado
-				+ ", id_envio=" + id_envio + ", fecha_envio=" + fecha_envio + "]";
+				+ ", id_envio=" + id_envio + ", fecha_envio=" + fecha_envio + ", precio_maximo=" + precio_maximo
+				+ ", precio_minimo=" + precio_minimo + ", precio_mayor=" + precio_mayor + "]";
 	}
 }

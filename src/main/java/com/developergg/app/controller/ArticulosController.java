@@ -107,6 +107,14 @@ public class ArticulosController {
 					}else {
 						a.setCantidad(0);
 					}
+					for (ArticuloSerial articuloSerial : articuloSerials) {
+						//buscamos el articulo
+						if(articuloSerial.getArticulo().getId() == a.getId()) {
+							a.setPrecio_maximo(articuloSerial.getPrecio_maximo());
+							a.setPrecio_mayor(articuloSerial.getPrecio_mayor());
+							a.setPrecio_minimo(articuloSerial.getPrecio_minimo());
+						}
+					}
 				}
 			});
 		model.addAttribute("articulos", lista);
@@ -174,6 +182,9 @@ public class ArticulosController {
 			}
 			if(articulo.getRango_precio_minimo_hasta() == null) {
 				articulo.setRango_precio_minimo_hasta(original.getRango_precio_minimo_hasta());
+			}
+			if(original.getImei().equalsIgnoreCase("SI")) {
+				articulo.setImei(original.getImei());
 			}
 		}
 		
@@ -479,6 +490,18 @@ public class ArticulosController {
 		}else if(cliente.getPrecio().equalsIgnoreCase("precio_3")) {
 			precio = articulo.getPrecio_mayor();
 		}
+		model.addAttribute("precioArticulo", precio);
+		return "facturas/factura :: #precioRango";
+	}
+	
+	@GetMapping("/ajax/getPriceWhitClientWhitSerial/{id}/{cant}/{idCliente}")
+	public String obtenerPrecioArticuloWhitClienteSerialAjax(@PathVariable("id") Integer idArticulo,
+			@PathVariable("cant") Integer cantidad, Model model,
+			@PathVariable("idCliente") Integer idCliente, HttpSession session) {
+		//Buscamos el articulo a partir del id
+		Double precio = 0.0;
+		Articulo articulo = serviceArticulos.buscarPorId(idArticulo);
+		precio = articulo.getCosto();
 		model.addAttribute("precioArticulo", precio);
 		return "facturas/factura :: #precioRango";
 	}

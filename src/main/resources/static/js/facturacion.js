@@ -111,10 +111,19 @@ function seleccionarCliente(){
 					//actualizamos el precio
 					var articulo = $("#articulo").val();
 					if(articulo!=""){
-						//verificamos que el articulo no tenga serial
+						//validacion para articulos sin serial
 						if ($("#tipoArticulo").val() != "SI") {
 							//Actualizamos precio
 							$.get("/articulos/ajax/getPriceWhitClient/" + idArticuloBuscado + "/" + 1 + "/" + idCliente,
+							function(fragment) {
+								$('#precioRango').replaceWith(fragment);
+								//activamos el input de precio para que se pueda modificar
+								$("#precioRango").removeAttr('disabled');
+							});
+						}else{
+							//validacion para articulos con serial
+							//Actualizamos precio
+							$.get("/articulos/ajax/getPriceWhitClientWhitSerial/" + idArticuloBuscado + "/" + 1 + "/" + idCliente,
 							function(fragment) {
 								$('#precioRango').replaceWith(fragment);
 								//activamos el input de precio para que se pueda modificar
@@ -211,6 +220,11 @@ $("#agregarArticuloFactura").click(function(e) {
 			})
 		}else{
 			//Selecciona al menos un serial
+			//validaciones del precio del articulo con serial si tiene cliente seleccionado
+			var idCliente = $("#selectCliente").val();
+			if(idCliente!=""){
+				var precioCliente = $("#precioCliente").val();
+			} //ggonzalez
 			 $.post("/articulos/ajax/addArticuloConSerial/",
 						{
 						  idArticulo: idArticulo,

@@ -16,6 +16,7 @@
  	<link rel="stylesheet" type="text/css" th:href="@{/css/dashboard.css}">
  	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap" rel="stylesheet">
  	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+ 	<link rel="stylesheet" type="text/css" th:href="@{/css/swal.css}">
  	<style>
 	  	.table-primary, .table-primary>th, .table-primary>td {
 	   		 background-color: #25396d;
@@ -32,7 +33,7 @@
 	<div class="container">
 		<div class="card all">
 			<div class="card-body" style="margin-top: 0px;">
-			   <h4 class="card-header"><strong style="color: #fff;">Entrada y Salida</strong></h4>    <!-- th:action="@{/articulos/inventario/serial/save}"  -->     
+			   <h4 class="card-header"><strong style="color: #fff;">Entrada de seriales</strong></h4>    <!-- th:action="@{/articulos/inventario/serial/save}"  -->     
 				<br>
 		<div id="ajaxLoadedContent">
 			
@@ -79,6 +80,27 @@
                   <div class="form-group">
                     <label for="fecha">Costo</label>
                     <input type="text" class="form-control" th:field="${articulo.costo}" id="costo" placeholder="Costo" required="required">
+                  </div>  
+                </div>
+              </div>
+              
+              <div class="row">
+                 <div class="col-md-4"> 
+                  <div class="form-group">
+                    <label for="precioMaximo">Precio M&aacute;ximo</label>
+                    <input type="number" min="0" class="form-control" th:field="*{precio_maximo}" id="precioMaximo" placeholder="Precio Maximo" required="required">
+                  </div>  
+                </div>
+                <div class="col-md-4"> 
+                   <div class="form-group">
+                    <label for="precioMinimo">Precio M&iacute;nimo</label>
+                    <input type="number" min="0" class="form-control" th:field="*{precio_minimo}" id="precioMinimo" placeholder="Precio Minimo" required="required">
+                  </div>  
+                </div>
+                 <div class="col-md-4"> 
+                  <div class="form-group">
+                    <label for="precioMayor">Precio x Mayor</label>
+                    <input type="number" min="0" class="form-control" th:field="*{precio_mayor}" id="precioMayor" placeholder="Precio Mayor" required="required">
                   </div>  
                 </div>
               </div>
@@ -132,9 +154,27 @@
 		//clic en el formulario
 		$("#articuloSerial").submit(function(e) {
 			 e.preventDefault();
-			 var $form = $("#articuloSerial");
-			 $('#ultimosImei').load("/articulosSeriales/ajax/serial", $form.serialize());
-			 limpiar();
+				var costo = $("#costo").val();
+   				var precio_mayor = $("#precioMayor").val();
+   				precio_mayor = parseFloat(precio_mayor);
+   				var precio_maximo = $("#precioMaximo").val();
+   				precio_maximo = parseFloat(precio_maximo);
+   				var precio_minimo = $("#precioMinimo").val();
+   				precio_minimo = parseFloat(precio_minimo);
+			 //verificamos que los precios sean mayor al costo
+			 if(costo>precio_mayor || costo>precio_maximo || costo>precio_minimo){
+				 Swal.fire({
+					 title: 'Alerta!',
+					 text: 'El costo no puede ser mayor a ningun precio de venta',
+					 icon: 'warning',
+					 confirmButtonText: 'Entendido'
+				})
+			 }else{
+				 var $form = $("#articuloSerial");
+				 $('#ultimosImei').load("/articulosSeriales/ajax/serial", $form.serialize(),function(){
+					 limpiar();
+				 });
+			 }
 		});
 	</script>
 	<script type="text/javascript">
@@ -164,6 +204,9 @@
 	<script type="text/javascript">
 		function limpiar(){
 			$("#valorImei").val("");
+			$("#precioMayor").val("");
+			$("#precioMaximo").val("");
+			$("#precioMinimo").val("");
 		}
 	</script>
 	 <span th:insert="fragments/footer :: footer"></span>  
