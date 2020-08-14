@@ -39,4 +39,12 @@ public class PropietariosServiceJpa implements IPropietariosService{
 	public void guardar(Propietario propietario) {
 		repo.save(propietario);
 	}
+
+	@Override
+	public void eliminar(Integer idPropietario) {
+		Optional<Propietario> optional = repo.findById(idPropietario);
+		if(optional.isPresent()) {
+			repo.delete(optional.get());
+		}
+	}
 }

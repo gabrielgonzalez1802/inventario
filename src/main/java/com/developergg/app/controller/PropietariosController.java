@@ -22,7 +22,7 @@ import com.developergg.app.service.IPropietariosService;
 public class PropietariosController {
 	
 	@Autowired
-	IPropietariosService servicePropietarios;
+	private IPropietariosService servicePropietarios;
 	
 	@GetMapping("/")
 	public String listaPropietarios(Model model) {
@@ -47,14 +47,30 @@ public class PropietariosController {
 		return "propietarios/formularioEdit";
 	}
 	
+	@GetMapping("/delete/{id}")
+	public String eliminar(@PathVariable("id") Integer idPropietario) {
+		Propietario propietario = servicePropietarios.buscarPorId(idPropietario);
+		if(propietario==null) {
+			return "redirect:/propietarios/create";
+		}
+		servicePropietarios.eliminar(idPropietario);
+		return "redirect:/propietarios/";
+	}
+	
 	@PostMapping("/save")
 	public String guardar(HttpSession session, Model model, Propietario propietario) {
 		Usuario usuario = (Usuario) session.getAttribute("usuario");
+		String option = "CREATE";
+		if(propietario.getId() != null) {
+			option = "UDPATE";
+		}
 		propietario.setFecha(new Date());
 		propietario.setUsuario(usuario);
 		servicePropietarios.guardar(propietario);
-		model.addAttribute("msg2", "Propietario modificado");
-		return "propietarios/formularioCrear";
+		if(option.equals("UPDATE")) {
+			model.addAttribute("msg2", "Propietario modificado");
+		}
+		return "redirect:/propietarios/";
 	}
 	
 }

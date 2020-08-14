@@ -77,6 +77,7 @@
 	<div class="container">
 		<div class="panel panel-default">
 		<div class="panel-heading all" style="border-bottom: 0px;"><h4 style="color: #fff;">Facturaci&oacute;n
+		<button class="btn btn-warning" id="btnNCF">NCF</button>
 		<button class="btn btn-primary pull-right" id="btnServiceModal">Servicio</button>
 		<button class="btn btn-success pull-right" id="btnClienteModal">Clientes</button>
 		</h4></div>
@@ -377,7 +378,7 @@
   </div>
 </div>	
 
-<!-- Modal de agregar servicios -->
+<!-- Modal de agregar seriales -->
 		<div id="serialesAcctModal" class="modal fade" role="dialog">
 			<div class="modal-dialog">
 				<!-- Modal content-->
@@ -432,6 +433,125 @@
 				</div>
 			</div>
 		</div>
+		
+<!-- Modal NCF -->
+<div id="ncfModal" class="modal fade" role="dialog">
+  <div class="modal-dialog modal-lg">
+    <!-- Modal content-->
+    <div class="modal-content all">
+      <div class="modal-body">
+      		<!-- Data persistence of comprobante fiscal -->
+			<div id="comprobanteFiscalInfo">
+				<input type="hidden" th:value="${idComprobanteFiscal}" id="idComprobanteFiscal">
+				<input type="hidden" th:value="${pagaItbis}" id="pagaItbis">
+				<input type="hidden" th:value="${incluyeItbis}" id="incluyeItbis">
+				<input type="hidden" th:value="${valorItbis}" id=valorItbis>
+			</div>
+			<div id="ncf">
+				<form>
+					<div class="row">
+						<div class="col col-md-4">
+							<div class="form-group">
+								 <div id="seleccionCondicionPago">
+								 	 <label>Condici&oacute;n</label>
+									 <select class="form-control" id="selectCondicionPago">
+									 	<option th:each="condicionPago:${condicionesPago}"
+									 		th:value="${condicionPago.id}" th:text="${condicionPago.nombre}"/>
+									 </select>
+								</div>
+							</div>
+						</div>
+						<div class="col col-md-4">
+							<div class="form-group">
+								 <label>ITBIS</label>
+								 <input class="form-control" id="itbisNCF" type="text" disabled="disabled">
+							</div>
+						</div>
+						<div class="col col-md-4">
+							<div class="form-group">
+								 <label>Total a pagar</label>
+								 <input class="form-control" id="totalNCF" type="text" disabled="disabled">
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col col-md-4">
+							<div class="form-group">
+								<div id="seleccionVendedor">
+								 	 <label>Vendedor</label>
+									 <select class="form-control" id="selectVendedor">
+									 	<option value=""></option>
+									 	<option th:each="vendedor:${vendedores}"
+									 		th:value="${vendedor.id}" th:text="${vendedor.nombre}"/>
+									 </select>
+								</div>
+							</div>
+						</div>
+						<div class="col col-md-4">
+							<div class="form-group">
+								<div id="seleccionComprobanteFiscal">
+								 	 <label>Tipo de comprobante</label>
+									 <select class="form-control" id="selectComprobanteFiscal">
+									 	<option th:each="comprobante:${comprobantesFiscales}"
+									 		th:value="${comprobante.id}" th:text="${comprobante.nombre}"/>
+									 </select>
+								</div>
+							</div>
+						</div>
+						<div class="col col-md-4">
+							<div class="form-group">
+								<label>NCF</label>
+	                      		<input id="ncfVlue" class="form-control" type="text" disabled="disabled">
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col col-md-8">
+							<div class="form-group">
+								<textarea class="form-control" rows="2" style="width:100%;overflow: scroll;resize: none;color: #000;" placeholder="Escribe alguna nota que desee recordar"></textarea>
+							</div>
+						</div>
+						<div class="col col-md-4">
+							<div class="form-group">
+								<label>Avance Taller</label>
+	                      		<input id="avanceTaller" class="form-control" type="text" disabled="disabled">
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col col-md-6">
+							<div class="form-group">
+								<div id="seleccionFormaPago">
+								 	 <label>Forma de pago</label>
+									 <select class="form-control" id="selectFormaPago">
+									 	<option th:each="formaPago:${formaPagos}"
+									 		th:value="${formaPago.id}" th:text="${formaPago.nombre}"/>
+									 </select>
+								</div>
+							</div>
+						</div>
+						<div class="col col-md-4">
+							<div class="form-group">
+								<label>Cantidad</label>
+	                      		<input id="cantidadDinero" class="form-control" type="number">
+							</div>
+						</div>
+						<div class="col col-md-2">
+							<div class="form-group">
+	                      		<button id="addPago" class="btn btn-standar" style="margin-top: 25px;"> + </button>
+							</div>
+						</div>
+					</div>
+           		 </form>
+		</div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-warning" data-dismiss="modal">Regresar</button>
+        <button type="button" class="btn btn-standar" id="">Agregar</button>
+      </div>
+    </div>
+  </div>
+</div>		
 
 	</div>
 	<script th:src="@{/js/jquery.min.js}"></script>

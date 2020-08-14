@@ -9,4 +9,5 @@ public interface IPropietariosService {
 	Propietario buscarPorId(Integer idPropietario);
 	Propietario buscarPorIdUsuario(Integer idUsuario);
 	void guardar(Propietario propietario);
+	void eliminar(Integer idPropietario);
 }

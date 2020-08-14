@@ -1,6 +1,20 @@
+//peticiones iniciales
 $('#articulos').load("/articulos/ajax/getAll",function(){
 	$("#seleccionCliente").load("/articulos/ajax/listaClientes/",function(){
-		factura_detalle_items();
+		$("#seleccionCondicionPago").load("/articulos/ajax/listaCondicionesPago/",function(){
+			$("#seleccionVendedor").load("/articulos/ajax/listaVendedores/",function(){
+				$("#seleccionComprobanteFiscal").load("/articulos/ajax/listaComprobantesFiscales/",function(){
+					$("#seleccionFormaPago").load("/articulos/ajax/serviceFormasPago/",function(){
+						var idComprobanteFiscal = $("#selectComprobanteFiscal").val();
+						if(idComprobanteFiscal){
+							$("#comprobanteFiscalInfo").load("/articulos/ajax/getComprobanteFiscal/"+idComprobanteFiscal,function(){
+								factura_detalle_items();
+							});
+						}
+					});
+				});
+			});
+		});
 	});
 });
 
@@ -197,7 +211,15 @@ $("#agregarArticuloFactura").click(function(e) {
 	var cantidad = $("#cantidadProducto").val();
 	var precio = $("#precioRango").val();
 	
-	var valorItbis = 18; //esta cableado en el código original validar
+	//obtenemos el valor del itbis
+	var valorItbis = 0;
+	var pagaItbis = $("#pagaItbis").val();
+	var incluyeItbis = $("#incluyeItbis").val();
+	var valorItbis = $("#valorItbis").val();
+	
+	if(incluyeItbis == 1){
+		valorItbis = $("#valorItbis").val();
+	}
 	
 	//verificacion para articulos con imei
 	if($("#tipoArticulo").val() == "SI"){
@@ -317,6 +339,18 @@ $("#agregarArticuloFactura").click(function(e) {
 
 		//si no hay errores agregamos el registro
 		if(error==0){
+			  //verificamos si el comprobante fiscal paga itbis
+			 if(pagaItbis==1){
+				 conItbis = "SI";
+				 //verificamos si el comprobante incluye itbis en el precio
+				 var realPrice = precio;
+				 if(incluyeItbis==1){
+					 precio = precio - (precio * (valorItbis/100));
+				 }
+			 }else{
+				 valorItbis=0;
+				 var realPrice = 0;
+			 }
 			  $.post("/articulos/ajax/addArticuloSinSerial/",
 						{
 						  idArticulo: idArticulo,
@@ -324,6 +358,9 @@ $("#agregarArticuloFactura").click(function(e) {
 						  precio: precio,
 						  conItbis: conItbis,
 						  disponible: disponible,
+						  valorItbis: valorItbis,
+						  incluyeItbis: incluyeItbis,
+						  realPrice: realPrice,
 						  maximo: maximo
 						},
 						function(data, status){
@@ -506,6 +543,9 @@ $("#guardarSerialesDelProducto").click(function(e) {
 });
 
 
+$("#btnNCF").click(function(e) {
+	$("#ncfModal").modal("show");
+});
 
 
 

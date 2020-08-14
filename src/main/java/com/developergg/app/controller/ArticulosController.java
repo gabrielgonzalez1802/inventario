@@ -25,21 +25,29 @@ import com.developergg.app.model.ArticuloAjuste;
 import com.developergg.app.model.ArticuloSerial;
 import com.developergg.app.model.Categoria;
 import com.developergg.app.model.Cliente;
+import com.developergg.app.model.ComprobanteFiscal;
+import com.developergg.app.model.CondicionPago;
 import com.developergg.app.model.FacturaDetalleTemp;
 import com.developergg.app.model.FacturaSerialTemp;
 import com.developergg.app.model.FacturaServicioTemp;
+import com.developergg.app.model.FormaPago;
 import com.developergg.app.model.Propietario;
 import com.developergg.app.model.Suplidor;
 import com.developergg.app.model.Usuario;
+import com.developergg.app.model.Vendedor;
 import com.developergg.app.service.IArticulosAjustesService;
 import com.developergg.app.service.IArticulosSeriales;
 import com.developergg.app.service.IArticulosService;
 import com.developergg.app.service.ICategoriasService;
 import com.developergg.app.service.IClientesService;
+import com.developergg.app.service.IComprobantesFiscalesService;
+import com.developergg.app.service.ICondicionesPagoService;
 import com.developergg.app.service.IFacturasDetallesTempService;
 import com.developergg.app.service.IFacturasSerialesTempService;
 import com.developergg.app.service.IFacturasServiciosTempService;
+import com.developergg.app.service.IFormasPagoService;
 import com.developergg.app.service.ISuplidoresService;
+import com.developergg.app.service.IVendedoresService;
 import com.developergg.app.util.Utileria;
 
 @Controller
@@ -72,6 +80,18 @@ public class ArticulosController {
 	
 	@Autowired
 	private IClientesService serviceClientes;
+	
+	@Autowired
+	private ICondicionesPagoService serviceCondicionesPago;
+	
+	@Autowired
+	private IVendedoresService serviceVendedores;
+	
+	@Autowired
+	private IComprobantesFiscalesService serviceComprobantesFiscales;
+	
+	@Autowired
+	private IFormasPagoService serviceFormasPago;
 	
 	@Value("${inventario.ruta.imagenes}")
 	private String ruta;
@@ -525,7 +545,8 @@ public class ArticulosController {
 	public String agregarArticuloSinSerial(HttpSession session, @RequestParam("idArticulo") Integer idArticulo,
 			@RequestParam("cantidad") Integer cantidad, @RequestParam("precio") Double precio,
 			@RequestParam("conItbis") String conItbis, @RequestParam("disponible") Integer disponible,
-			@RequestParam("maximo") Double maximo) {
+			@RequestParam("maximo") Double maximo, @RequestParam("valorItbis") Double valorItbis,
+			@RequestParam("incluyeItbis") Integer incluyeItbis, @RequestParam("realPrice") Double realPrice) {
 		Double itBis = 0.0;
 		Usuario usuario = (Usuario) session.getAttribute("usuario");
 		//Buscamos el articulo
@@ -539,15 +560,25 @@ public class ArticulosController {
 		
 		double newPrecio = precio*cantidad;
 		
+		Double subtotal = 0.0;
+		
 		if(conItbis.equals("SI")) {
-			itBis= newPrecio * impuestoTemp; 
+			//verificamos si incluye itbis en el precio
+			if(incluyeItbis == 1) {
+				String temp = "1."+valorItbis.intValue();
+				subtotal = realPrice / Double.parseDouble(temp);
+				itBis = realPrice - subtotal;
+				newPrecio = realPrice;
+			}else {
+				itBis= newPrecio * valorItbis/100; 
+			}
 		}
 				
 		facturaTemp.setPrecio(newPrecio);
 		facturaTemp.setExistencia(disponible);
 		facturaTemp.setItbis(itBis);
 		facturaTemp.setPrecio_maximo(maximo);
-		facturaTemp.setSubtotal(newPrecio+itBis);
+		facturaTemp.setSubtotal(incluyeItbis==1?subtotal:newPrecio+itBis);
 		serviceFacturasDetallesTemp.guardar(facturaTemp);
 		return "facturas/factura :: #responseAddArticuloSinSerial";
 	}
@@ -801,13 +832,56 @@ public class ArticulosController {
 	}
 	
 	@GetMapping("/ajax/getInfoCliente/{id}")
-	public String obtenerInformacionClienteAjax(@PathVariable("id") Integer idCliente, Model model, HttpSession session) {
+	public String obtenerInformacionClienteAjax(@PathVariable("id") Integer idCliente, Model model) {
 		//Buscamos el cliente a partir del id
 		Cliente cliente = serviceClientes.buscarPorIdCliente(idCliente);
 		model.addAttribute("idCliente", cliente.getId());
 		model.addAttribute("rncCliente", cliente.getRnc());
 		model.addAttribute("precioCliente", cliente.getPrecio());
 		return "facturas/factura :: #nuevoCliente";
+	}
+	
+	@GetMapping("/ajax/listaCondicionesPago/")
+	public String obtenerCondicionesPago(Model model) {
+		List<CondicionPago> condicionesPago = serviceCondicionesPago.buscarTodos();
+		model.addAttribute("condicionesPago", condicionesPago);
+		return "facturas/factura :: #seleccionCondicionPago";
+	}
+	
+	@GetMapping("/ajax/listaVendedores/")
+	public String obtenerVendedores(Model model, HttpSession session) {
+		Usuario usuario = (Usuario) session.getAttribute("usuario");
+		//Lista de vendedores por almacen que no esten eliminaos
+		List<Vendedor> vendedores = serviceVendedores.buscarPorAlmacen(usuario.getAlmacen()).
+				stream().filter(v -> v.getEliminado() == 0).
+				collect(Collectors.toList());
+		model.addAttribute("vendedores", vendedores);
+		return "facturas/factura :: #seleccionVendedor";
+	}
+	
+	@GetMapping("/ajax/listaComprobantesFiscales/")
+	public String obtenerComprobantes(Model model, HttpSession session) {
+		Usuario usuario = (Usuario) session.getAttribute("usuario");
+		List<ComprobanteFiscal> comprobantesFiscales = serviceComprobantesFiscales.buscarPorTienda(usuario.getAlmacen().getPropietario());
+		model.addAttribute("comprobantesFiscales", comprobantesFiscales);
+		return "facturas/factura :: #seleccionComprobanteFiscal";
+	}
+	
+	@GetMapping("/ajax/serviceFormasPago/")
+	public String obtenerFormasDePago(Model model) {
+		List<FormaPago> formaPagos = serviceFormasPago.buscarTodas();
+		model.addAttribute("formaPagos", formaPagos);
+		return "facturas/factura :: #seleccionFormaPago";
+	}
+	
+	@GetMapping("/ajax/getComprobanteFiscal/{id}")
+	public String obtenerComprobanteFiscal(Model model, @PathVariable("id") Integer idComprobanteFiscal) {
+		ComprobanteFiscal comprobanteFiscal = serviceComprobantesFiscales.buscarPorId(idComprobanteFiscal);
+		model.addAttribute("idComprobanteFiscal", comprobanteFiscal.getId());
+		model.addAttribute("pagaItbis", comprobanteFiscal.getPaga_itbis());
+		model.addAttribute("incluyeItbis", comprobanteFiscal.getIncluye_itbis());
+		model.addAttribute("valorItbis", comprobanteFiscal.getValor_itbis());
+		return "facturas/factura :: #comprobanteFiscalInfo";
 	}
 		
 	@ModelAttribute

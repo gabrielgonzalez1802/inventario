@@ -34,7 +34,7 @@ public class ComprobanteFiscal {
 	private Propietario tienda;
 	
 	private Integer incluye_itbis;
-	private Integer valor_itbis;
+	private Integer valor_itbis = 0;
 	
 	public Integer getId() {
 		return id;
