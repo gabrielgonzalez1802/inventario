@@ -76,11 +76,39 @@
      <br>
 	<div class="container">
 		<div class="panel panel-default">
-		<div class="panel-heading all" style="border-bottom: 0px;"><h4 style="color: #fff;">Facturaci&oacute;n
-		<button class="btn btn-warning" id="btnNCF">NCF</button>
-		<button class="btn btn-primary pull-right" id="btnServiceModal">Servicio</button>
-		<button class="btn btn-success pull-right" id="btnClienteModal">Clientes</button>
-		</h4></div>
+		<div class="panel-heading all" style="border-bottom: 0px;">
+		
+<!-- 		<h4 style="color: #fff;">Facturaci&oacute;n -->
+<!-- 		<button class="btn btn-warning" id="btnNCF">NCF</button> </h4>-->
+		 
+		 <form class="form-inline" action="#" id="formTop">
+			  <div class="form-group">
+			    <label style="color: #fff;font-size: 25px;">Facturaci&oacute;n | &nbsp;&nbsp;</label>
+			  </div>
+			  <div class="form-group" id="seleccionCondicionPago">
+					<select class="form-control" id="selectCondicionPago">
+						<option th:each="condicionPago:${condicionesPago}"
+						th:value="${condicionPago.id}" th:text="${condicionPago.nombre}"/>
+				</select>
+			  </div>
+			  <div class="form-group" id="seleccionComprobanteFiscal">
+					 <select class="form-control" id="selectComprobanteFiscal">
+						<option th:each="comprobante:${comprobantesFiscales}"
+								th:value="${comprobante.id}" th:text="${comprobante.nombre}"/>
+					</select>
+			  </div>
+			  <div class="form-group" id="seleccionVendedor">
+					 <select class="form-control" id="selectVendedor">
+							<option value="" selected="selected">Vendedor</option>
+							<option th:each="vendedor:${vendedores}"
+							th:value="${vendedor.id}" th:text="${vendedor.nombre}"/>
+					</select>
+			  </div>
+			  <button class="btn btn-primary pull-right" id="btnServiceModal">Servicio</button>
+			  <button class="btn btn-success pull-right" id="btnClienteModal">Clientes</button>
+		</form>
+		 
+		</div>
 		  <div class="panel-body all">
 		     <form  method="post" action="#" id="formCreateInvoice">            
               <div class="row">
@@ -112,6 +140,7 @@
 	                	<label for="cantidad">Cantidad</label>
 	                	<input type="number" th:value="${cantidad}" class="form-control" min="1" name="cantidad" id="cantidadProducto">
 	                </div>
+	                 <input type="hidden" class="form-control" id="temporalPrice" disabled>
 	                 <div class="col-md-2"> 
 	                	<label for="cantidad">Precio</label>
 	                	<input type="number" class="form-control" id="precioRango" name="precio" th:value="${precioArticulo}" disabled>
@@ -433,6 +462,63 @@
 				</div>
 			</div>
 		</div>
+	
+<!--  Modal de seriales con costos distintos -->		
+<div id="ditinctSerialPriceModal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <!-- Modal content-->
+    <div class="modal-content all">
+    <div class="modal-header bg-primary">
+		<button type="button" class="close" data-dismiss="modal">&times;</button>
+			<h3 class="modal-title">Seriales</h3>
+	</div>
+      <div class="modal-body">
+      	 	<div id="estatusModificarSeriales">
+      	 		<input type="hidden" th:value="${estatusUpdateSerial}" id="estatusUpdateSerial">
+      	 		<input type="hidden" th:value="${sumaSeriales}" id="sumaSeriales">
+      	 		<input type="hidden" th:value="${autorizado}" id="autorizado">
+      		</div>
+			<div id="responsePreciosSeriales">
+				<form>
+					<div class="row">
+							<div class="col col-md-6">
+								 <div class="form-group">
+									 <h4>Serial</h4>
+								</div>
+							</div>
+							<div class="col col-md-6">
+								 <div class="form-group">
+									 <h4>Precio</h4>
+								</div>
+							</div>
+					</div>
+					<div class="row">
+						<input type="hidden" th:value="${estatus}" id="estatusDistinctSerials">
+						<div th:each="serial:${listaSerialesAcct}" id="listaSerialesAcct">
+							 <div class="col col-md-6">
+								 <div class="form-group">
+								 	 <input class="form-control" th:value="${serial.id}" type="hidden" disabled="disabled">
+									 <input class="form-control" th:value="${serial.serial}" type="text" disabled="disabled">
+								</div>
+							</div>
+							<div class="col col-md-6">
+								 <div class="form-group">
+									 <input class="form-control" th:value="${serial.temporalPrice}" min="0" type="number">
+								</div>
+							</div>
+						</div>
+					</div>
+           		 </form>
+		</div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-warning" data-dismiss="modal">Regresar</button>
+        <button type="button" class="btn btn-standar" id="guardarCostoSeriales">Guardar</button>
+      </div>
+    </div>
+  </div>
+</div>
+		
 		
 <!-- Modal NCF -->
 <div id="ncfModal" class="modal fade" role="dialog">
@@ -442,7 +528,7 @@
       <div class="modal-body">
       		<!-- Data persistence of comprobante fiscal -->
 			<div id="comprobanteFiscalInfo">
-				<input type="hidden" th:value="${idComprobanteFiscal}" id="idComprobanteFiscal">
+				<input type="hidden" th:value="${idComprobanteFiscal}" id="idComprobanteFiscal"> 
 				<input type="hidden" th:value="${pagaItbis}" id="pagaItbis">
 				<input type="hidden" th:value="${incluyeItbis}" id="incluyeItbis">
 				<input type="hidden" th:value="${valorItbis}" id=valorItbis>
@@ -450,24 +536,13 @@
 			<div id="ncf">
 				<form>
 					<div class="row">
-						<div class="col col-md-4">
-							<div class="form-group">
-								 <div id="seleccionCondicionPago">
-								 	 <label>Condici&oacute;n</label>
-									 <select class="form-control" id="selectCondicionPago">
-									 	<option th:each="condicionPago:${condicionesPago}"
-									 		th:value="${condicionPago.id}" th:text="${condicionPago.nombre}"/>
-									 </select>
-								</div>
-							</div>
-						</div>
-						<div class="col col-md-4">
+						<div class="col col-md-6">
 							<div class="form-group">
 								 <label>ITBIS</label>
 								 <input class="form-control" id="itbisNCF" type="text" disabled="disabled">
 							</div>
 						</div>
-						<div class="col col-md-4">
+						<div class="col col-md-6">
 							<div class="form-group">
 								 <label>Total a pagar</label>
 								 <input class="form-control" id="totalNCF" type="text" disabled="disabled">
@@ -475,30 +550,7 @@
 						</div>
 					</div>
 					<div class="row">
-						<div class="col col-md-4">
-							<div class="form-group">
-								<div id="seleccionVendedor">
-								 	 <label>Vendedor</label>
-									 <select class="form-control" id="selectVendedor">
-									 	<option value=""></option>
-									 	<option th:each="vendedor:${vendedores}"
-									 		th:value="${vendedor.id}" th:text="${vendedor.nombre}"/>
-									 </select>
-								</div>
-							</div>
-						</div>
-						<div class="col col-md-4">
-							<div class="form-group">
-								<div id="seleccionComprobanteFiscal">
-								 	 <label>Tipo de comprobante</label>
-									 <select class="form-control" id="selectComprobanteFiscal">
-									 	<option th:each="comprobante:${comprobantesFiscales}"
-									 		th:value="${comprobante.id}" th:text="${comprobante.nombre}"/>
-									 </select>
-								</div>
-							</div>
-						</div>
-						<div class="col col-md-4">
+						<div class="col col-md-12">
 							<div class="form-group">
 								<label>NCF</label>
 	                      		<input id="ncfVlue" class="form-control" type="text" disabled="disabled">

@@ -10,6 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 @Entity
 @Table(name = "articulos_seriales")
@@ -59,6 +60,9 @@ public class ArticuloSerial {
 	private Double precio_maximo;
 	private Double precio_minimo;
 	private Double precio_mayor;
+	
+	@Transient
+	private Double temporalPrice;
 	
 	public Integer getId() {
 		return id;
@@ -191,6 +195,12 @@ public class ArticuloSerial {
 	}
 	public void setPrecio_mayor(Double precio_mayor) {
 		this.precio_mayor = precio_mayor;
+	}
+	public Double getTemporalPrice() {
+		return temporalPrice;
+	}
+	public void setTemporalPrice(Double temporalPrice) {
+		this.temporalPrice = temporalPrice;
 	}
 	
 	@Override
