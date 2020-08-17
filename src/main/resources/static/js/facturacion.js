@@ -1,19 +1,27 @@
 //peticiones iniciales
 var incluyeItbis = 0;
+var columnas = [];
 $('#articulos').load("/articulos/ajax/getAll",function(){
 	$("#seleccionCliente").load("/articulos/ajax/listaClientes/",function(){
-		$("#seleccionCondicionPago").load("/articulos/ajax/listaCondicionesPago/",function(){
-			$("#seleccionVendedor").load("/articulos/ajax/listaVendedores/",function(){
-				$("#seleccionComprobanteFiscal").load("/articulos/ajax/listaComprobantesFiscales/",function(){
-					$("#seleccionFormaPago").load("/articulos/ajax/serviceFormasPago/",function(){
-						var idComprobanteFiscal = $("#selectComprobanteFiscal").val();
-						if(idComprobanteFiscal){
-							$("#comprobanteFiscalInfo").load("/articulos/ajax/getComprobanteFiscal/"+idComprobanteFiscal,function(){
-								incluyeItbis = $("#incluyeItbis").val();
-								factura_detalle_items(incluyeItbis);
-							});
-						}
-					});
+		//verificamos si la factura tiene un cliente asociado
+		$("#clienteAcct").load("/articulos/ajax/getClienteAcct/",function(){
+			var clienteAcct = $("#actualCliente").val();
+			var rncClienteAcct = $("#actualRnc").val();
+			if(clienteAcct!="0"){
+				$("#selectCliente").val(clienteAcct);
+				$("#rncCliente").val(clienteAcct);
+			}
+			$("#seleccionCondicionPago").load("/articulos/ajax/listaCondicionesPago/",function(){
+				$("#seleccionVendedor").load("/articulos/ajax/listaVendedores/",function(){
+						$("#seleccionFormaPago").load("/articulos/ajax/serviceFormasPago/",function(){
+							var idComprobanteFiscal = $("#selectComprobanteFiscal").val();
+							if(idComprobanteFiscal){
+								$("#comprobanteFiscalInfo").load("/articulos/ajax/getComprobanteFiscal/"+idComprobanteFiscal,function(){
+									incluyeItbis = $("#incluyeItbis").val();
+									factura_detalle_items(incluyeItbis);
+								});
+							}
+						});
 				});
 			});
 		});
@@ -29,6 +37,7 @@ $("#selectComprobanteFiscal").change(function(){
 	var comprobanteFiscalID = $("#selectComprobanteFiscal").val();
 	$("#comprobanteFiscalInfo").load("/articulos/ajax/getComprobanteFiscal/"+comprobanteFiscalID,function(){
 		incluyeItbis = $("#incluyeItbis").val();
+		factura_detalle_items(incluyeItbis);
 	});
 });
 
@@ -264,7 +273,7 @@ $("#agregarArticuloFactura").click(function(e) {
 			var temporalPrice = $("#temporalPrice").val();
 			var idDetalle = $("#detalleArticuloId").val();
 			//verificamos si selecciona varios seriales
-			if(cantidad>1){
+			//if(cantidad>1){
 				//Si selecciona mas de un serial verificamos si tienen el mismo precio, 
 				//de lo contrario mostramos modal
 				$("#responsePreciosSeriales").load("/articulos/ajax/verificarPreciosDeSeriales/",{
@@ -281,36 +290,62 @@ $("#agregarArticuloFactura").click(function(e) {
 						if(estatusDistinctSerials == 1){
 							$("#ditinctSerialPriceModal").modal("show");
 						}else{
-							alert("seriales con costo igual");
+							//seriales con precio igual 
+							//verificamos que el precio no sea menor que el precio minimo
+							$("#responsePreciosSerialesNotMinimo").load("/articulos/ajax/verificarPreciosDeSerialesNotMinimo/",{
+								 'idDetalle': idDetalle,
+								 'idArticulo': idArticulo, 
+								 'precio': precio,
+								 'cantidad': cantidad,
+								 'idCliente': idCliente,
+								 'seriales': seriales.toString()
+							},function(){
+								//si la validacion es correcta autorizamos
+								var estatus = $("#estatusUpdateSerialNotMinimo").val();
+								if(estatus == "1"){
+									//es menor
+									Swal.fire({
+										  title: 'Advertencia!',
+										  text: 'El precio no puede ser menor al precio minimo',
+										  position: 'top',
+										  icon: 'warning',
+										  confirmButtonText: 'Cool'
+									})
+								}else{
+									$("#autorizado").val(1);
+								}						
+							});
 						}
 					}
+					
+					//verificamos si esta autorizado para que agregue el articulo con serial a la factura
+					if($("#autorizado").val()==1){
+						 $.post("/articulos/ajax/addArticuloConSerial/",
+									{
+										idArticulo: idArticulo,
+										cantidad: cantidad,
+									    idCliente: idCliente,
+										precio: precio,
+										realPrice: temporalPrice,
+										comprobanteFiscalId: comprobanteFiscalId,
+										seriales: seriales.toString(),
+										columnas: columnas.toString()
+									},
+									function(data, status){
+										console.log("Articulo agregado a la facturacion");
+										//remover la lista de los seriales seleccionados
+										$('#serialesSeleccionados li').remove();
+										$("#cantidadProducto").val("0");
+										$("#precioRango").val("");
+										factura_detalle_items(incluyeItbis);
+										$("#autorizado").val(0);
+										location.reload();
+								});
+					}else{
+						$("#autorizado").val(0);
+					}
 				});
-			}
-			
-			//verificamos si esta autorizado para que agregue el articulo con serial a la factura
-			if($("#autorizado").val()==1){
-				 $.post("/articulos/ajax/addArticuloConSerial/",
-							{
-								idArticulo: idArticulo,
-								cantidad: cantidad,
-							    idCliente: idCliente,
-								precio: precio,
-								realPrice: temporalPrice,
-								comprobanteFiscalId: comprobanteFiscalId,
-								seriales: seriales.toString()
-							},
-							function(data, status){
-								console.log("Articulo agregado a la facturacion");
-								//remover la lista de los seriales seleccionados
-								$('#serialesSeleccionados li').remove();
-								$("#cantidadProducto").val("0");
-								$("#precioRango").val("");
-								factura_detalle_items(incluyeItbis);
-								$("#autorizado").val(0);
-						});
-			}else{
-				return false;
-			}
+			//}
 		}
 	}else{
 		//verificacion para articulos sin Imei
@@ -424,7 +459,6 @@ $("#agregarArticuloFactura").click(function(e) {
 
 $("#guardarCostoSeriales").click(function(e) {
 	e.preventDefault();	
-	var columnas = [];
 	
 	$('#responsePreciosSeriales').find('input').each(function() {
 		  console.log($(this).val());

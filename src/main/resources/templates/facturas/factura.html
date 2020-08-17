@@ -81,7 +81,7 @@
 <!-- 		<h4 style="color: #fff;">Facturaci&oacute;n -->
 <!-- 		<button class="btn btn-warning" id="btnNCF">NCF</button> </h4>-->
 		 
-		 <form class="form-inline" action="#" id="formTop">
+		 <form class="form-inline" action="#" id="formTop" th:object="${facturaTemp}">
 			  <div class="form-group">
 			    <label style="color: #fff;font-size: 25px;">Facturaci&oacute;n | &nbsp;&nbsp;</label>
 			  </div>
@@ -91,8 +91,8 @@
 						th:value="${condicionPago.id}" th:text="${condicionPago.nombre}"/>
 				</select>
 			  </div>
-			  <div class="form-group" id="seleccionComprobanteFiscal">
-					 <select class="form-control" id="selectComprobanteFiscal">
+			  <div class="form-group">
+					 <select class="form-control" th:field="*{comprobanteFiscal.id}" id="selectComprobanteFiscal">
 						<option th:each="comprobante:${comprobantesFiscales}"
 								th:value="${comprobante.id}" th:text="${comprobante.nombre}"/>
 					</select>
@@ -371,6 +371,10 @@
 				<div class="row">
 					<div class="col col-md-10">
 						<div class="form-group">
+						<div id="clienteAcct">
+							<input type="hidden" id="actualCliente" th:value="${actualCliente}">
+							<input type="hidden" id="actualRnc" th:value="${actualRnc}">
+						</div>
 							<div id="seleccionCliente">
 								 <label>Cliente</label>
 								 <select class="form-control" id="selectCliente" onchange="seleccionarCliente()">
@@ -473,6 +477,9 @@
 			<h3 class="modal-title">Seriales</h3>
 	</div>
       <div class="modal-body">
+      		<div id="responsePreciosSerialesNotMinimo">
+      			<input type="hidden" th:value="${estatusUpdateSerialNotMinimo}" id="estatusUpdateSerialNotMinimo">
+      		</div>
       	 	<div id="estatusModificarSeriales">
       	 		<input type="hidden" th:value="${estatusUpdateSerial}" id="estatusUpdateSerial">
       	 		<input type="hidden" th:value="${sumaSeriales}" id="sumaSeriales">

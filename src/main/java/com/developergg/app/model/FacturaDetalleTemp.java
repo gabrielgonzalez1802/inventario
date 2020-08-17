@@ -39,8 +39,16 @@ public class FacturaDetalleTemp {
 	private Double precio_maximo;
 	
 	@OneToOne
+	@JoinColumn(name = "id_comprobanteFiscal")
+	private ComprobanteFiscal comprobanteFiscal;
+	
+	@OneToOne
 	@JoinColumn(name = "id_usuario")
 	private Usuario usuario;
+	
+	@OneToOne
+	@JoinColumn(name = "id_cliente")
+	private Cliente cliente;
 	
 	@OneToOne
 	@JoinColumn(name = "id_almacen")
@@ -161,12 +169,37 @@ public class FacturaDetalleTemp {
 	public void setTaller(Integer taller) {
 		this.taller = taller;
 	}
+	
+	public Cliente getCliente() {
+		return cliente;
+	}
+
+	public void setCliente(Cliente cliente) {
+		this.cliente = cliente;
+	}
+
+	public List<FacturaSerialTemp> getSeriales() {
+		return seriales;
+	}
+
+	public void setSeriales(List<FacturaSerialTemp> seriales) {
+		this.seriales = seriales;
+	}
+	
+	public ComprobanteFiscal getComprobanteFiscal() {
+		return comprobanteFiscal;
+	}
+
+	public void setComprobanteFiscal(ComprobanteFiscal comprobanteFiscal) {
+		this.comprobanteFiscal = comprobanteFiscal;
+	}
 
 	@Override
 	public String toString() {
 		return "FacturaDetalleTemp [id=" + id + ", articulo=" + articulo + ", cantidad=" + cantidad + ", precio="
 				+ precio + ", itbis=" + itbis + ", imei=" + imei + ", conItbis=" + conItbis + ", existencia="
 				+ existencia + ", subtotal=" + subtotal + ", precio_maximo=" + precio_maximo + ", usuario=" + usuario
-				+ ", almacen=" + almacen + ", taller=" + taller + ", seriales=" + seriales + "]";
+				+ ", cliente=" + cliente + ", almacen=" + almacen + ", taller=" + taller + ", seriales=" + seriales
+				+ "]";
 	}
 }
