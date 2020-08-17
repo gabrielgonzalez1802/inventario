@@ -542,6 +542,7 @@ public class ArticulosController {
 	public String agregarServicio(HttpSession session, @RequestParam("descripcion") String descripcion, @RequestParam("costo") Double costo,
 			@RequestParam("precio") Double precio, @RequestParam("cantidad") Integer cantidad) {
 		Usuario usuario = (Usuario) session.getAttribute("usuario");
+		FacturaTemp factura = serviceFacturasTemp.buscarPorUsuario(usuario);
 		FacturaServicioTemp servicioFac = new FacturaServicioTemp();
 		servicioFac.setUsuario(usuario);
 		servicioFac.setAlmacen(usuario.getAlmacen()); //redundante por el usuario. validar
@@ -549,6 +550,7 @@ public class ArticulosController {
 		servicioFac.setCosto(costo);
 		servicioFac.setPrecio(precio);
 		servicioFac.setCantidad(cantidad);
+		servicioFac.setComprobanteFiscal(factura.getComprobanteFiscal());
 		serviceServiciosTemp.guardar(servicioFac);
 		return "facturas/factura :: #responseAddService";
 	}
@@ -1079,12 +1081,47 @@ public class ArticulosController {
 				}
 			}
 		}
+		
+		//Validaciones para servicios
 		for (FacturaServicioTemp facturaServicioTemp : facturaServiciosTemp) {
-			total+=facturaServicioTemp.getPrecio();
+			//Verificamos si el comprobante fiscal paga itbis
+			if(facturaTemp.getComprobanteFiscal().getPaga_itbis() == 1) {
+				//verificamos si el comprobante fiscal incluye el itbis en el precio				
+				if(facturaTemp.getComprobanteFiscal().getIncluye_itbis() == 1) {
+					//realizamos las conversiones
+					String tempSv = "1."+facturaTemp.getComprobanteFiscal().getValor_itbis().intValue();
+					Double precioTempSv = facturaServicioTemp.getPrecio() / Double.parseDouble(tempSv);
+					Double itBisTempSv = (facturaServicioTemp.getCantidad() * precioTempSv) * (facturaTemp.getComprobanteFiscal().getValor_itbis()/100.00);
+					facturaServicioTemp.setPrecio(Double.parseDouble(df2.format(precioTempSv).replace(",", ".")));
+					facturaServicioTemp.setItbis(Double.parseDouble(df2.format(itBisTempSv).replace(",", ".")));
+					facturaServicioTemp.setSubtotal(Double.parseDouble(df2.format((facturaServicioTemp.getCantidad()*facturaServicioTemp.getPrecio())+facturaServicioTemp.getItbis()).replace(",", ".")));
+					total+=facturaServicioTemp.getSubtotal();
+				}else {
+					//realizamos las conversiones
+					Double itBisTempServ = (facturaServicioTemp.getCantidad() * facturaServicioTemp.getPrecio()) * (facturaTemp.getComprobanteFiscal().getValor_itbis()/100.00);
+					facturaServicioTemp.setPrecio(Double.parseDouble(df2.format(facturaServicioTemp.getPrecio()).replace(",", ".")));
+					facturaServicioTemp.setItbis(Double.parseDouble(df2.format(itBisTempServ).replace(",", ".")));
+					facturaServicioTemp.setSubtotal(Double.parseDouble(df2.format((facturaServicioTemp.getCantidad()*facturaServicioTemp.getPrecio())+facturaServicioTemp.getItbis()).replace(",", ".")));
+					total+=facturaServicioTemp.getSubtotal();
+				}
+			}else {
+				//verificamos si el valor inicial del comprobante fiscal en la factura incluye itbis
+				if(facturaServicioTemp.getComprobanteFiscal().getIncluye_itbis()==1) {
+					//realizamos las conversiones
+					facturaServicioTemp.setPrecio(Double.parseDouble(df2.format((facturaServicioTemp.getSubtotal()/facturaServicioTemp.getCantidad())).replace(",", ".")));
+					facturaServicioTemp.setItbis(Double.parseDouble(df2.format((facturaServicioTemp.getCantidad()*facturaServicioTemp.getPrecio())*(facturaTemp.getComprobanteFiscal().getValor_itbis()/100.00)).replace(",", ".")));
+					facturaServicioTemp.setSubtotal(Double.parseDouble(df2.format((facturaServicioTemp.getCantidad()*facturaServicioTemp.getPrecio())+facturaServicioTemp.getItbis()).replace(",", ".")));
+					total+=facturaServicioTemp.getSubtotal();
+				}else {
+					total+=facturaServicioTemp.getSubtotal();
+				}
+			}
+			subTotalItbis+=facturaServicioTemp.getItbis();
 		}
+		
 		model.addAttribute("facturaDetalles", facturaDetallesTemp);
 		model.addAttribute("facturaServicios", facturaServiciosTemp);
-		model.addAttribute("subTotalItbis", subTotalItbis);
+		model.addAttribute("subTotalItbis", Double.parseDouble(df2.format(subTotalItbis).replace(",", ".")));
 		model.addAttribute("total", Double.parseDouble(df2.format(total).replace(",", ".")));
 		return "facturas/cuerpoFactura :: cuerpoFactura";
 	}

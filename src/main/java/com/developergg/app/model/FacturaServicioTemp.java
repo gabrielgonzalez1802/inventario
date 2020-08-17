@@ -21,6 +21,8 @@ public class FacturaServicioTemp {
 	private Double costo;
 	private Integer cantidad;
 	private Double precio;
+	private Double itbis;
+	private Double subtotal;
 	
 	@OneToOne
 	@JoinColumn(name = "id_usuario")
@@ -29,6 +31,10 @@ public class FacturaServicioTemp {
 	@OneToOne
 	@JoinColumn(name = "id_almacen")
 	private Almacen almacen;
+	
+	@OneToOne
+	@JoinColumn(name = "id_comprobanteFiscal")
+	private ComprobanteFiscal comprobanteFiscal;
 	
 	private Integer taller = 0;
 
@@ -95,11 +101,36 @@ public class FacturaServicioTemp {
 	public void setTaller(Integer taller) {
 		this.taller = taller;
 	}
+	
+	public ComprobanteFiscal getComprobanteFiscal() {
+		return comprobanteFiscal;
+	}
+
+	public void setComprobanteFiscal(ComprobanteFiscal comprobanteFiscal) {
+		this.comprobanteFiscal = comprobanteFiscal;
+	}
+
+	public Double getItbis() {
+		return itbis;
+	}
+
+	public void setItbis(Double itbis) {
+		this.itbis = itbis;
+	}
+
+	public Double getSubtotal() {
+		return subtotal;
+	}
+
+	public void setSubtotal(Double subtotal) {
+		this.subtotal = subtotal;
+	}
 
 	@Override
 	public String toString() {
 		return "FacturaServicioTemp [id=" + id + ", descripcion=" + descripcion + ", costo=" + costo + ", cantidad="
-				+ cantidad + ", precio=" + precio + ", usuario=" + usuario + ", almacen=" + almacen + ", taller="
-				+ taller + "]";
+				+ cantidad + ", precio=" + precio + ", itbis=" + itbis + ", subtotal=" + subtotal + ", usuario="
+				+ usuario + ", almacen=" + almacen + ", comprobanteFiscal=" + comprobanteFiscal + ", taller=" + taller
+				+ "]";
 	}
 }

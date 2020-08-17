@@ -501,6 +501,7 @@ $("#guardarCostoSeriales").click(function(e) {
 //Carga el detalle de la factura
 function factura_detalle_items(incluyeItbis){
 	$('#cuerpoFactura').load("/articulos/ajax/loadCuerpoFactura/"+incluyeItbis);
+	$('#articulo').val("");
 }
 
 //Limpiar valores del modal de servicios
@@ -532,6 +533,7 @@ function eliminarServicioFactura(id){
 					},function(data, status){
 						console.log("Servicio eliminado de la facturacion");
 						factura_detalle_items(incluyeItbis);
+						$('#articulo').val("");
 					});  
 			  }
 			})

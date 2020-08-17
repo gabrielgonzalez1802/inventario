@@ -22,6 +22,7 @@ public class FacturaSerialTemp {
 	@OneToOne
 	@JoinColumn(name = "id_detalle_factura")
 	private FacturaDetalleTemp idDetalle;
+	
 
 	public Integer getId() {
 		return id;
