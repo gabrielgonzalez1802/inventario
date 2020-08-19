@@ -68,6 +68,18 @@
 		.table-hover tbody tr:hover td, .table-hover tbody tr:hover th {
 		  background-color: #085865;
 		}
+		
+		.personalized > input{
+		    border: 0px;
+		    -webkit-box-shadow: none;
+		    -moz-box-shadow: none;
+		    box-shadow: none;
+			background: transparent;
+			border: none;
+    		border-bottom: solid 1px #fff;
+    		border-radius: 0px;
+    		color: #fff;
+		}
   </style>
   <link rel="stylesheet" type="text/css" th:href="@{/css/swal.css}">
   </head>
@@ -106,6 +118,7 @@
 			  </div>
 			  <button class="btn btn-primary pull-right" id="btnServiceModal">Servicio</button>
 			  <button class="btn btn-success pull-right" id="btnClienteModal">Clientes</button>
+			  <button class="btn btn-info pull-right" id="btnTallerModal">Taller</button>
 		</form>
 		 
 		</div>
@@ -146,10 +159,14 @@
 	                	<input type="number" class="form-control" id="precioRango" name="precio" th:value="${precioArticulo}" disabled>
 	                </div>
                 </div>
-                <div class="col-md-3"> 
+                <div class="col-md-2"> 
                 	 <br>
-               		 <button id="agregarArticuloFactura" class="btn btn-standar" style="margin-top: 5px;"> + </button>
+               		 <button id="agregarArticuloFactura" class="btn btn-standar" style="margin-top: 5px;"> Agregar </button>
                 </div>  
+                <div class="col-md-2"> 
+                	<br>
+               		 <button id="guardarFactura" class="btn btn-success pull-right" style="margin-top: 5px;"> Guardar </button>
+                </div>
               </div>                                                  
             </form>
 
@@ -306,7 +323,7 @@
 </div>			
 		
 <!-- Modal de agregar servicios -->
-<div id="servicioModal" class="modal fade" role="dialog">
+<div id="servicioModal" class="modal fade" role="dialog" data-backdrop="static">
   <div class="modal-dialog">
     <!-- Modal content-->
     <div class="modal-content all">
@@ -358,7 +375,7 @@
 </div>		
 
 <!-- Modal de agregar cliente -->
-<div id="clienteModal" class="modal fade" role="dialog">
+<div id="clienteModal" class="modal fade" role="dialog" data-backdrop="static">
   <div class="modal-dialog">
     <!-- Modal content-->
     <div class="modal-content all">
@@ -386,7 +403,7 @@
 							</div>
 						</div>
 					<div class="col col-md-2">
-					        <button type="button" class="btn btn-standar" style="margin-top: 25px;" id="btnAddCliente"> + </button>
+<!-- 					        <button type="button" class="btn btn-standar" style="margin-top: 25px;" id="btnAddCliente"> + </button> -->
 					</div>
 				</div>
 				<div id="nuevoCliente">
@@ -412,7 +429,7 @@
 </div>	
 
 <!-- Modal de agregar seriales -->
-		<div id="serialesAcctModal" class="modal fade" role="dialog">
+		<div id="serialesAcctModal" class="modal fade" role="dialog" data-backdrop="static">
 			<div class="modal-dialog">
 				<!-- Modal content-->
 				<div class="modal-content all">
@@ -468,7 +485,7 @@
 		</div>
 	
 <!--  Modal de seriales con costos distintos -->		
-<div id="ditinctSerialPriceModal" class="modal fade" role="dialog">
+<div id="ditinctSerialPriceModal" class="modal fade" role="dialog" data-backdrop="static">
   <div class="modal-dialog">
     <!-- Modal content-->
     <div class="modal-content all">
@@ -525,10 +542,224 @@
     </div>
   </div>
 </div>
+
+<!-- Modal de agregar taller -->
+<div id="tallerModal" class="modal fade" role="dialog" data-backdrop="static">
+  <div class="modal-dialog">
+    <!-- Modal content-->
+    <div class="modal-content all">
+      <div class="modal-header bg-primary">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h3 class="modal-title">Recepcion de Equipos</h3>
+      </div>
+      <div class="modal-body">
+			<div id="nuevoTaller">
+				<form th:object="${taller}" id="taller">
+					<div class="row">
+					<input type="hidden" id="responseAddRecepcion" th:value="${responseAddRecepcion}">
+						<div class="col col-md-6">
+							<div class="form-group">
+								 <label>Celular</label>
+								 <input th:field="*{celular}" class="form-control" id="celularTaller" type="text" placeholder="Celular" autocomplete="off">
+							</div>
+						</div>
+						<div class="col col-md-6">
+							<div class="form-group">
+								<label>Nombre Cliente</label>
+	                       		<input th:field="*{nombre}" class="form-control" id="nombreTaller" type="text" placeholder="Nombre Cliente" autocomplete="off">
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col col-md-6">
+							<div class="form-group">
+								<label>Cedula / RNC</label>
+	                       		<input th:field="*{cedula}" class="form-control" id="cedulaTaller" type="text" placeholder="Cedula" autocomplete="off">
+							</div>
+						</div>
+						<div class="col col-md-6">
+							<div class="form-group">
+								<label>Telefono</label>
+	                       		<input th:field="*{telefono}" class="form-control" id="telefonoTaller" type="text" placeholder="Telefono" autocomplete="off">
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col col-md-6">
+							<div class="form-group">
+								<label>Serial</label>
+	                       		<input th:field="*{serial}" class="form-control" id="serialTaller" type="text" placeholder="Serial" autocomplete="off">
+							</div>
+						</div>
+						<div class="col col-md-6">
+							<div class="form-group">
+								<label>Marca</label>
+	                       		<input th:field="*{marca}" class="form-control" id="marcaTaller" type="text" placeholder="Marca" autocomplete="off">
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col col-md-6">
+							<div class="form-group">
+								<label>Modelo</label>
+	                       		<input th:field="*{modelo}" class="form-control" id="modeloTaller" type="text" placeholder="Modelo" autocomplete="off">
+							</div>
+						</div>
+						<div class="col col-md-6">
+							<div class="form-group">
+								<label>Tipo Equipo</label>
+	                       		<Select th:field="*{tipoEquipo.id}" class="form-control" id="tipoEquipoTaller">
+	                       			<option th:each="tipoEquipo:${tiposEquipo}" 
+	                       					th:value="${tipoEquipo.id}" 
+	                       					th:text="${tipoEquipo.nombre}"></option>
+	                       		</Select>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col col-md-6">
+							<div class="form-group">
+								<label>Tipo Reparacion</label>
+	                       		<Select th:field="*{tipo_reparacion}" class="form-control" id="tipoReparacionTaller">
+	                       			 <option value="1">Taller</option>
+	                       			 <option value="2">Garantia</option>
+	                       			 <option value="3">Desbloqueo</option>
+	                       		</Select>
+							</div>
+						</div>
+						<div class="col col-md-6">
+							<div class="form-group">
+								<label>Problema</label>
+	                       		<textarea th:field="*{problema}" id="problemaTaller" class="form-control" rows="2" style="width:100%;overflow: scroll;resize: none;color: #000;" placeholder="Problema"></textarea>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col col-md-6">
+							<div class="form-group">
+								<label>Avance</label>
+	                       		<input th:field="*{avance}" class="form-control" min="0" id="avanceTaller" type="number" placeholder="Avance" autocomplete="off">
+							</div>
+						</div>
+					</div>
+           		 </form>
+		</div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-warning" data-dismiss="modal">Regresar</button>
+        <button type="button" class="btn btn-standar" id="btnAddTaller">Agregar</button>
+      </div>
+    </div>
+  </div>
+</div>	
+
+<!-- Modal de pago -->
+<div id="pagoModal" class="modal fade" role="dialog" data-backdrop="static">
+  <div class="modal-dialog modal-md">
+    <!-- Modal content-->
+    <div class="modal-content all">
+      <div class="modal-body">
+			<form>
+				<div id="nuevoPago">
+					<div class="row">
+						<div class="col col-md-4">
+							<div class="form-group personalized">
+								<label>Cliente</label>
+	                       		<input class="form-control" type="text">
+							</div>
+						</div>
+						<div class="col col-md-4">
+							<div class="form-group personalized">
+								<label>Tel&eacute;fono</label>
+	                       		<input class="form-control" type="text">
+							</div>
+						</div>
+						<div class="col col-md-4">
+							<div class="form-group personalized">
+								<label>RNC</label>
+	                       		<input class="form-control" type="text">
+							</div>
+						</div>
+					</div>
+					
+					<br>
+					
+					<div class="row">
+						<div class="col col-md-6">
+							<div class="form-group personalized">
+								<label>Monto Factura</label>
+	                       		<input class="form-control" type="text" value="850">
+							</div>
+						</div>
+					</div>
+					
+					<h2><center>Forma de pago </center> </h2>
+					
+					<div class="row">
+						<div class="col col-md-4">
+							<div class="form-group">
+	                       		<input class="form-control" type="text">
+							</div>
+						</div>
+						<div class="col col-md-4">
+							<div class="form-group">
+	                       		<input class="form-control" type="text">
+							</div>
+						</div>
+						
+						<div class="col col-md-4">
+							<div class="form-group">
+	                       		<button class="btn btn-success"> Agregar </button>
+							</div>
+						</div>
+					</div>
+					
+					<br>
+					<div class="row">
+						<div class="col col-md-9">
+							<div class="form-group">
+							    <table class="table table-hover" style="width: 100%;">
+									<thead>
+										<tr style="background-color: #17a2b8;color:#fff">
+											<th>Forma de pago</th>
+											<th>Monto</th>
+										</tr>
+									</thead>
+									<tbody class="items">
+										<tr>
+											<td>Efectivo</td>
+											<td>200</td>
+										</tr>
+										<tr>
+											<td>Tarjeta</td>
+											<td>400</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+						<div class="col col-md-3">
+							<div class="form-group">
+								<span style="font-size: 20px;">Total &nbsp; 600</span><br>
+								<span style="font-size: 20px;">Resta &nbsp; 250</span><br>
+								<span style="font-size: 20px;">Cambio &nbsp; 0</span><br>
+							</div>
+						</div>	
+					</div>
+				</div>	
+           </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-warning" data-dismiss="modal">Regresar</button>
+        <button type="button" class="btn btn-standar" data-dismiss="modal">Guardar</button>
+      </div>
+    </div>
+  </div>
+</div>		
 		
 		
 <!-- Modal NCF -->
-<div id="ncfModal" class="modal fade" role="dialog">
+<div id="ncfModal" class="modal fade" role="dialog" data-backdrop="static">
   <div class="modal-dialog modal-lg">
     <!-- Modal content-->
     <div class="modal-content all">
@@ -561,19 +792,6 @@
 							<div class="form-group">
 								<label>NCF</label>
 	                      		<input id="ncfVlue" class="form-control" type="text" disabled="disabled">
-							</div>
-						</div>
-					</div>
-					<div class="row">
-						<div class="col col-md-8">
-							<div class="form-group">
-								<textarea class="form-control" rows="2" style="width:100%;overflow: scroll;resize: none;color: #000;" placeholder="Escribe alguna nota que desee recordar"></textarea>
-							</div>
-						</div>
-						<div class="col col-md-4">
-							<div class="form-group">
-								<label>Avance Taller</label>
-	                      		<input id="avanceTaller" class="form-control" type="text" disabled="disabled">
 							</div>
 						</div>
 					</div>

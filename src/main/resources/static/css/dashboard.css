@@ -64,3 +64,15 @@ body{
 	box-shadow: 2px 2px 5px 0px rgba(0, 0, 0, 0.75);
 	color: #ffffff;
 }
+
+.personalized>input:hover:active:link:visited:focus {
+	border: 0px;
+	-webkit-box-shadow: none;
+	-moz-box-shadow: none;
+	box-shadow: none;
+	background: transparent;
+	border: none;
+	border-radius: 0px;
+	border-bottom: solid 2px #fff;
+	color: #fff;
+}

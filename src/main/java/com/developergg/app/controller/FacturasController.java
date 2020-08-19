@@ -12,9 +12,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.developergg.app.model.ComprobanteFiscal;
 import com.developergg.app.model.FacturaTemp;
+import com.developergg.app.model.Taller;
+import com.developergg.app.model.TipoEquipo;
 import com.developergg.app.model.Usuario;
 import com.developergg.app.service.IComprobantesFiscalesService;
 import com.developergg.app.service.IFacturasTempService;
+import com.developergg.app.service.ITiposEquipoService;
 
 @Controller
 @RequestMapping("/facturas")
@@ -25,6 +28,9 @@ public class FacturasController {
 	
 	@Autowired
 	private IComprobantesFiscalesService serviceComprobantesFiscales;
+	
+	@Autowired
+	private ITiposEquipoService serviceTiposEquipos;
 
 	@GetMapping("/create")
 	public String create(HttpSession session, Model model) {
@@ -32,6 +38,7 @@ public class FacturasController {
 		//verificamos si existe una factura temporal
 		FacturaTemp facturaTemp = serviceFacturasTemp.buscarPorUsuario(usuario);
 		List<ComprobanteFiscal> comprobantesFiscales = serviceComprobantesFiscales.buscarPorTienda(usuario.getAlmacen().getPropietario());
+		List<TipoEquipo> tiposEquipo = serviceTiposEquipos.buscarTodos();
 		ComprobanteFiscal comprobanteFiscal = null;
 		for (ComprobanteFiscal comprobanteF : comprobantesFiscales) {
 			if(comprobanteF.getNombre().equalsIgnoreCase("Consumidor final")) {
@@ -47,6 +54,8 @@ public class FacturasController {
 		}
 		model.addAttribute("facturaTemp", facturaTemp);
 		model.addAttribute("comprobantesFiscales", comprobantesFiscales);
+		model.addAttribute("tiposEquipo", tiposEquipo);
+		model.addAttribute("taller", new Taller());
 		return "facturas/factura";
 	}
 	

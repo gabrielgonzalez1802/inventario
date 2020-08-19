@@ -681,6 +681,55 @@ $("#btnNCF").click(function(e) {
 	$("#ncfModal").modal("show");
 });
 
+$("#btnTallerModal").click(function(e) {
+	$("#tallerModal").modal("show");
+});
+
+//guardar taller
+$("#btnAddTaller").click(function(e) {
+	 $.post("/talleres/ajax/addRecepcion/", $("#taller").serialize(),
+		function(data, status){
+		 	$('#responseAddRecepcion').replaceWith(data);
+		 	if($('#responseAddRecepcion').val()==1){
+		 		Swal.fire({
+						title : 'Muy bien!',
+						text : 'Registro guardado',
+						position : 'top',
+						icon : 'success',
+						confirmButtonText : 'Cool'
+					})
+					limpiarTaller();
+		 			$("#tallerModal").modal("hide");
+		 	}else{
+		 		Swal.fire({
+						title : 'Advertencia!',
+						text : 'El serial el registro no pudo ser guardado',
+						position : 'top',
+						icon : 'warning',
+						confirmButtonText : 'Cool'
+					})
+		 	}
+		});
+	 
+});
+
+function limpiarTaller(){
+	$("#celularTaller").val("");
+	$("#nombreTaller").val("");
+	$("#cedulaTaller").val("");
+	$("#telefonoTaller").val("");
+	$("#serialTaller").val("");
+	$("#marcaTaller").val("");
+	$("#modeloTaller").val("");
+	$("#problemaTaller").val("");
+	$("#avanceTaller").val("");
+}
+
+$("#guardarFactura").click(function(e) {
+	e.preventDefault();
+	$("#pagoModal").modal("show");
+});
+
 
 
 
