@@ -30,12 +30,11 @@ import com.developergg.app.model.ArticuloSerial;
 import com.developergg.app.model.Categoria;
 import com.developergg.app.model.Cliente;
 import com.developergg.app.model.ComprobanteFiscal;
-import com.developergg.app.model.CondicionPago;
+import com.developergg.app.model.FacturaDetallePagoTemp;
 import com.developergg.app.model.FacturaDetalleTemp;
 import com.developergg.app.model.FacturaSerialTemp;
 import com.developergg.app.model.FacturaServicioTemp;
 import com.developergg.app.model.FacturaTemp;
-import com.developergg.app.model.FormaPago;
 import com.developergg.app.model.Propietario;
 import com.developergg.app.model.SerialTemporal;
 import com.developergg.app.model.Suplidor;
@@ -47,12 +46,11 @@ import com.developergg.app.service.IArticulosService;
 import com.developergg.app.service.ICategoriasService;
 import com.developergg.app.service.IClientesService;
 import com.developergg.app.service.IComprobantesFiscalesService;
-import com.developergg.app.service.ICondicionesPagoService;
+import com.developergg.app.service.IFacturasDetallesPagoTempService;
 import com.developergg.app.service.IFacturasDetallesTempService;
 import com.developergg.app.service.IFacturasSerialesTempService;
 import com.developergg.app.service.IFacturasServiciosTempService;
 import com.developergg.app.service.IFacturasTempService;
-import com.developergg.app.service.IFormasPagoService;
 import com.developergg.app.service.ISuplidoresService;
 import com.developergg.app.service.IVendedoresService;
 import com.developergg.app.util.Utileria;
@@ -89,19 +87,16 @@ public class ArticulosController {
 	private IClientesService serviceClientes;
 	
 	@Autowired
-	private ICondicionesPagoService serviceCondicionesPago;
-	
-	@Autowired
 	private IVendedoresService serviceVendedores;
 	
 	@Autowired
 	private IComprobantesFiscalesService serviceComprobantesFiscales;
 	
 	@Autowired
-	private IFormasPagoService serviceFormasPago;
+	private IFacturasTempService serviceFacturasTemp;
 	
 	@Autowired
-	private IFacturasTempService serviceFacturasTemp;
+	private IFacturasDetallesPagoTempService serviceDetallesPagosTemp;
 	
 	@Value("${inventario.ruta.imagenes}")
 	private String ruta;
@@ -1126,6 +1121,41 @@ public class ArticulosController {
 		return "facturas/cuerpoFactura :: cuerpoFactura";
 	}
 	
+	@GetMapping("/ajax/loadCuerpoFacturaPago/{precioTotal}")
+	public String getCuerpoFacturaPagoTemp(Model model, HttpSession session, @PathVariable("precioTotal") Double precioTotal) {
+		Usuario usuario = (Usuario) session.getAttribute("usuario");
+		FacturaTemp facturaTemp = serviceFacturasTemp.buscarPorUsuario(usuario);
+		List<FacturaDetallePagoTemp> listaPagos = serviceDetallesPagosTemp.buscarPorFacturaTemp(facturaTemp);
+		
+		Double totalPagos = 0.0;
+		Double totalRestaPagos = 0.0;
+		Double totalCambioPagos = 0.0;
+		Integer mostrarCambio = 0;
+		
+		if(!listaPagos.isEmpty()) {
+			for (FacturaDetallePagoTemp facturaDetallePagoTemp : listaPagos) {
+				totalPagos+=facturaDetallePagoTemp.getMonto();
+			}
+			if(totalPagos<precioTotal) {
+				totalRestaPagos = precioTotal-totalPagos;
+			}else if(totalPagos>precioTotal) {
+				totalCambioPagos = (precioTotal-totalPagos)*-1;
+			}
+			
+			//si el ultimo pago es efectivo mostramos el cambio
+			if(listaPagos.get(listaPagos.size()-1).getFormaPago().getNombre().equalsIgnoreCase("efectivo")) {
+				mostrarCambio = 1;
+			}
+		}
+		
+		model.addAttribute("mostrarCambio", mostrarCambio);
+		model.addAttribute("listaPagos", listaPagos);
+		model.addAttribute("totalPagos", totalPagos);
+		model.addAttribute("totalRestaPagos", totalRestaPagos);
+		model.addAttribute("totalCambioPagos", totalCambioPagos);
+		return "facturas/cuerpoPago :: cuerpoPago";
+	}
+	
 	@PostMapping("/ajax/deleteService/")
 	public String quitarServicioFactura(Model model, @RequestParam("idServicio") Integer idServicio) {
 		serviceServiciosTemp.eliminar(idServicio);
@@ -1311,16 +1341,11 @@ public class ArticulosController {
 		factura.setCliente(cliente);
 		serviceFacturasTemp.guardar(factura);
 		model.addAttribute("idCliente", cliente!=null?cliente.getId():"0");
-		model.addAttribute("rncCliente", cliente.getRnc());
-		model.addAttribute("precioCliente", cliente.getPrecio());
+		model.addAttribute("nombreCliente", cliente!=null?cliente.getNombre():"");
+		model.addAttribute("telefonoCliente", cliente!=null?cliente.getTelefono():"");
+		model.addAttribute("rncCliente", cliente!=null?cliente.getRnc():"");
+		model.addAttribute("precioCliente", cliente!=null?cliente.getPrecio():"");
 		return "facturas/factura :: #nuevoCliente";
-	}
-	
-	@GetMapping("/ajax/listaCondicionesPago/")
-	public String obtenerCondicionesPago(Model model) {
-		List<CondicionPago> condicionesPago = serviceCondicionesPago.buscarTodos();
-		model.addAttribute("condicionesPago", condicionesPago);
-		return "facturas/factura :: #seleccionCondicionPago";
 	}
 	
 	@GetMapping("/ajax/listaVendedores/")
@@ -1332,13 +1357,6 @@ public class ArticulosController {
 				collect(Collectors.toList());
 		model.addAttribute("vendedores", vendedores);
 		return "facturas/factura :: #seleccionVendedor";
-	}
-
-	@GetMapping("/ajax/serviceFormasPago/")
-	public String obtenerFormasDePago(Model model) {
-		List<FormaPago> formaPagos = serviceFormasPago.buscarTodas();
-		model.addAttribute("formaPagos", formaPagos);
-		return "facturas/factura :: #seleccionFormaPago";
 	}
 	
 	@GetMapping("/ajax/getComprobanteFiscal/{id}")

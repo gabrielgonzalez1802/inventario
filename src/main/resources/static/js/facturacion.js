@@ -10,18 +10,14 @@ $('#articulos').load("/articulos/ajax/getAll",function(){
 				$("#selectCliente").val(clienteAcct);
 				$("#rncCliente").val(clienteAcct);
 			}
-			$("#seleccionCondicionPago").load("/articulos/ajax/listaCondicionesPago/",function(){
-				$("#seleccionVendedor").load("/articulos/ajax/listaVendedores/",function(){
-						$("#seleccionFormaPago").load("/articulos/ajax/serviceFormasPago/",function(){
-							var idComprobanteFiscal = $("#selectComprobanteFiscal").val();
-							if(idComprobanteFiscal){
-								$("#comprobanteFiscalInfo").load("/articulos/ajax/getComprobanteFiscal/"+idComprobanteFiscal,function(){
-									incluyeItbis = $("#incluyeItbis").val();
-									factura_detalle_items(incluyeItbis);
-								});
-							}
-						});
-				});
+			$("#seleccionVendedor").load("/articulos/ajax/listaVendedores/",function(){
+				var idComprobanteFiscal = $("#selectComprobanteFiscal").val();
+				if(idComprobanteFiscal){
+					$("#comprobanteFiscalInfo").load("/articulos/ajax/getComprobanteFiscal/"+idComprobanteFiscal,function(){
+						incluyeItbis = $("#incluyeItbis").val();
+						factura_detalle_items(incluyeItbis);
+					});
+				}
 			});
 		});
 });
@@ -134,13 +130,20 @@ function seleccionarCliente(){
 		$("#cantidadProducto").val("0");
 		$("#precioRango").attr('disabled','disabled');
 		$.get("/articulos/ajax/getInfoCliente/" + 0,
-				function(fragment) {
-		});
+			function(fragment) {
+				$("#facturaCliente").val("");
+				$("#facturaTelefono").val("");
+				$("#facturaRnc").val("");
+			});
 	}else{
 		//obtenemos la informacion del cliente
 		$.get("/articulos/ajax/getInfoCliente/" + idCliente,
 				function(fragment) {
 					$('#nuevoCliente').replaceWith(fragment);
+					//Actualizamos el cliente en el formulario de pago
+					$("#facturaCliente").val($("#nombreCliente").val());
+					$("#facturaTelefono").val($("#telefonoCliente").val());
+					$("#facturaRnc").val($("#rncCliente").val());
 					//actualizamos el precio
 					var articulo = $("#articulo").val();
 					if(articulo!=""){
@@ -500,8 +503,18 @@ $("#guardarCostoSeriales").click(function(e) {
 
 //Carga el detalle de la factura
 function factura_detalle_items(incluyeItbis){
-	$('#cuerpoFactura').load("/articulos/ajax/loadCuerpoFactura/"+incluyeItbis);
-	$('#articulo').val("");
+	$('#cuerpoFactura').load("/articulos/ajax/loadCuerpoFactura/"+incluyeItbis,function(){
+		$('#articulo').val("");
+		//actualizamos el precio en el formulario de pago
+		var precioTotal = $('#precioTotal').text();
+		$('#montoFactura').val(precioTotal);
+		//Si el precio total es 0 ocultamos el boton de pago
+		if(precioTotal=="0.0"){
+			$('#divButtonSaveFact').hide();
+		}else{
+			$('#divButtonSaveFact').show();
+		}
+	});
 }
 
 //Limpiar valores del modal de servicios
@@ -685,6 +698,15 @@ $("#btnTallerModal").click(function(e) {
 	$("#tallerModal").modal("show");
 });
 
+$("#selectCondicionPago").change(function(){
+	var condicionPago = $("#selectCondicionPago").val();
+	 $.post("/facturas/ajax/updateCondicionPagoFactura/", {
+		 'condicionPagoID' : condicionPago
+	 },function(data){
+		 console.log("condicion cambiada");
+	 });
+});
+
 //guardar taller
 $("#btnAddTaller").click(function(e) {
 	 $.post("/talleres/ajax/addRecepcion/", $("#taller").serialize(),
@@ -727,10 +749,118 @@ function limpiarTaller(){
 
 $("#guardarFactura").click(function(e) {
 	e.preventDefault();
-	$("#pagoModal").modal("show");
+	//cargamos los detalles de pago en la factura
+	factura_pagos_detalle_items();
 });
 
+//Carga el detalle de pago en la factura
+function factura_pagos_detalle_items(){
+	var precioTotal = $("#precioTotal").text();
+	$('#cuerpoPago').load("/articulos/ajax/loadCuerpoFacturaPago/"+precioTotal,function(){
+		if($("#mostrarCambio").val()==0){
+			$("#totalCanbioPagos").hide();
+		}else{
+			$("#totalCanbioPagos").show();
+		}
+		$("#pagoModal").modal("show");
+	});
+}
 
+function factura_pagos_detalle_itemsNotModalOpen(){
+	var precioTotal = $("#precioTotal").text();
+	$('#cuerpoPago').load("/articulos/ajax/loadCuerpoFacturaPago/"+precioTotal,function(){
+		if($("#mostrarCambio").val()==0){
+			$("#totalCanbioPagos").hide();
+		}else{
+			$("#totalCanbioPagos").show();
+		}
+	});
+}
+
+$("#btnAgregarPago").click(function(e) {
+	e.preventDefault();
+	var formaPago = $("#selectFormaPago").val();
+	var montoFormaPago = $("#montoFormaPago").val();
+	if(montoFormaPago<0){
+		Swal.fire({
+			title : 'Advertencia!',
+			text : 'El monto no puede ser negativo',
+			position : 'top',
+			icon : 'warning',
+			confirmButtonText : 'Cool'
+		})
+		$("#montoFormaPago").val("");
+	}else{
+		 $.post("/formasPago/ajax/addPagoFactura/", {
+				 'formaPago' : formaPago,
+				 'montoFormaPago': montoFormaPago,
+				 'montoTotal': $("#precioTotal").text()
+		   },function(response){
+				$('#responseAddPago').replaceWith(response);
+				if($("#responseAddPago").val() == 0){
+					Swal.fire({
+						title : 'Advertencia!',
+						text : 'El monto no puede ser mayor al total de la factura',
+						position : 'top',
+						icon : 'warning',
+						confirmButtonText : 'Cool'
+					})
+				}
+				$("#montoFormaPago").val("");
+				factura_pagos_detalle_itemsNotModalOpen();
+		 	});
+	}
+});
+
+function eliminarPagoFactura(idPago){
+	 $.post("/formasPago/ajax/deletePagoFactura/", {
+		 'pago' : idPago
+   },function(response){
+		factura_pagos_detalle_itemsNotModalOpen();
+		$("#montoFormaPago").val("");
+ 	});
+}
+
+$("#btnGuardarFactura").click(function(e) {
+	e.preventDefault();
+	//verificamos que la factura tenga los pagos completos para proceder a guardarla
+	if($("#totalRestaPagos").text()!="0.0"){
+		Swal.fire({
+			title : 'Advertencia!',
+			text : 'No se puede guardar la factura hasta completarse los pagos',
+			position : 'top',
+			icon : 'warning',
+			confirmButtonText : 'Cool'
+		})
+	}else{
+		//validacion, debe incluir cliente
+		if($("#facturaCliente").val()==""){
+			Swal.fire({
+				title : 'Advertencia!',
+				text : 'El cliente no puede estar vacio',
+				position : 'top',
+				icon : 'warning',
+				confirmButtonText : 'Cool'
+			})
+		}else{
+			//debe incluir RNC
+			if($("#facturaRnc").val()==""){
+				Swal.fire({
+					title : 'Advertencia!',
+					text : 'El RNC es necesario para guardar la factura',
+					position : 'top',
+					icon : 'warning',
+					confirmButtonText : 'Cool'
+				})
+			}else{
+				//proceso de guardado de la factura
+				 $.post("/facturas/ajax/guardarFactura/",function(response){
+					alert("ok");
+			 	});
+			}
+		}
+	}
+});
 
 
 

@@ -43,4 +43,9 @@ public class CondicionesPagosServiceJpa implements ICondicionesPagoService {
 		}
 	}
 
+	@Override
+	public CondicionPago buscarPorCondicionPago(String condicionPago) {
+		return repo.findByNombre(condicionPago);
+	}
+
 }

@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.developergg.app.model.Almacen;
 import com.developergg.app.model.FormaPago;
 import com.developergg.app.repository.FormasPagoRepository;
 import com.developergg.app.service.IFormasPagoService;
@@ -41,6 +42,11 @@ public class FormasPagoServiceJpa implements IFormasPagoService {
 		if(optional.isPresent()) {
 			repo.save(optional.get());
 		}
+	}
+
+	@Override
+	public List<FormaPago> buscarPorAlmacen(Almacen almacen) {
+		return repo.findByAlmacen(almacen);
 	}
 
 }

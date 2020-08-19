@@ -84,21 +84,18 @@
   <link rel="stylesheet" type="text/css" th:href="@{/css/swal.css}">
   </head>
   <body>
-<!--      <span th:insert="fragments/topMenu :: menu-principal"></span>  -->
      <br>
 	<div class="container">
 		<div class="panel panel-default">
 		<div class="panel-heading all" style="border-bottom: 0px;">
-		
-<!-- 		<h4 style="color: #fff;">Facturaci&oacute;n -->
-<!-- 		<button class="btn btn-warning" id="btnNCF">NCF</button> </h4>-->
-		 
+
 		 <form class="form-inline" action="#" id="formTop" th:object="${facturaTemp}">
 			  <div class="form-group">
 			    <label style="color: #fff;font-size: 25px;">Facturaci&oacute;n | &nbsp;&nbsp;</label>
 			  </div>
+			  <input type="hidden" id="responseUpdateCondicion">
 			  <div class="form-group" id="seleccionCondicionPago">
-					<select class="form-control" id="selectCondicionPago">
+					<select class="form-control" th:field="*{condicionPago.id}" id="selectCondicionPago">
 						<option th:each="condicionPago:${condicionesPago}"
 						th:value="${condicionPago.id}" th:text="${condicionPago.nombre}"/>
 				</select>
@@ -163,7 +160,7 @@
                 	 <br>
                		 <button id="agregarArticuloFactura" class="btn btn-standar" style="margin-top: 5px;"> Agregar </button>
                 </div>  
-                <div class="col-md-2"> 
+                <div class="col-md-2" id="divButtonSaveFact"> 
                 	<br>
                		 <button id="guardarFactura" class="btn btn-success pull-right" style="margin-top: 5px;"> Guardar </button>
                 </div>
@@ -409,6 +406,8 @@
 				<div id="nuevoCliente">
 					<input type="hidden" th:value="${idCliente}" id="idCliente">
 					<input type="hidden" th:value="${precioCliente}" id="precioCliente">
+					<input type="hidden" th:value="${nombreCliente}" id="nombreCliente">
+					<input type="hidden" th:value="${telefonoCliente}" id="telefonoCliente">
 					
 					<div class="row">
 						<div class="col col-md-6">
@@ -661,23 +660,24 @@
       <div class="modal-body">
 			<form>
 				<div id="nuevoPago">
+					<input type="hidden" id="responseAddPago" th:value="${responseAddPago}">
 					<div class="row">
 						<div class="col col-md-4">
 							<div class="form-group personalized">
 								<label>Cliente</label>
-	                       		<input class="form-control" type="text">
+	                       		<input th:value="${facturaTemp.cliente.nombre}" id="facturaCliente" class="form-control" type="text" placeholder="Cliente">
 							</div>
 						</div>
 						<div class="col col-md-4">
 							<div class="form-group personalized">
 								<label>Tel&eacute;fono</label>
-	                       		<input class="form-control" type="text">
+	                       		<input th:value="${facturaTemp.cliente.telefono}" id="facturaTelefono" class="form-control" type="text" placeholder="Tel&eacute;fono">
 							</div>
 						</div>
 						<div class="col col-md-4">
 							<div class="form-group personalized">
 								<label>RNC</label>
-	                       		<input class="form-control" type="text">
+	                       		<input th:value="${facturaTemp.cliente.rnc}" id="facturaRnc" class="form-control" type="text" placeholder="RNC">
 							</div>
 						</div>
 					</div>
@@ -688,62 +688,41 @@
 						<div class="col col-md-6">
 							<div class="form-group personalized">
 								<label>Monto Factura</label>
-	                       		<input class="form-control" type="text" value="850">
+	                       		<input class="form-control" style="font-size: 20px;text-align: center; color: black;" type="text" id="montoFactura" disabled="disabled">
 							</div>
 						</div>
 					</div>
 					
-					<h2><center>Forma de pago </center> </h2>
+					<h2><center>Forma de pago </center></h2>
 					
 					<div class="row">
 						<div class="col col-md-4">
 							<div class="form-group">
-	                       		<input class="form-control" type="text">
+	                       		<div id="seleccionFormaPago">
+									 <select class="form-control" id="selectFormaPago">
+									 	<option th:each="formaPago:${formaPagos}"
+									 		th:value="${formaPago.id}" th:text="${formaPago.nombre}"/>
+									 </select>
+								</div>
 							</div>
 						</div>
 						<div class="col col-md-4">
 							<div class="form-group">
-	                       		<input class="form-control" type="text">
+	                       		<input class="form-control" type="number" min="0" placeholder="Monto" id="montoFormaPago">
 							</div>
 						</div>
 						
 						<div class="col col-md-4">
 							<div class="form-group">
-	                       		<button class="btn btn-success"> Agregar </button>
+	                       		<button class="btn btn-success" id="btnAgregarPago"> Agregar </button>
 							</div>
 						</div>
 					</div>
 					
 					<br>
 					<div class="row">
-						<div class="col col-md-9">
-							<div class="form-group">
-							    <table class="table table-hover" style="width: 100%;">
-									<thead>
-										<tr style="background-color: #17a2b8;color:#fff">
-											<th>Forma de pago</th>
-											<th>Monto</th>
-										</tr>
-									</thead>
-									<tbody class="items">
-										<tr>
-											<td>Efectivo</td>
-											<td>200</td>
-										</tr>
-										<tr>
-											<td>Tarjeta</td>
-											<td>400</td>
-										</tr>
-									</tbody>
-								</table>
-							</div>
-						</div>
-						<div class="col col-md-3">
-							<div class="form-group">
-								<span style="font-size: 20px;">Total &nbsp; 600</span><br>
-								<span style="font-size: 20px;">Resta &nbsp; 250</span><br>
-								<span style="font-size: 20px;">Cambio &nbsp; 0</span><br>
-							</div>
+						<div id="cuerpoPago">
+							<!--  load data ajax -->
 						</div>	
 					</div>
 				</div>	
@@ -751,7 +730,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-warning" data-dismiss="modal">Regresar</button>
-        <button type="button" class="btn btn-standar" data-dismiss="modal">Guardar</button>
+        <button type="button" class="btn btn-standar" id="btnGuardarFactura">Guardar</button>
       </div>
     </div>
   </div>
@@ -796,17 +775,6 @@
 						</div>
 					</div>
 					<div class="row">
-						<div class="col col-md-6">
-							<div class="form-group">
-								<div id="seleccionFormaPago">
-								 	 <label>Forma de pago</label>
-									 <select class="form-control" id="selectFormaPago">
-									 	<option th:each="formaPago:${formaPagos}"
-									 		th:value="${formaPago.id}" th:text="${formaPago.nombre}"/>
-									 </select>
-								</div>
-							</div>
-						</div>
 						<div class="col col-md-4">
 							<div class="form-group">
 								<label>Cantidad</label>
