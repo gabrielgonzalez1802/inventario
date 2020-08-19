@@ -47,10 +47,6 @@ public class FacturaDetalleTemp {
 	private Usuario usuario;
 	
 	@OneToOne
-	@JoinColumn(name = "id_cliente")
-	private Cliente cliente;
-	
-	@OneToOne
 	@JoinColumn(name = "id_almacen")
 	private Almacen almacen;
 	
@@ -169,14 +165,6 @@ public class FacturaDetalleTemp {
 	public void setTaller(Integer taller) {
 		this.taller = taller;
 	}
-	
-	public Cliente getCliente() {
-		return cliente;
-	}
-
-	public void setCliente(Cliente cliente) {
-		this.cliente = cliente;
-	}
 
 	public List<FacturaSerialTemp> getSeriales() {
 		return seriales;
@@ -198,8 +186,8 @@ public class FacturaDetalleTemp {
 	public String toString() {
 		return "FacturaDetalleTemp [id=" + id + ", articulo=" + articulo + ", cantidad=" + cantidad + ", precio="
 				+ precio + ", itbis=" + itbis + ", imei=" + imei + ", conItbis=" + conItbis + ", existencia="
-				+ existencia + ", subtotal=" + subtotal + ", precio_maximo=" + precio_maximo + ", usuario=" + usuario
-				+ ", cliente=" + cliente + ", almacen=" + almacen + ", taller=" + taller + ", seriales=" + seriales
-				+ "]";
+				+ existencia + ", subtotal=" + subtotal + ", precio_maximo=" + precio_maximo + ", comprobanteFiscal="
+				+ comprobanteFiscal + ", usuario=" + usuario + ", almacen=" + almacen + ", taller=" + taller
+				+ ", seriales=" + seriales + "]";
 	}
 }

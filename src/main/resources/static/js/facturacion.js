@@ -2,7 +2,6 @@
 var incluyeItbis = 0;
 var columnas = [];
 $('#articulos').load("/articulos/ajax/getAll",function(){
-	$("#seleccionCliente").load("/articulos/ajax/listaClientes/",function(){
 		//verificamos si la factura tiene un cliente asociado
 		$("#clienteAcct").load("/articulos/ajax/getClienteAcct/",function(){
 			var clienteAcct = $("#actualCliente").val();
@@ -25,7 +24,6 @@ $('#articulos').load("/articulos/ajax/getAll",function(){
 				});
 			});
 		});
-	});
 });
 
 var idArticuloBuscado;
@@ -129,12 +127,15 @@ $("#cantidadProducto").on(
 
 //cuando seleccione algun cliente obtenemos toda su informacion
 function seleccionarCliente(){
-	var idCliente = $("#selectCliente").val();
+	var idCliente = $("#selectCliente").val();	
 	if(idCliente==""){
 		$("#rncCliente").val("");
 		$("#precioRango").val("");
 		$("#cantidadProducto").val("0");
 		$("#precioRango").attr('disabled','disabled');
+		$.get("/articulos/ajax/getInfoCliente/" + 0,
+				function(fragment) {
+		});
 	}else{
 		//obtenemos la informacion del cliente
 		$.get("/articulos/ajax/getInfoCliente/" + idCliente,
@@ -273,7 +274,6 @@ $("#agregarArticuloFactura").click(function(e) {
 			var temporalPrice = $("#temporalPrice").val();
 			var idDetalle = $("#detalleArticuloId").val();
 			//verificamos si selecciona varios seriales
-			//if(cantidad>1){
 				//Si selecciona mas de un serial verificamos si tienen el mismo precio, 
 				//de lo contrario mostramos modal
 				$("#responsePreciosSeriales").load("/articulos/ajax/verificarPreciosDeSeriales/",{

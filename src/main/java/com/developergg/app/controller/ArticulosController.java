@@ -1288,27 +1288,13 @@ public class ArticulosController {
 		return "facturas/factura :: #cantidadYprecio";
 	}
 	
-	@GetMapping("/ajax/listaClientes/")
-	public String obtenerClientes(Model model, HttpSession session) {
-		Usuario usuario = (Usuario) session.getAttribute("usuario");
-		List<Cliente> clientes = serviceClientes.buscarPorAlmacen(usuario.getAlmacen());
-		model.addAttribute("clientes", clientes);
-		return "facturas/factura :: #seleccionCliente";
-	}
-	
 	@GetMapping("/ajax/getClienteAcct/")
 	public String obtenerCliente(Model model, HttpSession session) {
 		Usuario usuario = (Usuario) session.getAttribute("usuario");
-		List<FacturaDetalleTemp> facturaDetallesTemp = serviceFacturasDetallesTemp.buscarPorUsuarioAlmacen(usuario, usuario.getAlmacen());
-		if(!facturaDetallesTemp.isEmpty()){
-			FacturaDetalleTemp tempF = facturaDetallesTemp.get(0);
-			if(tempF.getCliente()!=null) {
-				model.addAttribute("actualCliente", tempF.getCliente().getId());
-				model.addAttribute("actualRnc", tempF.getCliente().getRnc());
-			}else {
-				model.addAttribute("actualCliente", "0");
-				model.addAttribute("actualRnc", "0");
-			}
+		FacturaTemp factura = serviceFacturasTemp.buscarPorUsuario(usuario);
+		if(factura.getCliente()!=null) {
+			model.addAttribute("actualCliente", factura.getCliente().getId());
+			model.addAttribute("actualRnc", factura.getCliente().getRnc());
 		}else {
 			model.addAttribute("actualCliente", "0");
 			model.addAttribute("actualRnc", "0");
@@ -1321,15 +1307,10 @@ public class ArticulosController {
 		//Buscamos el cliente a partir del id
 		Cliente cliente = serviceClientes.buscarPorIdCliente(idCliente);
 		Usuario usuario = (Usuario) session.getAttribute("usuario");
-		//actualizamos el cliente en el detalle
-		List<FacturaDetalleTemp> facturaDetallesTemp = serviceFacturasDetallesTemp.buscarPorUsuarioAlmacen(usuario, usuario.getAlmacen());
-		if(!facturaDetallesTemp.isEmpty()){
-			FacturaDetalleTemp tempF = facturaDetallesTemp.get(0);
-			tempF.setCliente(cliente);
-			serviceFacturasDetallesTemp.guardar(tempF);
-		}
-		
-		model.addAttribute("idCliente", cliente.getId());
+		FacturaTemp factura = serviceFacturasTemp.buscarPorUsuario(usuario);
+		factura.setCliente(cliente);
+		serviceFacturasTemp.guardar(factura);
+		model.addAttribute("idCliente", cliente!=null?cliente.getId():"0");
 		model.addAttribute("rncCliente", cliente.getRnc());
 		model.addAttribute("precioCliente", cliente.getPrecio());
 		return "facturas/factura :: #nuevoCliente";
