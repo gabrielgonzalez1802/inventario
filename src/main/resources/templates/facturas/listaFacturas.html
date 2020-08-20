@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <title>Sistema Celulares</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" sizes="64x64" th:href="@{/img/icon.png}">
+    <link rel="stylesheet" type="text/css" th:href="@{/bootstrap/css/bootstrap.min.css}">
+	<link rel="stylesheet" type="text/css" th:href="@{/css/sticky-dark-top-nav.css}">
+    <!-- Font-icon css-->
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+ 	<link rel="stylesheet" type="text/css" th:href="@{/css/sticky-dark-top-nav.css}">
+ 	<link rel="stylesheet" type="text/css" th:href="@{/css/Minimal-tabs.css}">
+ 	<link rel="stylesheet" type="text/css" th:href="@{/css/dashboard.css}">
+ 	<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css">
+ 	<link rel="stylesheet" type="text/css" th:href="@{/fontawesom/css/all.min.css}">
+ 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+ 	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap" rel="stylesheet">
+ 	<style>
+.table-primary, .table-primary>th, .table-primary>td {
+	background-color: #25396d;
+	color: #ffff;
+}
+
+.table-primary th, .table-primary td, .table-primary thead th,
+	.table-primary tbody+tbody {
+	border-color: #25396d;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.current,
+	.dataTables_wrapper .dataTables_paginate .paginate_button.current:hover
+{
+	  background-image: linear-gradient(#54b4eb, #2FA4E7 60%, #1d9ce5);
+}
+.dataTables_wrapper .dataTables_paginate .paginate_button.current, .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+    color: #fffdfd !important;
+    border-color: #2FA4E7;
+}
+</style>
+  </head>
+  <body>
+     <span th:insert="fragments/topMenu :: menu-principal"></span> 
+     <br>
+	<div class="container text-white">
+		<div class="card text-primary border rounded">
+			<div class="card-body" style="margin-top: 0px;">
+				<h1 class="card-title" style="font-size: 16px;">Lista de Facturas
+					<a class="btn btn-primary" style="float: right;" th:href="@{/facturas/create}">Agregar</a>
+				</h1>
+				<br>
+					<table class="table table-striped" id="tabla">
+							<thead>
+								<tr class="table-primary">
+									<th>Fecha</th>
+									<th>Hora</th>
+									<th>NCF</th>
+									<th>Condici&oacute;n</th>
+									<th>Cliente</th>
+									<th>Itbis</th>
+									<th>Total</th>
+									<th></th>
+								</tr>
+							</thead>
+							<tbody>
+								 <tr th:each="factura:${facturas}">
+				                  <td th:text="${#dates.format(factura.fecha, 'dd-MM-yyyy')}"></td>
+				                  <td th:text="${factura.hora}"></td> 
+				                   <td th:text="${factura.ncf}"></td> 
+				                   <td th:text="${factura.condicion}"></td> 
+				                  <td th:text="${factura.cliente.nombre}"></td>
+				                  <td th:text="${factura.itbis}"></td>
+				                  <td th:text="${factura.total}"></td>
+				                  <td>
+				                     <a class="btn btn-success btn-sm" data-toggle="tooltip" data-placement="top" title="Modificar" role="button"><i class="fa fa-edit" aria-hidden="true"></i></a>
+				                  	<a onclick="return confirm('¿Estas seguro?')" class="btn btn-danger btn-sm" data-toggle="tooltip" data-placement="top" title="Eliminar" role="button"><i class="fa fa-trash" aria-hidden="true"></i></a>
+				                  </td>
+				                </tr>
+							</tbody>
+						</table>
+			</div>
+			<a class="card-link" href="#"></a>
+		</div>
+	</div>
+	<script th:src="@{/js/jquery.min.js}"></script>
+    <script th:src="@{/bootstrap/js/bootstrap.min.js}"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function() {
+			$('#tabla').DataTable({
+				"scrollY": "400px"
+			});
+		});
+	</script>
+	 <span th:insert="fragments/footer :: footer"></span>  
+</body>
+</html>

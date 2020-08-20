@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.developergg.app.model.FacturaDetalleTemp;
 import com.developergg.app.model.FacturaSerialTemp;
+import com.developergg.app.model.FacturaTemp;
 import com.developergg.app.repository.FacturasSerialesTempRepository;
 import com.developergg.app.service.IFacturasSerialesTempService;
 
@@ -47,5 +48,10 @@ public class FacturasSerialesTempServiceJpa implements IFacturasSerialesTempServ
 	@Override
 	public void eliminarListaSeriales(List<FacturaSerialTemp> lista) {
 		repo.deleteAll(lista);
+	}
+
+	@Override
+	public List<FacturaSerialTemp> buscarPorFacturaTemp(FacturaTemp facturaTemp) {
+		return repo.findByFacturaTemp(facturaTemp);
 	}
 }

@@ -18,11 +18,18 @@ public class FacturaSerialTemp {
 	private Integer id;
 	
 	private Integer id_serial; //preguntar. esto es el serial
+
+	@OneToOne
+	@JoinColumn(name = "id_factura_temp")
+	private FacturaTemp facturaTemp;
 	
 	@OneToOne
 	@JoinColumn(name = "id_detalle_factura")
 	private FacturaDetalleTemp idDetalle;
 	
+	@OneToOne
+	@JoinColumn(name = "id_articulo_serial")
+	private ArticuloSerial articuloSerial;
 
 	public Integer getId() {
 		return id;
@@ -47,9 +54,26 @@ public class FacturaSerialTemp {
 	public void setIdDetalle(FacturaDetalleTemp idDetalle) {
 		this.idDetalle = idDetalle;
 	}
+	
+	public FacturaTemp getFacturaTemp() {
+		return facturaTemp;
+	}
+
+	public void setFacturaTemp(FacturaTemp facturaTemp) {
+		this.facturaTemp = facturaTemp;
+	}
+
+	public ArticuloSerial getArticuloSerial() {
+		return articuloSerial;
+	}
+
+	public void setArticuloSerial(ArticuloSerial articuloSerial) {
+		this.articuloSerial = articuloSerial;
+	}
 
 	@Override
 	public String toString() {
-		return "FacturaSerialTemp [id=" + id + ", id_serial=" + id_serial + ", idDetalle=" + idDetalle + "]";
+		return "FacturaSerialTemp [id=" + id + ", id_serial=" + id_serial + ", facturaTemp=" + facturaTemp
+				+ ", idDetalle=" + idDetalle + ", articuloSerial=" + articuloSerial + "]";
 	}
 }

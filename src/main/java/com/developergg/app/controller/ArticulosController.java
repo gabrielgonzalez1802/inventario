@@ -53,6 +53,7 @@ import com.developergg.app.service.IFacturasServiciosTempService;
 import com.developergg.app.service.IFacturasTempService;
 import com.developergg.app.service.ISuplidoresService;
 import com.developergg.app.service.IVendedoresService;
+import com.developergg.app.service.db.ArticulosSerialesService;
 import com.developergg.app.util.Utileria;
 
 @Controller
@@ -754,6 +755,12 @@ public class ArticulosController {
 					FacturaSerialTemp serialTemp = new FacturaSerialTemp();
 					serialTemp.setId_serial(listSerial.getSerial());
 					serialTemp.setIdDetalle(facturaTemp);
+					serialTemp.setFacturaTemp(factura);
+					//verificamos el serial del articulo
+					List<ArticuloSerial> serialesDelArticulo = serviceArticulosSeriales.buscarPorSerialAndAlmacen(String.valueOf(listSerial.getSerial()), usuario.getAlmacen());
+					if(!serialesDelArticulo.isEmpty()) {
+						serialTemp.setArticuloSerial(serialesDelArticulo.get(0));
+					}
 					serviceSerialesTemp.guardar(serialTemp);
 				}
 			}else {
@@ -804,6 +811,12 @@ public class ArticulosController {
 						FacturaSerialTemp serialTemp = new FacturaSerialTemp();
 						serialTemp.setId_serial(Integer.parseInt(serial));
 						serialTemp.setIdDetalle(facturaTemp);
+						serialTemp.setFacturaTemp(factura);
+						//verificamos el serial del articulo
+						List<ArticuloSerial> serialesDelArticulo = serviceArticulosSeriales.buscarPorSerialAndAlmacen(String.valueOf(serial), usuario.getAlmacen());
+						if(!serialesDelArticulo.isEmpty()) {
+							serialTemp.setArticuloSerial(serialesDelArticulo.get(0));
+						}
 						serviceSerialesTemp.guardar(serialTemp);
 					}
 				}
@@ -856,6 +869,12 @@ public class ArticulosController {
 					FacturaSerialTemp serialTemp = new FacturaSerialTemp();
 					serialTemp.setId_serial(Integer.parseInt(serial));
 					serialTemp.setIdDetalle(facturaTemp);
+					serialTemp.setFacturaTemp(factura);
+					//verificamos el serial del articulo
+					List<ArticuloSerial> serialesDelArticulo = serviceArticulosSeriales.buscarPorSerialAndAlmacen(String.valueOf(serial), usuario.getAlmacen());
+					if(!serialesDelArticulo.isEmpty()) {
+						serialTemp.setArticuloSerial(serialesDelArticulo.get(0));
+					}
 					serviceSerialesTemp.guardar(serialTemp);
 				}
 			}
@@ -1146,13 +1165,15 @@ public class ArticulosController {
 			if(listaPagos.get(listaPagos.size()-1).getFormaPago().getNombre().equalsIgnoreCase("efectivo")) {
 				mostrarCambio = 1;
 			}
+		}else {
+			totalRestaPagos = precioTotal;
 		}
 		
 		model.addAttribute("mostrarCambio", mostrarCambio);
 		model.addAttribute("listaPagos", listaPagos);
-		model.addAttribute("totalPagos", totalPagos);
-		model.addAttribute("totalRestaPagos", totalRestaPagos);
-		model.addAttribute("totalCambioPagos", totalCambioPagos);
+		model.addAttribute("totalPagos", df2.format(totalPagos));
+		model.addAttribute("totalRestaPagos", df2.format(totalRestaPagos));
+		model.addAttribute("totalCambioPagos", df2.format(totalCambioPagos));
 		return "facturas/cuerpoPago :: cuerpoPago";
 	}
 	
@@ -1242,6 +1263,12 @@ public class ArticulosController {
 				FacturaSerialTemp newSerial = new FacturaSerialTemp();
 				newSerial.setId_serial(serial);
 				newSerial.setIdDetalle(detalleTemp);
+				//verificamos el serial del articulo
+				List<ArticuloSerial> serialesDelArticulo = serviceArticulosSeriales.buscarPorSerialAndAlmacen(String.valueOf(serial), usuario.getAlmacen());
+				if(!serialesDelArticulo.isEmpty()) {
+					newSerial.setArticuloSerial(serialesDelArticulo.get(0));
+				}
+				newSerial.setFacturaTemp(factura);
 				serviceSerialesTemp.guardar(newSerial);
 				if(newSerial.getId()!=null) {
 					//Obtenemos los datos del serial original

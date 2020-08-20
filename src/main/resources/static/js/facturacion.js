@@ -824,7 +824,7 @@ function eliminarPagoFactura(idPago){
 $("#btnGuardarFactura").click(function(e) {
 	e.preventDefault();
 	//verificamos que la factura tenga los pagos completos para proceder a guardarla
-	if($("#totalRestaPagos").text()!="0.0"){
+	if($("#totalRestaPagos").text()>0){
 		Swal.fire({
 			title : 'Advertencia!',
 			text : 'No se puede guardar la factura hasta completarse los pagos',
@@ -853,8 +853,20 @@ $("#btnGuardarFactura").click(function(e) {
 					confirmButtonText : 'Cool'
 				})
 			}else{
+				var total_venta = $("#precioTotal").text();
+				var total_itbis = $("#subTotalItbis").text();
+				var nombreCliente = $("#facturaCliente").val();
+				var telefonoCliente = $("#facturaTelefono").val();
+				var rncCliente = $("#facturaRnc").val();
 				//proceso de guardado de la factura
-				 $.post("/facturas/ajax/guardarFactura/",function(response){
+				 $.post("/facturas/ajax/guardarFactura/",
+						{
+					 		'total_venta':total_venta,
+					 		'nombreCliente':nombreCliente,
+					 		'telefonoCliente':telefonoCliente,
+					 		'rncCliente':rncCliente,
+					 		'total_itbis':total_itbis
+						},function(response){
 					alert("ok");
 			 	});
 			}
