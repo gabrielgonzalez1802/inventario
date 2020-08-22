@@ -13,7 +13,6 @@ public class WebConfig implements WebMvcConfigurer {
 	
 	@Override
 	public void addResourceHandlers(ResourceHandlerRegistry registry) {
-//		registry.addResourceHandler("/logos/**").addResourceLocations("file:/inventario-java/img/"); //Linux
-		registry.addResourceHandler("/logos/**").addResourceLocations("file:"+rutaImagenes); //Windows
+		registry.addResourceHandler("/logos/**").addResourceLocations("file:"+rutaImagenes);
 	}
 }

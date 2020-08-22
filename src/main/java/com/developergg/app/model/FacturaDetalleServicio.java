@@ -27,6 +27,7 @@ public class FacturaDetalleServicio {
 	private Integer cantidad;
 	private Double precio;
 	private Double subtotal;
+	private Double itbis;
 	
 	public Integer getId() {
 		return id;
@@ -70,9 +71,16 @@ public class FacturaDetalleServicio {
 	public void setSubtotal(Double subtotal) {
 		this.subtotal = subtotal;
 	}
+	public Double getItbis() {
+		return itbis;
+	}
+	public void setItbis(Double itbis) {
+		this.itbis = itbis;
+	}
 	@Override
 	public String toString() {
 		return "FacturaDetalleServicio [id=" + id + ", factura=" + factura + ", descripcion=" + descripcion + ", costo="
-				+ costo + ", cantidad=" + cantidad + ", precio=" + precio + ", subtotal=" + subtotal + "]";
+				+ costo + ", cantidad=" + cantidad + ", precio=" + precio + ", subtotal=" + subtotal + ", itbis="
+				+ itbis + "]";
 	}
 }

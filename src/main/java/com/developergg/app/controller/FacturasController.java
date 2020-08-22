@@ -1,16 +1,33 @@
 package com.developergg.app.controller;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.stream.Collectors;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -19,6 +36,7 @@ import com.developergg.app.model.ArticuloSerial;
 import com.developergg.app.model.Cliente;
 import com.developergg.app.model.ComprobanteFiscal;
 import com.developergg.app.model.CondicionPago;
+import com.developergg.app.model.DetalleFactura;
 import com.developergg.app.model.Factura;
 import com.developergg.app.model.FacturaDetalle;
 import com.developergg.app.model.FacturaDetallePagoTemp;
@@ -48,6 +66,14 @@ import com.developergg.app.service.IFacturasServiciosTempService;
 import com.developergg.app.service.IFacturasTempService;
 import com.developergg.app.service.IFormasPagoService;
 import com.developergg.app.service.ITiposEquipoService;
+
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 @Controller
 @RequestMapping("/facturas")
@@ -101,9 +127,23 @@ public class FacturasController {
 	@Autowired
 	private IArticulosAjustesService serviceArticulosAjuste;
 	
+	@Autowired
+	private DataSource dataSource;
+	
+	@Value("${inventario.ruta.imagenes}")
+	private String rutaImagenes;
+	
+	@Value("${inventario.ruta.reporte.factura}")
+	private String rutaJreport;
+	
+	private String tempFolder =  System.getProperty("java.io.tmpdir");
+//	private String pathSeparator = System.getProperty("file.separator");
+	
 	@GetMapping("/")
 	public String mostrarFacturas(Model model, HttpSession session) {
 		Usuario usuario = (Usuario) session.getAttribute("usuario");
+		List<Factura> facturas = serviceFacturas.buscarPorAlmacen(usuario.getAlmacen());
+		model.addAttribute("facturas", facturas);
 		return "facturas/listaFacturas";
 	}
 
@@ -181,6 +221,9 @@ public class FacturasController {
 			Factura ultimaFactura = listaFacturas.get(listaFacturas.size() - 1);
 			tempCode = ultimaFactura.getCodigo() + 1;
 		}
+		
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("KK:mm:ss a", Locale.ENGLISH);
+        String now = LocalDateTime.now().format(formatter);
 
 		// Creamos la factura
 		Factura factura = new Factura();
@@ -189,7 +232,9 @@ public class FacturasController {
 		factura.setComprobanteFiscal(facturaTemp.getComprobanteFiscal());
 		// factura.setNcf($prefijo.$secuencia_actual); //validar
 		factura.setFecha(new Date());
-		// factura.setCondicion(); //validar
+		factura.setHora(now);
+		factura.setCondicionPago(facturaTemp.getCondicionPago());
+		factura.setCondicion(facturaTemp.getCondicionPago().getNombre()); //redundante validar
 		factura.setTotal_venta(total_venta);
 		factura.setNombre_cliente(nombreCliente);
 		factura.setTelefono_cliente(telefonoCliente);
@@ -292,12 +337,96 @@ public class FacturasController {
 			facturaDetalleServicio.setDescripcion(facturaServicioTemp.getDescripcion());
 			facturaDetalleServicio.setPrecio(facturaServicioTemp.getPrecio());
 			facturaDetalleServicio.setSubtotal(facturaServicioTemp.getSubtotal());
+			facturaDetalleServicio.setItbis(facturaServicioTemp.getItbis());
 			facturaDetalleServicio.setFactura(factura);
 			facturasDetallesServiciosService.guardar(facturaDetalleServicio);
 		}
 		//borramos registros temporales
 		
-		return "redirect:/";
+		return "redirect:/facturas/";
+	}
+	
+	@GetMapping("/download/{id}")
+	public void descargarFactura(@PathVariable("id") Integer idFactura,
+			HttpServletRequest request, 
+            HttpServletResponse response,
+            @RequestHeader String referer) throws JRException, SQLException {
+		
+		//Check the renderer
+        if(referer != null && !referer.isEmpty()) {
+            //do nothing
+            //or send error
+        }
+        
+		Factura factura = serviceFacturas.buscarPorId(idFactura);
+		
+		if(factura!=null) {
+			List<DetalleFactura> listaDetalle = new LinkedList<>();
+			
+			//verificamos los detalles en los articulos
+			List<FacturaDetalle> serviFacturaDetalles = facturasDetallesService.buscarPorFactura(factura);
+			for (FacturaDetalle facturaDetalle : serviFacturaDetalles) {
+				DetalleFactura detalleFacturaArticulo = new DetalleFactura();
+				detalleFacturaArticulo.setId(facturaDetalle.getId());
+				detalleFacturaArticulo.setOriginalTable("factura_detalle");
+				detalleFacturaArticulo.setCantidad(facturaDetalle.getCantidad());
+				detalleFacturaArticulo.setDescripcion(facturaDetalle.getArticulo().getNombre());
+				detalleFacturaArticulo.setItbis(facturaDetalle.getItbis());
+				detalleFacturaArticulo.setPrecio(facturaDetalle.getPrecio());
+				detalleFacturaArticulo.setSubtotal(facturaDetalle.getSubtotal());
+				listaDetalle.add(detalleFacturaArticulo);
+			}
+			
+			//verificamos los servicios
+			List<FacturaDetalleServicio> detalleServicios = facturasDetallesServiciosService.buscarPorFactura(factura);
+			for (FacturaDetalleServicio facturaDetalleServicio : detalleServicios) {
+				DetalleFactura detalleFacturaServicio = new DetalleFactura();
+				detalleFacturaServicio.setId(facturaDetalleServicio.getId());
+				detalleFacturaServicio.setOriginalTable("factura_detalle_servicio");
+				detalleFacturaServicio.setCantidad(facturaDetalleServicio.getCantidad());
+				detalleFacturaServicio.setDescripcion(facturaDetalleServicio.getDescripcion());
+				detalleFacturaServicio.setItbis(facturaDetalleServicio.getItbis());
+				detalleFacturaServicio.setPrecio(facturaDetalleServicio.getPrecio());
+				detalleFacturaServicio.setSubtotal(facturaDetalleServicio.getSubtotal());
+				listaDetalle.add(detalleFacturaServicio);
+			}
+			
+			JasperReport jasperReport = JasperCompileManager.compileReport(rutaJreport);
+			
+			Map<String, Object> parameters = new HashMap<String, Object>();
+			
+			//convertimos la lista a JRBeanCollectionDataSource
+			JRBeanCollectionDataSource itemsJRBean = new JRBeanCollectionDataSource(listaDetalle);
+			
+			parameters.put("idFactura", idFactura); 
+			parameters.put("imagen", rutaImagenes+factura.getAlmacen().getImagen());
+			parameters.put("detalleFactura", itemsJRBean);
+			
+			JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource.getConnection());
+			
+			String dataDirectory = tempFolder + "factura"+factura.getId()+".pdf";
+			
+			JasperExportManager.exportReportToPdfFile(jasperPrint,dataDirectory);
+		
+			 //If user is not authorized - he should be thrown out from here itself
+	         
+	        //Authorized user will download the file
+//	        String dataDirectory = request.getServletContext().getRealPath("/WEB-INF/downloads/pdf/");
+	        Path file = Paths.get(tempFolder, "factura"+factura.getId()+".pdf");
+	        if (Files.exists(file)) 
+	        {
+	            response.setContentType("application/pdf");
+	            response.addHeader("Content-Disposition", "attachment; filename="+"factura"+factura.getId()+".pdf");
+	            try
+	            {
+	                Files.copy(file, response.getOutputStream());
+	                response.getOutputStream().flush();
+	            } 
+	            catch (IOException ex) {
+	                ex.printStackTrace();
+	            }
+	        }
+		}
 	}
 
 }

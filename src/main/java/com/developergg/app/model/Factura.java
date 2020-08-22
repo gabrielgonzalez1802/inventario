@@ -29,6 +29,10 @@ public class Factura {
 	@JoinColumn(name = "id_comprobante")
 	private ComprobanteFiscal comprobanteFiscal;
 	
+	@OneToOne
+	@JoinColumn(name = "id_condicion_pago")
+	private CondicionPago condicionPago;
+	
 	private String ncf;
 	private Date fecha;
 	private Date vencimiento;
@@ -292,15 +296,24 @@ public class Factura {
 		this.paga = paga;
 	}
 
+	public CondicionPago getCondicionPago() {
+		return condicionPago;
+	}
+
+	public void setCondicionPago(CondicionPago condicionPago) {
+		this.condicionPago = condicionPago;
+	}
+
 	@Override
 	public String toString() {
 		return "Factura [id=" + id + ", codigo=" + codigo + ", cliente=" + cliente + ", comprobanteFiscal="
-				+ comprobanteFiscal + ", ncf=" + ncf + ", fecha=" + fecha + ", vencimiento=" + vencimiento + ", hora="
-				+ hora + ", condicion=" + condicion + ", total_venta=" + total_venta + ", nombre_cliente="
-				+ nombre_cliente + ", telefono_cliente=" + telefono_cliente + ", rnc_cliente=" + rnc_cliente
-				+ ", nota_factura=" + nota_factura + ", total_itbis=" + total_itbis + ", usuario=" + usuario
-				+ ", vendedor=" + vendedor + ", almacen=" + almacen + ", abono=" + abono + ", credito=" + credito
-				+ ", cuotas=" + cuotas + ", taller=" + taller + ", formaPago=" + formaPago + ", avance_taller="
-				+ avance_taller + ", comision=" + comision + ", id_comision=" + id_comision + ", paga=" + paga + "]";
+				+ comprobanteFiscal + ", condicionPago=" + condicionPago + ", ncf=" + ncf + ", fecha=" + fecha
+				+ ", vencimiento=" + vencimiento + ", hora=" + hora + ", condicion=" + condicion + ", total_venta="
+				+ total_venta + ", nombre_cliente=" + nombre_cliente + ", telefono_cliente=" + telefono_cliente
+				+ ", rnc_cliente=" + rnc_cliente + ", nota_factura=" + nota_factura + ", total_itbis=" + total_itbis
+				+ ", usuario=" + usuario + ", vendedor=" + vendedor + ", almacen=" + almacen + ", abono=" + abono
+				+ ", credito=" + credito + ", cuotas=" + cuotas + ", taller=" + taller + ", formaPago=" + formaPago
+				+ ", avance_taller=" + avance_taller + ", comision=" + comision + ", id_comision=" + id_comision
+				+ ", paga=" + paga + "]";
 	}
 }

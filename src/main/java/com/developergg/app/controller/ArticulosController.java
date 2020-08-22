@@ -53,7 +53,6 @@ import com.developergg.app.service.IFacturasServiciosTempService;
 import com.developergg.app.service.IFacturasTempService;
 import com.developergg.app.service.ISuplidoresService;
 import com.developergg.app.service.IVendedoresService;
-import com.developergg.app.service.db.ArticulosSerialesService;
 import com.developergg.app.util.Utileria;
 
 @Controller
@@ -539,13 +538,53 @@ public class ArticulosController {
 			@RequestParam("precio") Double precio, @RequestParam("cantidad") Integer cantidad) {
 		Usuario usuario = (Usuario) session.getAttribute("usuario");
 		FacturaTemp factura = serviceFacturasTemp.buscarPorUsuario(usuario);
+		double itbis = 0.0;
+		double subtotal = 0.0;
+		double total = 0.0;
+		double subTotalItbis = 0.0;
 		FacturaServicioTemp servicioFac = new FacturaServicioTemp();
 		servicioFac.setUsuario(usuario);
 		servicioFac.setAlmacen(usuario.getAlmacen()); //redundante por el usuario. validar
 		servicioFac.setDescripcion(descripcion);
 		servicioFac.setCosto(costo);
-		servicioFac.setPrecio(precio);
 		servicioFac.setCantidad(cantidad);
+		
+		//Verificamos si el comprobante fiscal paga itbis
+		
+		if (factura.getComprobanteFiscal().getPaga_itbis() == 1) {
+			// verificamos si el comprobante fiscal incluye el itbis en el precio
+			if (factura.getComprobanteFiscal().getIncluye_itbis() == 1) {
+				// realizamos las conversiones
+				String tempSv = "1." + factura.getComprobanteFiscal().getValor_itbis().intValue();
+				Double precioTempSv = precio / Double.parseDouble(tempSv);
+				Double itBisTempSv = (cantidad * precioTempSv)
+						* (factura.getComprobanteFiscal().getValor_itbis() / 100.00);
+				precio = Double.parseDouble(df2.format(precioTempSv).replace(",", "."));
+				itbis = Double.parseDouble(df2.format(itBisTempSv).replace(",", "."));
+				subtotal = Double
+						.parseDouble(df2.format((cantidad * precio)
+								+ itbis).replace(",", "."));
+				total += subtotal;
+			} else {
+				// realizamos las conversiones
+				Double itBisTempServ = (cantidad * precio)
+						* (factura.getComprobanteFiscal().getValor_itbis() / 100.00);
+				precio = Double.parseDouble(df2.format(precio).replace(",", "."));
+				itbis = Double.parseDouble(df2.format(itBisTempServ).replace(",", "."));
+				subtotal = Double
+						.parseDouble(df2.format((cantidad * precio)
+								+ itbis).replace(",", "."));
+				total += subtotal;
+			}
+		}else {
+			total = precio;
+		}
+		
+		subTotalItbis+=itbis;
+		
+		servicioFac.setPrecio(precio);
+		servicioFac.setItbis(subTotalItbis);
+		servicioFac.setSubtotal(total);
 		servicioFac.setComprobanteFiscal(factura.getComprobanteFiscal());
 		serviceServiciosTemp.guardar(servicioFac);
 		return "facturas/factura :: #responseAddService";
