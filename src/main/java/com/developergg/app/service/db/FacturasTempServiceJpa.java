@@ -49,4 +49,9 @@ public class FacturasTempServiceJpa implements IFacturasTempService {
 		}
 	}
 
+	@Override
+	public void eliminar(FacturaTemp facturaTemp) {
+		repo.delete(facturaTemp);
+	}
+
 }

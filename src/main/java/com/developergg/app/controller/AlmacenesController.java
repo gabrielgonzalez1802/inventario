@@ -24,9 +24,11 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.developergg.app.model.Almacen;
+import com.developergg.app.model.FormaPago;
 import com.developergg.app.model.Propietario;
 import com.developergg.app.model.Usuario;
 import com.developergg.app.service.IAlmacenesService;
+import com.developergg.app.service.IFormasPagoService;
 import com.developergg.app.service.IPropietariosService;
 import com.developergg.app.util.Utileria;
 
@@ -39,6 +41,9 @@ public class AlmacenesController {
 	
 	@Autowired
 	private IPropietariosService servicePropietarios;
+	
+	@Autowired
+	private IFormasPagoService serviceFormasPago;
 	
 	@Value("${inventario.ruta.imagenes}")
 	private String ruta;
@@ -105,6 +110,17 @@ public class AlmacenesController {
 			attributes.addFlashAttribute("msg2", "Almacen modificado");
 		}else {
 			attributes.addFlashAttribute("msg", "Almacen creado");
+		}
+		//Verificamos si no existen formas de pago asociadas al almacen
+		List<FormaPago> formasPago = serviceFormasPago.buscarPorAlmacen(almacen);
+		if(formasPago.isEmpty()) {
+			//Creamos 2 formas de pago por defecto
+			for (int i = 0; i < 2; i++) {
+				FormaPago formaPago = new FormaPago();
+				formaPago.setAlmacen(almacen);
+				formaPago.setNombre(i==0?"Efectivo":"Tarjeta");
+				serviceFormasPago.guardar(formaPago);
+			}
 		}
 		return "redirect:/almacenes/create";
 	}

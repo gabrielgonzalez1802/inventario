@@ -10,5 +10,6 @@ public interface IFacturasDetallesTempService {
 	void guardar(FacturaDetalleTemp facturaDetalle);
 	List<FacturaDetalleTemp> buscarPorUsuarioAlmacen(Usuario usuario, Almacen almacen);
 	FacturaDetalleTemp buscarPorId(Integer idFacturaDetalle);
+	void eliminarListadoDetalles(List<FacturaDetalleTemp> lista);
 	void eliminar(Integer idFacturaDetalle);
 }

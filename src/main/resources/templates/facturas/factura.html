@@ -116,6 +116,7 @@
 			  <button class="btn btn-primary pull-right" id="btnServiceModal">Servicio</button>
 			  <button class="btn btn-success pull-right" id="btnClienteModal">Clientes</button>
 			  <button class="btn btn-info pull-right" id="btnTallerModal">Taller</button>
+			  <button class="btn btn-warning pull-danget" onclick="javascript:location.href='/facturas/'">Regresar</button>
 		</form>
 		 
 		</div>
@@ -130,6 +131,7 @@
               		<div id="responseDeleteArticulo">
                   		  <input type="hidden" id="DeleteArticuloStatus" th:value="${response}">
               		</div>
+              		<input type="hidden" id="responseGeneratedInvoice" th:value="${response}">
                  	<input type="hidden" id="responseDeleteSerial">
                   	<input type="hidden" id="responseDeleteService">
                     <input type="hidden" id="responseAddArticuloConSerial">
@@ -148,7 +150,7 @@
                 <div id="cantidadYprecio">
 	                <div class="col-md-2"> 
 	                	<label for="cantidad">Cantidad</label>
-	                	<input type="number" th:value="${cantidad}" class="form-control" min="1" name="cantidad" id="cantidadProducto">
+	                	<input type="number" th:value="${cantidad}" class="form-control" min="0" name="cantidad" id="cantidadProducto">
 	                </div>
 	                 <input type="hidden" class="form-control" id="temporalPrice" disabled>
 	                 <div class="col-md-2"> 

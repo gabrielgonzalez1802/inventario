@@ -237,7 +237,8 @@ $("#agregarArticuloFactura").click(function(e) {
 	var cantidad = $("#cantidadProducto").val();
 	var precio = $("#precioRango").val();
 	
-	//obtenemos el valor del itbis
+if(cantidad>0){		
+	// obtenemos el valor del itbis
 	var valorItbis = 0;
 	var pagaItbis = $("#pagaItbis").val();
 	var incluyeItbis = $("#incluyeItbis").val();
@@ -247,17 +248,17 @@ $("#agregarArticuloFactura").click(function(e) {
 		valorItbis = $("#valorItbis").val();
 	}
 	
-	//verificacion para articulos con imei
+	// verificacion para articulos con imei
 	if($("#tipoArticulo").val() == "SI"){
 		var count = 0;
 		var seriales = [];
-		//Evento cuando se pasen los seriales a la derecha
+		// Evento cuando se pasen los seriales a la derecha
 		 $('#serialesSeleccionados li').each(function (i) {
 	           var index = $(this).index();
 	           seriales.push($(this).text());
 	           count++;
 	       });
-		 //Si no selecciona ningun serial mostrar mensaje de alerta
+		 // Si no selecciona ningun serial mostrar mensaje de alerta
 		if(count==0){
 			Swal.fire({
 				  title: 'Advertencia!',
@@ -267,8 +268,9 @@ $("#agregarArticuloFactura").click(function(e) {
 				  confirmButtonText: 'Cool'
 			})
 		}else{
-			//Selecciona al menos un serial
-			//validaciones del precio del articulo con serial si tiene cliente seleccionado
+			// Selecciona al menos un serial
+			// validaciones del precio del articulo con serial si tiene cliente
+			// seleccionado
 			var idCliente = $("#selectCliente").val();
 			if(!idCliente){
 				idCliente = 0;
@@ -276,9 +278,10 @@ $("#agregarArticuloFactura").click(function(e) {
 			var comprobanteFiscalId = $("#selectComprobanteFiscal").val();
 			var temporalPrice = $("#temporalPrice").val();
 			var idDetalle = $("#detalleArticuloId").val();
-			//verificamos si selecciona varios seriales
-				//Si selecciona mas de un serial verificamos si tienen el mismo precio, 
-				//de lo contrario mostramos modal
+			// verificamos si selecciona varios seriales
+				// Si selecciona mas de un serial verificamos si tienen el mismo
+				// precio,
+				// de lo contrario mostramos modal
 				$("#responsePreciosSeriales").load("/articulos/ajax/verificarPreciosDeSeriales/",{
 					 'idDetalle': idDetalle,
 					 'idArticulo': idArticulo, 
@@ -293,8 +296,9 @@ $("#agregarArticuloFactura").click(function(e) {
 						if(estatusDistinctSerials == 1){
 							$("#ditinctSerialPriceModal").modal("show");
 						}else{
-							//seriales con precio igual 
-							//verificamos que el precio no sea menor que el precio minimo
+							// seriales con precio igual
+							// verificamos que el precio no sea menor que el
+							// precio minimo
 							$("#responsePreciosSerialesNotMinimo").load("/articulos/ajax/verificarPreciosDeSerialesNotMinimo/",{
 								 'idDetalle': idDetalle,
 								 'idArticulo': idArticulo, 
@@ -303,10 +307,10 @@ $("#agregarArticuloFactura").click(function(e) {
 								 'idCliente': idCliente,
 								 'seriales': seriales.toString()
 							},function(){
-								//si la validacion es correcta autorizamos
+								// si la validacion es correcta autorizamos
 								var estatus = $("#estatusUpdateSerialNotMinimo").val();
 								if(estatus == "1"){
-									//es menor
+									// es menor
 									Swal.fire({
 										  title: 'Advertencia!',
 										  text: 'El precio no puede ser menor al precio minimo',
@@ -321,7 +325,8 @@ $("#agregarArticuloFactura").click(function(e) {
 						}
 					}
 					
-					//verificamos si esta autorizado para que agregue el articulo con serial a la factura
+					// verificamos si esta autorizado para que agregue el
+					// articulo con serial a la factura
 					if($("#autorizado").val()==1){
 						 $.post("/articulos/ajax/addArticuloConSerial/",
 									{
@@ -336,7 +341,8 @@ $("#agregarArticuloFactura").click(function(e) {
 									},
 									function(data, status){
 										console.log("Articulo agregado a la facturacion");
-										//remover la lista de los seriales seleccionados
+										// remover la lista de los seriales
+										// seleccionados
 										$('#serialesSeleccionados li').remove();
 										$("#cantidadProducto").val("0");
 										$("#precioRango").val("");
@@ -348,10 +354,10 @@ $("#agregarArticuloFactura").click(function(e) {
 						$("#autorizado").val(0);
 					}
 				});
-			//}
+			// }
 		}
 	}else{
-		//verificacion para articulos sin Imei
+		// verificacion para articulos sin Imei
 		var nombre = $("#nombreArticuloBuscado").val();
 		var minimo = $("#precioMinimo").val();
 		minimo = parseFloat(minimo);
@@ -365,16 +371,17 @@ $("#agregarArticuloFactura").click(function(e) {
 		precio = parseFloat(precio);
 		var error = 0;
 		
-		//validaciones del precio del articulo si tiene cliente seleccionado
+		// validaciones del precio del articulo si tiene cliente seleccionado
 		var idCliente = $("#selectCliente").val();
 		if(idCliente!=""){
 			var precioCliente = $("#precioCliente").val();
-			//verificamos el precio del cliente y hacemos las comparaciones
+			// verificamos el precio del cliente y hacemos las comparaciones
 			if(precioCliente == "precio_1"){
 				if(precio>=maximo){
 					error=0;
 				}else{
-					//si el cliente tiene precio maximo se puede bajar al minimo pero nunca menos de ahi
+					// si el cliente tiene precio maximo se puede bajar al
+					// minimo pero nunca menos de ahi
 					// a menos que se cumpla la condicion de cantidad
 					if(precio==minimo){
 						error=0;
@@ -424,12 +431,12 @@ $("#agregarArticuloFactura").click(function(e) {
 			}
 		}
 
-		//si no hay errores agregamos el registro
+		// si no hay errores agregamos el registro
 		if(error==0){
-			  //verificamos si el comprobante fiscal paga itbis
+			  // verificamos si el comprobante fiscal paga itbis
 			 if(pagaItbis==1){
 				 conItbis = "SI";
-				 //verificamos si el comprobante incluye itbis en el precio
+				 // verificamos si el comprobante incluye itbis en el precio
 				 var realPrice = precio;
 				 if(incluyeItbis==1){
 					 precio = precio - (precio * (valorItbis/100));
@@ -458,6 +465,7 @@ $("#agregarArticuloFactura").click(function(e) {
 					});
 		}
 	}
+}	
 });
 
 $("#guardarCostoSeriales").click(function(e) {
@@ -867,7 +875,21 @@ $("#btnGuardarFactura").click(function(e) {
 					 		'rncCliente':rncCliente,
 					 		'total_itbis':total_itbis
 						},function(response){
-					alert("ok");
+					$('#responseGeneratedInvoice').replaceWith(response);
+					var invoiceId = $('#responseGeneratedInvoice').val();
+					if(invoiceId>0){
+						$.get("/facturas/download/"+invoiceId,function(data,status,xhr){
+							factura_detalle_items(incluyeItbis);
+							$("#pagoModal").modal("hide");
+							var a = document.createElement('a');
+							  a.target="_blank";
+							  a.href='/facturas/download/'+invoiceId;
+							  a.click();
+							setTimeout(function() {
+								location.href = '/facturas/';
+							}, 3000);
+						});
+					}
 			 	});
 			}
 		}

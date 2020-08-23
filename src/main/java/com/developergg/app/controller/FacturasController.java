@@ -345,22 +345,46 @@ public class FacturasController {
 			facturaDetalleServicio.setFactura(factura);
 			facturasDetallesServiciosService.guardar(facturaDetalleServicio);
 		}
-		//borramos registros temporales
 		
-		return "redirect:/facturas/";
+		//obtenemos los seriales temporales de la factura
+		List<FacturaSerialTemp> listaSerialesTemp = serviceFacturasSerialesTemp.buscarPorFacturaTemp(facturaTemp);
+		//borramos registros temporales
+		if(!listaSerialesTemp.isEmpty()) {
+			//borramos los articulos con serial
+			serviceFacturasSerialesTemp.eliminarListaSeriales(listaSerialesTemp);
+		}
+		if(!facturaDetallesTemp.isEmpty()) {
+			//borramos detalles de articulos
+			facturasDetallesTempService.eliminarListadoDetalles(facturaDetallesTemp);
+		}
+		if(!facturasServicioTemp.isEmpty()) {
+			//borramos los servicios
+			facturasServiciosTempService.eliminarListaServicios(facturasServicioTemp);
+		}
+		if(!detallesPagosTemp.isEmpty()) {
+			//borramos los pagos
+			serviceFacturaDetallesPagosTemp.eliminarListaPagos(detallesPagosTemp);
+		}
+		
+		//Borramos la factura temporal
+		serviceFacturasTemp.eliminar(facturaTemp); 
+				
+		model.addAttribute("response", factura.getId());
+		return "facturas/factura :: #responseGeneratedInvoice";
 	}
 	
 	@GetMapping("/download/{id}")
 	public void descargarFactura(@PathVariable("id") Integer idFactura,
 			HttpServletRequest request, 
-            HttpServletResponse response,
-            @RequestHeader String referer) throws JRException, SQLException {
+            HttpServletResponse response
+           // @RequestHeader String referer
+            ) throws JRException, SQLException {
 		
 		//Check the renderer
-        if(referer != null && !referer.isEmpty()) {
-            //do nothing
-            //or send error
-        }
+//        if(referer != null && !referer.isEmpty()) {
+//            //do nothing
+//            //or send error
+//        }
         
 		Factura factura = serviceFacturas.buscarPorId(idFactura);
 		

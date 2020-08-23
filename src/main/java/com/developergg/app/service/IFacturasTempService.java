@@ -11,4 +11,5 @@ public interface IFacturasTempService {
 	FacturaTemp buscarPorUsuario(Usuario usuario);
 	void guardar(FacturaTemp facturaTemp);
 	void eliminar(Integer idFacturaTemp);
+	void eliminar(FacturaTemp facturaTemp);
 }

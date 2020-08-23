@@ -44,4 +44,9 @@ public class FacturasDetallesPagoTempServiceJpa implements IFacturasDetallesPago
 		}
 	}
 
+	@Override
+	public void eliminarListaPagos(List<FacturaDetallePagoTemp> lista) {
+		repo.deleteAll(lista);
+	}
+
 }

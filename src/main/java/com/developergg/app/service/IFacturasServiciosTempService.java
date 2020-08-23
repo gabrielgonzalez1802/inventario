@@ -9,5 +9,6 @@ import com.developergg.app.model.Usuario;
 public interface IFacturasServiciosTempService {
 	void guardar(FacturaServicioTemp servicio);
 	List<FacturaServicioTemp> buscarPorUsuarioAlmacen(Usuario usuario, Almacen almacen);
+	void eliminarListaServicios(List<FacturaServicioTemp> lista);
 	void eliminar(Integer idServicio);
 }

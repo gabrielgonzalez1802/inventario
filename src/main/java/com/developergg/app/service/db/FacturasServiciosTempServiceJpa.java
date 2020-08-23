@@ -36,4 +36,9 @@ public class FacturasServiciosTempServiceJpa implements IFacturasServiciosTempSe
 		}
 	}
 
+	@Override
+	public void eliminarListaServicios(List<FacturaServicioTemp> lista) {
+		repo.deleteAll(lista);
+	}
+
 }
