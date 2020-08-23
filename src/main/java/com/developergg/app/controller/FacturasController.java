@@ -175,6 +175,10 @@ public class FacturasController {
 			facturaTemp.setCondicionPago(condicionPago);
 			serviceFacturasTemp.guardar(facturaTemp);
 		}
+		
+		if(facturaTemp.getCliente()==null) {
+			facturaTemp.setCliente(new Cliente());
+		}
 
 		model.addAttribute("condicionesPago", condicionesPago);
 		model.addAttribute("formaPagos", formaPagos);
