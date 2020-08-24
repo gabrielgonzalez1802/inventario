@@ -27,7 +27,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -50,6 +49,7 @@ import com.developergg.app.model.FormaPago;
 import com.developergg.app.model.Taller;
 import com.developergg.app.model.TipoEquipo;
 import com.developergg.app.model.Usuario;
+import com.developergg.app.model.Vendedor;
 import com.developergg.app.service.IArticulosAjustesService;
 import com.developergg.app.service.IArticulosSeriales;
 import com.developergg.app.service.IClientesService;
@@ -66,6 +66,7 @@ import com.developergg.app.service.IFacturasServiciosTempService;
 import com.developergg.app.service.IFacturasTempService;
 import com.developergg.app.service.IFormasPagoService;
 import com.developergg.app.service.ITiposEquipoService;
+import com.developergg.app.service.IVendedoresService;
 
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperCompileManager;
@@ -128,6 +129,9 @@ public class FacturasController {
 	private IArticulosAjustesService serviceArticulosAjuste;
 	
 	@Autowired
+	private IVendedoresService serviceVendedores;
+	
+	@Autowired
 	private DataSource dataSource;
 	
 	@Value("${inventario.ruta.imagenes}")
@@ -155,6 +159,9 @@ public class FacturasController {
 		List<ComprobanteFiscal> comprobantesFiscales = serviceComprobantesFiscales
 				.buscarPorTienda(usuario.getAlmacen().getPropietario());
 		List<TipoEquipo> tiposEquipo = serviceTiposEquipos.buscarTodos();
+		//Lista de vendedores que no esten eliminados
+		List<Vendedor> listaVendedores = serviceVendedores.buscarPorAlmacen(usuario.getAlmacen()).
+				stream().filter(v -> v.getEliminado() == 0).collect(Collectors.toList());
 		// Clientes que no esten eliminados y pertenezcan al almacen
 		List<Cliente> clientes = serviceClientes.buscarPorAlmacen(usuario.getAlmacen()).stream()
 				.filter(c -> c.getEliminado() == 0).collect(Collectors.toList());
@@ -180,6 +187,7 @@ public class FacturasController {
 			facturaTemp.setCliente(new Cliente());
 		}
 
+		model.addAttribute("vendedores", listaVendedores);
 		model.addAttribute("condicionesPago", condicionesPago);
 		model.addAttribute("formaPagos", formaPagos);
 		model.addAttribute("clientes", clientes);
@@ -190,6 +198,17 @@ public class FacturasController {
 		return "facturas/factura";
 	}
 
+	@PostMapping("/ajax/updateVendedorFactura")
+	public String modificarVendedor(Model model, HttpSession session,
+			@RequestParam("vendedorID") Integer vendedorID) {
+		Usuario usuario = (Usuario) session.getAttribute("usuario");
+		FacturaTemp facturaTemp = serviceFacturasTemp.buscarPorUsuario(usuario);
+		Vendedor vendedor = serviceVendedores.buscarPorIdVendedor(vendedorID);
+		facturaTemp.setVendedor(vendedor);
+		serviceFacturasTemp.guardar(facturaTemp);
+		return "facturas/factura :: #responseUpdateVendedor";
+	}
+	
 	@PostMapping("/ajax/updateCondicionPagoFactura")
 	public String modificarCondicionPago(Model model, HttpSession session,
 			@RequestParam("condicionPagoID") Integer condicionPagoID) {
@@ -210,8 +229,6 @@ public class FacturasController {
 		FacturaTemp facturaTemp = serviceFacturasTemp.buscarPorUsuario(usuario);
 		List<FacturaDetalleTemp> facturaDetallesTemp = facturasDetallesTempService.buscarPorUsuarioAlmacen(usuario, usuario.getAlmacen());
 		
-		// TODO: GGONZALEZ verificar actualizacion de secuencia en comprobante fiscal
-
 		// validacion para condicion de pago contado
 //		if (facturaTemp.getCondicionPago().getNombre().equalsIgnoreCase("contado")) {
 //
@@ -228,24 +245,33 @@ public class FacturasController {
 		
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("KK:mm:ss a", Locale.ENGLISH);
         String now = LocalDateTime.now().format(formatter);
-
+        
+        //actualizamos secuencia del comprobante fiscal
+		ComprobanteFiscal comprobanteFiscal = facturaTemp.getComprobanteFiscal();
+        try {
+			comprobanteFiscal.setSecuencia_actual(String.valueOf(Integer.parseInt(comprobanteFiscal.getSecuencia_actual())+1));
+			serviceComprobantesFiscales.guardar(comprobanteFiscal);
+		} catch (NumberFormatException e) {
+			//NumberFormatException
+		}
+        
 		// Creamos la factura
 		Factura factura = new Factura();
 		factura.setCodigo(tempCode);
 		factura.setCliente(facturaTemp.getCliente());
-		factura.setComprobanteFiscal(facturaTemp.getComprobanteFiscal());
-		// factura.setNcf($prefijo.$secuencia_actual); //validar
+		factura.setComprobanteFiscal(comprobanteFiscal);
 		factura.setFecha(new Date());
 		factura.setHora(now);
 		factura.setCondicionPago(facturaTemp.getCondicionPago());
-		factura.setCondicion(facturaTemp.getCondicionPago().getNombre()); //redundante validar
+		factura.setCondicion(facturaTemp.getCondicionPago().getNombre()); 
 		factura.setTotal_venta(total_venta);
 		factura.setNombre_cliente(nombreCliente);
 		factura.setTelefono_cliente(telefonoCliente);
 		factura.setRnc_cliente(rncCliente);
 		//factura.setNota_factura(); //validar
+		factura.setNcf(factura.getComprobanteFiscal().getPrefijo()+factura.getComprobanteFiscal().getSecuencia_actual());
 		factura.setUsuario(facturaTemp.getUsuario());
-		factura.setVendedor(facturaTemp.getVendedor()); //TODO:GGONZALEZ AGREGAR LOGICA
+		factura.setVendedor(facturaTemp.getVendedor());
 		factura.setAlmacen(usuario.getAlmacen());
 		//factura.setAbono(abono); //validar
 		//factura.setCredito(credito); //validar

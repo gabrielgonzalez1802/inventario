@@ -39,7 +39,6 @@ import com.developergg.app.model.Propietario;
 import com.developergg.app.model.SerialTemporal;
 import com.developergg.app.model.Suplidor;
 import com.developergg.app.model.Usuario;
-import com.developergg.app.model.Vendedor;
 import com.developergg.app.service.IArticulosAjustesService;
 import com.developergg.app.service.IArticulosSeriales;
 import com.developergg.app.service.IArticulosService;
@@ -52,7 +51,6 @@ import com.developergg.app.service.IFacturasSerialesTempService;
 import com.developergg.app.service.IFacturasServiciosTempService;
 import com.developergg.app.service.IFacturasTempService;
 import com.developergg.app.service.ISuplidoresService;
-import com.developergg.app.service.IVendedoresService;
 import com.developergg.app.util.Utileria;
 
 @Controller
@@ -85,10 +83,7 @@ public class ArticulosController {
 	
 	@Autowired
 	private IClientesService serviceClientes;
-	
-	@Autowired
-	private IVendedoresService serviceVendedores;
-	
+
 	@Autowired
 	private IComprobantesFiscalesService serviceComprobantesFiscales;
 	
@@ -1398,6 +1393,18 @@ public class ArticulosController {
 		return "facturas/factura :: #clienteAcct";
 	}
 	
+	@GetMapping("/ajax/getVendedorAcct/")
+	public String obtenerVendedor(Model model, HttpSession session) {
+		Usuario usuario = (Usuario) session.getAttribute("usuario");
+		FacturaTemp factura = serviceFacturasTemp.buscarPorUsuario(usuario);
+		if(factura.getVendedor()!=null) {
+			model.addAttribute("actualVendedor", factura.getVendedor().getId());
+		}else {
+			model.addAttribute("actualVendedor", "0");
+		}
+		return "facturas/factura :: #vendedorAcct";
+	}
+	
 	@GetMapping("/ajax/getInfoCliente/{id}")
 	public String obtenerInformacionClienteAjax(@PathVariable("id") Integer idCliente, Model model, HttpSession session) {
 		//Buscamos el cliente a partir del id
@@ -1412,17 +1419,6 @@ public class ArticulosController {
 		model.addAttribute("rncCliente", cliente!=null?cliente.getRnc():"");
 		model.addAttribute("precioCliente", cliente!=null?cliente.getPrecio():"");
 		return "facturas/factura :: #nuevoCliente";
-	}
-	
-	@GetMapping("/ajax/listaVendedores/")
-	public String obtenerVendedores(Model model, HttpSession session) {
-		Usuario usuario = (Usuario) session.getAttribute("usuario");
-		//Lista de vendedores por almacen que no esten eliminaos
-		List<Vendedor> vendedores = serviceVendedores.buscarPorAlmacen(usuario.getAlmacen()).
-				stream().filter(v -> v.getEliminado() == 0).
-				collect(Collectors.toList());
-		model.addAttribute("vendedores", vendedores);
-		return "facturas/factura :: #seleccionVendedor";
 	}
 	
 	@GetMapping("/ajax/getComprobanteFiscal/{id}")

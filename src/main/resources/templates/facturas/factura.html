@@ -106,6 +106,7 @@
 								th:value="${comprobante.id}" th:text="${comprobante.nombre}"/>
 					</select>
 			  </div>
+			  <input type="hidden" id="responseUpdateVendedor">
 			  <div class="form-group" id="seleccionVendedor">
 					 <select class="form-control" id="selectVendedor">
 							<option value="" selected="selected">Vendedor</option>
@@ -390,6 +391,9 @@
 						<div id="clienteAcct">
 							<input type="hidden" id="actualCliente" th:value="${actualCliente}">
 							<input type="hidden" id="actualRnc" th:value="${actualRnc}">
+						</div>
+						<div id="vendedorAcct">
+							<input type="hidden" id="actualVendedor" th:value="${actualVendedor}">
 						</div>
 							<div id="seleccionCliente">
 								 <label>Cliente</label>

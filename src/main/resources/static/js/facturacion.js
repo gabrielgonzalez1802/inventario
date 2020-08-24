@@ -10,7 +10,12 @@ $('#articulos').load("/articulos/ajax/getAll",function(){
 				$("#selectCliente").val(clienteAcct);
 				$("#rncCliente").val(clienteAcct);
 			}
-			$("#seleccionVendedor").load("/articulos/ajax/listaVendedores/",function(){
+			//Verificamos si la factura tiene un vendedor asociado
+			$("#vendedorAcct").load("/articulos/ajax/getVendedorAcct/",function(){
+				var vendedorAcct = $("#actualVendedor").val();
+				if(vendedorAcct!="0"){
+					$("#selectVendedor").val(vendedorAcct);
+				}
 				var idComprobanteFiscal = $("#selectComprobanteFiscal").val();
 				if(idComprobanteFiscal){
 					$("#comprobanteFiscalInfo").load("/articulos/ajax/getComprobanteFiscal/"+idComprobanteFiscal,function(){
@@ -120,6 +125,19 @@ $("#cantidadProducto").on(
 				}
 			}
 		});
+
+//Cambiar vendedor
+$("#selectVendedor").change(function(){
+	 var vendedorAcct = $("#selectVendedor").val();
+	 if(vendedorAcct==""){
+		 vendedorAcct = 0;
+	 }
+	 $.post("/facturas/ajax/updateVendedorFactura/", {
+		 'vendedorID' : vendedorAcct
+	 },function(data){
+		 console.log("vendedor cambiado");
+	 });
+});
 
 //cuando seleccione algun cliente obtenemos toda su informacion
 function seleccionarCliente(){

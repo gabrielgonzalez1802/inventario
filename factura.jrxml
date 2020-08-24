@@ -100,12 +100,15 @@
 	<queryString>
 		<![CDATA[SELECT f.codigo AS codifoFactura, a.nombre AS nombreAlmacen, a.direccion AS direccionAlmacen,
 a.telefono AS telefonoAlmacen, DATE_FORMAT(f.fecha, '%d/%m/%Y') AS fechaFactura,
-c.nombre AS nombreCondicionPago, f.nota_factura AS numFactura, 
+c.nombre AS nombreCondicionPago, f.codigo AS numFactura, 
 f.nombre_cliente AS nombreCliente, f.telefono_cliente AS telefonoCliente, f.rnc_cliente AS rncCliente,
- IFNULL(a.pie_pagina_factura,'') AS pieFactura
+ IFNULL(a.pie_pagina_factura,'') AS pieFactura, f.ncf, cf.nombre AS tncf,
+(SELECT direccion FROM clientes WHERE f.id_cliente = id_cliente) AS direccion,
+(SELECT nombre FROM vendedores WHERE f.id_vendedor = id_vendedor) AS vendedor
 FROM facturas f 
 INNER JOIN almacenes a ON a.id_almacen = f.id_almacen
 INNER JOIN condicion_pago c ON c.id_condicion = f.id_condicion_pago
+INNER JOIN comprobante_fiscales cf ON cf.id_comprobante = f.id_comprobante
 WHERE f.id_factura = $P{idFactura}]]>
 	</queryString>
 	<field name="codifoFactura" class="java.lang.Integer">
@@ -137,8 +140,8 @@ WHERE f.id_factura = $P{idFactura}]]>
 		<property name="com.jaspersoft.studio.field.label" value="nombreCondicionPago"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="condicion_pago"/>
 	</field>
-	<field name="numFactura" class="java.lang.String">
-		<property name="com.jaspersoft.studio.field.name" value="nota_factura"/>
+	<field name="numFactura" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.name" value="codigo"/>
 		<property name="com.jaspersoft.studio.field.label" value="numFactura"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="facturas"/>
 	</field>
@@ -162,6 +165,25 @@ WHERE f.id_factura = $P{idFactura}]]>
 		<property name="com.jaspersoft.studio.field.label" value="pieFactura"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="almacenes"/>
 	</field>
+	<field name="ncf" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="ncf"/>
+		<property name="com.jaspersoft.studio.field.label" value="ncf"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="facturas"/>
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="tncf" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="nombre"/>
+		<property name="com.jaspersoft.studio.field.label" value="tncf"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="comprobante_fiscales"/>
+	</field>
+	<field name="direccion" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="direccion"/>
+		<property name="com.jaspersoft.studio.field.label" value="direccion"/>
+	</field>
+	<field name="vendedor" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="vendedor"/>
+		<property name="com.jaspersoft.studio.field.label" value="vendedor"/>
+	</field>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
@@ -183,35 +205,35 @@ WHERE f.id_factura = $P{idFactura}]]>
 		</band>
 	</title>
 	<pageHeader>
-		<band height="80" splitType="Stretch">
+		<band height="83" splitType="Stretch">
 			<staticText>
-				<reportElement x="350" y="0" width="50" height="20" uuid="3bc7108b-a4fe-4bab-a963-0ae334b1f6d5"/>
+				<reportElement x="410" y="0" width="50" height="20" uuid="3bc7108b-a4fe-4bab-a963-0ae334b1f6d5"/>
 				<text><![CDATA[Fecha]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="350" y="20" width="60" height="20" uuid="329e3ad0-68a5-4926-9a68-a165def3fcba"/>
+				<reportElement x="410" y="20" width="60" height="20" uuid="329e3ad0-68a5-4926-9a68-a165def3fcba"/>
 				<text><![CDATA[No. Factura]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="350" y="40" width="50" height="20" uuid="b203fe4b-3233-4fa8-b858-65088397552b"/>
+				<reportElement x="410" y="40" width="50" height="20" uuid="b203fe4b-3233-4fa8-b858-65088397552b"/>
 				<text><![CDATA[Vendedor]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="350" y="60" width="50" height="20" uuid="3bb776be-0dcf-422c-908f-3aa372d4ec6b"/>
+				<reportElement x="410" y="60" width="50" height="20" uuid="3bb776be-0dcf-422c-908f-3aa372d4ec6b"/>
 				<text><![CDATA[Condición]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="455" y="0" width="100" height="20" uuid="10781429-151f-4b11-b0ec-fe63278a1dc8"/>
+				<reportElement x="445" y="0" width="100" height="20" uuid="10781429-151f-4b11-b0ec-fe63278a1dc8"/>
 				<textElement textAlignment="Right"/>
 				<textFieldExpression><![CDATA[$F{fechaFactura}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="455" y="20" width="100" height="20" uuid="6050bef8-45cf-4540-ac77-11bec78840ce"/>
+				<reportElement x="445" y="20" width="100" height="20" uuid="6050bef8-45cf-4540-ac77-11bec78840ce"/>
 				<textElement textAlignment="Right"/>
 				<textFieldExpression><![CDATA[$F{numFactura}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="430" y="60" width="125" height="20" uuid="ab8e74fd-1972-4225-95ca-2fad96788c28"/>
+				<reportElement x="420" y="60" width="125" height="20" uuid="ab8e74fd-1972-4225-95ca-2fad96788c28"/>
 				<textElement textAlignment="Right"/>
 				<textFieldExpression><![CDATA[$F{nombreCondicionPago}]]></textFieldExpression>
 			</textField>
@@ -223,52 +245,86 @@ WHERE f.id_factura = $P{idFactura}]]>
 				<reportElement x="0" y="20" width="100" height="30" uuid="f955a9a3-1c09-4190-921e-07c85614c9de"/>
 				<textFieldExpression><![CDATA[$F{telefonoCliente}]]></textFieldExpression>
 			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="460" y="40" width="85" height="20" uuid="61a69040-c2f1-4662-9ee8-e1d3c83a5482"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{vendedor}]]></textFieldExpression>
+			</textField>
 		</band>
 	</pageHeader>
 	<columnHeader>
-		<band height="83">
+		<band height="89">
 			<staticText>
 				<reportElement x="0" y="6" width="60" height="21" uuid="6e26fe91-cfc3-4286-9559-432bfdd03752"/>
-				<textElement>
-					<font size="12" isBold="true"/>
+				<textElement verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Cliente]]></text>
 			</staticText>
 			<textField>
 				<reportElement x="80" y="0" width="100" height="30" uuid="a41a5403-c8df-4f4f-a682-a8e6e4c9754a"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{nombreCliente}]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement x="0" y="30" width="80" height="21" uuid="1e4894da-10a4-469a-8c33-177d2b234771"/>
-				<textElement>
-					<font size="12" isBold="true"/>
+				<textElement verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Cedula/RNC]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="0" y="51" width="80" height="21" uuid="23ff2700-036a-4cbb-94ce-f33e9a01d099"/>
-				<textElement>
-					<font size="12" isBold="true"/>
+				<reportElement x="220" y="30" width="60" height="21" uuid="23ff2700-036a-4cbb-94ce-f33e9a01d099"/>
+				<textElement verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Dirección]]></text>
 			</staticText>
 			<textField>
 				<reportElement x="80" y="30" width="100" height="21" uuid="56f14bc6-595c-4099-b91a-39076424ea79"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{rncCliente}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="290" y="5" width="70" height="21" uuid="22423d9e-1f84-4a06-a580-b18da20afb97"/>
-				<textElement>
-					<font size="12" isBold="true"/>
+				<reportElement x="220" y="5" width="60" height="21" uuid="22423d9e-1f84-4a06-a580-b18da20afb97"/>
+				<textElement verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Teléfono]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="380" y="0" width="100" height="30" uuid="546ad68e-1e91-4fbd-b6c0-f0f57446e2e1"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<reportElement x="280" y="1" width="90" height="30" uuid="546ad68e-1e91-4fbd-b6c0-f0f57446e2e1"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{telefonoCliente}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="1" y="51" width="49" height="21" uuid="16376b9d-282d-4d9c-9afd-4139ee31f76e"/>
+				<textElement verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[TNCF]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="220" y="50" width="49" height="21" uuid="bb65a4c9-8194-4963-bf7b-b2b10dc73e1c"/>
+				<textElement verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[NCF]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="80" y="50" width="100" height="20" uuid="3b98804e-70d8-4a31-b5e7-a105d6b2120e"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{tncf}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="280" y="50" width="90" height="22" uuid="cf83cf9f-4688-410d-96cf-3dd7f9af5f89"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{ncf}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="ScaleFont" isBlankWhenNull="true">
+				<reportElement x="280" y="31" width="140" height="20" uuid="11790c1d-778e-4697-8be5-218646dd8be6"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{direccion}]]></textFieldExpression>
 			</textField>
 		</band>
 	</columnHeader>
