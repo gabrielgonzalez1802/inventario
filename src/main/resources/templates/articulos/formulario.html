@@ -52,7 +52,7 @@
                  <div class="col-md-2"> 
                   <div class="form-group">
                     <label for="fecha">Costo</label>
-                    <input type="text" class="form-control" th:field="*{costo}" id="costo" placeholder="Costo" required="required">
+                    <input type="number" min="0" class="form-control" th:field="*{costo}" id="costo" placeholder="Costo" required="required">
                   </div>  
                 </div>
               </div>
@@ -63,55 +63,55 @@
                 <div class="col-md-2"> 
                   <div class="form-group">
                     <label for="precio_maximo" id="lbl_precio_maximo">Precio M&aacute;ximo</label>
-                    <input type="text" th:field="*{precio_maximo}" class="form-control" id="precio_maximo" placeholder="Precio M&aacute;ximo" disabled="disabled">
+                    <input type="text" th:field="*{precio_maximo}" class="form-control" id="precio_maximo" placeholder="Precio M&aacute;ximo">
                   </div>  
                 </div>
                  <div class="col-md-1"> 
                   <div class="form-group">
                     <label for="min_precio_maximo" id="lbl_min_precio_maximo">Min</label>
-                    <input type="number" th:field="*{rango_precio_maximo_desde}" class="form-control" min = "0" id="min_precio_maximo" disabled="disabled">
+                    <input type="number" th:field="*{rango_precio_maximo_desde}" class="form-control" min = "0" id="min_precio_maximo">
                   </div>  
                 </div>
                  <div class="col-md-1"> 
                   <div class="form-group">
                     <label for="max_precio_maximo" id="lbl_max_precio_maximo">Max</label>
-                    <input type="number" th:field="*{rango_precio_maximo_hasta}"  class="form-control" min = "0" id="max_precio_maximo" disabled="disabled">
+                    <input type="number" th:field="*{rango_precio_maximo_hasta}"  class="form-control" min = "0" id="max_precio_maximo">
                   </div>  
                 </div>
                  <div class="col-md-2"> 
                   <div class="form-group">
                     <label for="precio_minimo" id="lbl_precio_minimo">Precio Minimo</label>
-                    <input type="text" class="form-control" th:field="*{precio_minimo}" id="precio_minimo" placeholder="Precio Minimo" disabled="disabled">
+                    <input type="text" class="form-control" th:field="*{precio_minimo}" id="precio_minimo" placeholder="Precio Minimo">
                   </div>  
                 </div>
                  <div class="col-md-1"> 
                   <div class="form-group">
                     <label for="min_precio_minimo" id="lbl_min_precio_minimo">Min</label>
-                    <input type="number" class="form-control" th:field="*{rango_precio_minimo_desde}" min = "0" id="min_precio_minimo" disabled="disabled">
+                    <input type="number" class="form-control" th:field="*{rango_precio_minimo_desde}" min = "0" id="min_precio_minimo">
                   </div>  
                 </div>
                  <div class="col-md-1"> 
                   <div class="form-group">
                     <label for="max_precio_minimo" id="lbl_max_precio_minimo">Max</label>
-                    <input type="number" th:field="*{rango_precio_minimo_hasta}" class="form-control" min = "0" id="max_precio_minimo" disabled="disabled">
+                    <input type="number" th:field="*{rango_precio_minimo_hasta}" class="form-control" min = "0" id="max_precio_minimo">
                   </div>  
                 </div>
                 <div class="col-md-2"> 
                   <div class="form-group">
                     <label for="precio_mayor" id="lbl_precio_mayor">Precio x Mayor</label>
-                    <input type="text" class="form-control" th:field="*{precio_mayor}" id="precio_mayor" placeholder="Precio x Mayor" disabled="disabled">
+                    <input type="text" class="form-control" th:field="*{precio_mayor}" id="precio_mayor" placeholder="Precio x Mayor">
                   </div>  
                 </div>
                 <div class="col-md-1"> 
                   <div class="form-group">
                     <label for="min_precio_mayor" id="lbl_min_precio_mayor">Min</label>
-                    <input type="number" th:field="*{rango_precio_mayor_desde}" class="form-control" min = "0" id="min_precio_mayor" disabled="disabled">
+                    <input type="number" th:field="*{rango_precio_mayor_desde}" class="form-control" min = "0" id="min_precio_mayor">
                   </div>  
                 </div>
                  <div class="col-md-1"> 
                   <div class="form-group">
                     <label for="max_precio_mayor" id="lbl_max_precio_mayor">Max</label>
-                    <input type="number" th:field="*{rango_precio_mayor_hasta}" class="form-control" min = "0" id="max_precio_mayor" disabled="disabled">
+                    <input type="number" th:field="*{rango_precio_mayor_hasta}" class="form-control" min = "0" id="max_precio_mayor">
                   </div>  
                 </div>
               </div>    
@@ -139,7 +139,7 @@
                 </div>
                <div class="col-md-3"> 
                   <div class="form-group">
-                    <label for="gama">Gama</label>
+                    <label for="gama" id="lblGama">Gama</label>
                      <select class="form-control" th:field="*{gama}" id="gama">
 					  <option value="BAJA">baja</option>
                       <option value="MEDIA">media</option>
@@ -302,8 +302,12 @@
 		$("#imei").change(function(){
 			if($("#imei").val()=="NO"){
 				mostrarPrecios();
+				$("#lblGama").hide();
+				$("#gama").hide();
 			}else{
 				ocultarPrecios();
+				$("#lblGama").show();
+				$("#gama").show();
 			}
 		});
 		
@@ -373,50 +377,7 @@
 		});
 		
    		 var _mSelect2 = $("#js-example-basic-multiple").select2();
-			//Si se introduce el costo activamos los demas campos
-			$("#costo").keydown(function(){
-				var costo = $("#costo").val();
-				if(costo.length > 0){
-					$("#precio_mayor").prop('disabled', false);
-					$("#min_precio_mayor").prop('disabled', false);
-					$("#max_precio_mayor").prop('disabled', false);
-					
-					$("#precio_maximo").prop('disabled', false);
-					$("#min_precio_maximo").prop('disabled', false);
-					$("#max_precio_maximo").prop('disabled', false);
-					
-					$("#precio_minimo").prop('disabled', false);
-					$("#min_precio_minimo").prop('disabled', false);
-					$("#max_precio_minimo").prop('disabled', false);
-				}else{
-					//vaciamos los imputs y desactivamos
-					$("#precio_mayor").val("");
-					$("#min_precio_mayor").val("");
-					$("#max_precio_mayor").val("");
 
-					$("#precio_maximo").val("");
-					$("#min_precio_maximo").val("");
-					$("#max_precio_maximo").val("");	
-			
-					$("#precio_minimo").val("");
-					$("#min_precio_minimo").val("");
-					$("#max_precio_minimo").val("");	
-					
-					$("#precio_mayor").prop('disabled', true);
-					$("#min_precio_mayor").prop('disabled', true);
-					$("#max_precio_mayor").prop('disabled', true);
-					
-					$("#precio_maximo").prop('disabled', true);
-					$("#min_precio_maximo").prop('disabled', true);
-					$("#max_precio_maximo").prop('disabled', true);
-					
-					$("#precio_minimo").prop('disabled', true);
-					$("#min_precio_minimo").prop('disabled', true);
-					$("#max_precio_minimo").prop('disabled', true);
-				}
-			});
-			
-   		 
 			//Validacion before submit
    		   $("#formAddProduct").submit(function() {
    			//Vaidacion: el costo no puede ser mayor a ningún precio de venta
