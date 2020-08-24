@@ -194,7 +194,7 @@ WHERE f.id_factura = $P{idFactura}]]>
 					<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
 				</reportElement>
 				<textElement rotation="None" markup="none">
-					<font fontName="Arial Black" size="26" isBold="false"/>
+					<font fontName="SansSerif" size="26" isBold="true"/>
 				</textElement>
 				<text><![CDATA[FACTURA]]></text>
 			</staticText>
