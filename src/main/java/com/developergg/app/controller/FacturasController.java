@@ -141,7 +141,7 @@ public class FacturasController {
 	private String rutaJreport;
 	
 	private String tempFolder =  System.getProperty("java.io.tmpdir");
-//	private String pathSeparator = System.getProperty("file.separator");
+	private String pathSeparator = System.getProperty("file.separator");
 	
 	@GetMapping("/")
 	public String mostrarFacturas(Model model, HttpSession session) {
@@ -458,7 +458,9 @@ public class FacturasController {
 			
 			JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource.getConnection());
 			
-			String dataDirectory = tempFolder + "factura"+factura.getId()+".pdf";
+			String dataDirectory = tempFolder + pathSeparator + "factura"+factura.getId()+".pdf";
+			
+			tempFolder += pathSeparator;
 			
 			JasperExportManager.exportReportToPdfFile(jasperPrint,dataDirectory);
 		
