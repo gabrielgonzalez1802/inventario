@@ -896,17 +896,15 @@ $("#btnGuardarFactura").click(function(e) {
 					$('#responseGeneratedInvoice').replaceWith(response);
 					var invoiceId = $('#responseGeneratedInvoice').val();
 					if(invoiceId>0){
-						$.get("/facturas/download/"+invoiceId,function(data,status,xhr){
-							factura_detalle_items(incluyeItbis);
-							$("#pagoModal").modal("hide");
-							var a = document.createElement('a');
-							  a.target="_blank";
-							  a.href='/facturas/print/'+invoiceId;
-							  a.click();
-							setTimeout(function() {
-								location.href = '/facturas/';
-							}, 1000);
-						});
+						factura_detalle_items(incluyeItbis);
+						$("#pagoModal").modal("hide");
+						var a = document.createElement('a');
+						  a.target="_blank";
+						  a.href='/facturas/print/'+invoiceId;
+						  a.click();
+						setTimeout(function() {
+							location.href = '/facturas/';
+						}, 1000);
 					}
 			 	});
 			}
