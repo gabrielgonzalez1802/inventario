@@ -901,11 +901,11 @@ $("#btnGuardarFactura").click(function(e) {
 							$("#pagoModal").modal("hide");
 							var a = document.createElement('a');
 							  a.target="_blank";
-							  a.href='/facturas/download/'+invoiceId;
+							  a.href='/facturas/print/'+invoiceId;
 							  a.click();
 							setTimeout(function() {
 								location.href = '/facturas/';
-							}, 3000);
+							}, 1000);
 						});
 					}
 			 	});

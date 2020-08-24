@@ -1,6 +1,7 @@
 package com.developergg.app.controller;
 
 import java.io.IOException;
+import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -477,6 +478,94 @@ public class FacturasController {
 	            {
 	                Files.copy(file, response.getOutputStream());
 	                response.getOutputStream().flush();
+	            } 
+	            catch (IOException ex) {
+	                ex.printStackTrace();
+	            }
+	        }
+		}
+	}
+	
+	@GetMapping("/print/{id}")
+	public void imprimirFactura(@PathVariable("id") Integer idFactura,
+			HttpServletRequest request, 
+            HttpServletResponse response
+           // @RequestHeader String referer
+            ) throws JRException, SQLException {
+		
+		//Check the renderer
+//        if(referer != null && !referer.isEmpty()) {
+//            //do nothing
+//            //or send error
+//        }
+        
+		Factura factura = serviceFacturas.buscarPorId(idFactura);
+		
+		if(factura!=null) {
+			List<DetalleFactura> listaDetalle = new LinkedList<>();
+			
+			//verificamos los detalles en los articulos
+			List<FacturaDetalle> serviFacturaDetalles = facturasDetallesService.buscarPorFactura(factura);
+			for (FacturaDetalle facturaDetalle : serviFacturaDetalles) {
+				DetalleFactura detalleFacturaArticulo = new DetalleFactura();
+				detalleFacturaArticulo.setId(facturaDetalle.getId());
+				detalleFacturaArticulo.setOriginalTable("factura_detalle");
+				detalleFacturaArticulo.setCantidad(facturaDetalle.getCantidad());
+				detalleFacturaArticulo.setDescripcion(facturaDetalle.getArticulo().getNombre());
+				detalleFacturaArticulo.setItbis(facturaDetalle.getItbis());
+				detalleFacturaArticulo.setPrecio(facturaDetalle.getPrecio());
+				detalleFacturaArticulo.setSubtotal(facturaDetalle.getSubtotal());
+				listaDetalle.add(detalleFacturaArticulo);
+			}
+			
+			//verificamos los servicios
+			List<FacturaDetalleServicio> detalleServicios = facturasDetallesServiciosService.buscarPorFactura(factura);
+			for (FacturaDetalleServicio facturaDetalleServicio : detalleServicios) {
+				DetalleFactura detalleFacturaServicio = new DetalleFactura();
+				detalleFacturaServicio.setId(facturaDetalleServicio.getId());
+				detalleFacturaServicio.setOriginalTable("factura_detalle_servicio");
+				detalleFacturaServicio.setCantidad(facturaDetalleServicio.getCantidad());
+				detalleFacturaServicio.setDescripcion(facturaDetalleServicio.getDescripcion());
+				detalleFacturaServicio.setItbis(facturaDetalleServicio.getItbis());
+				detalleFacturaServicio.setPrecio(facturaDetalleServicio.getPrecio());
+				detalleFacturaServicio.setSubtotal(facturaDetalleServicio.getSubtotal());
+				listaDetalle.add(detalleFacturaServicio);
+			}
+			
+			JasperReport jasperReport = JasperCompileManager.compileReport(rutaJreport);
+			
+			Map<String, Object> parameters = new HashMap<String, Object>();
+			
+			//convertimos la lista a JRBeanCollectionDataSource
+			JRBeanCollectionDataSource itemsJRBean = new JRBeanCollectionDataSource(listaDetalle);
+			
+			parameters.put("idFactura", idFactura); 
+			parameters.put("imagen", rutaImagenes+factura.getAlmacen().getImagen());
+			parameters.put("detalleFactura", itemsJRBean);
+			
+			JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource.getConnection());
+			
+			String dataDirectory = tempFolder + pathSeparator + "factura"+factura.getId()+".pdf";
+			
+			tempFolder += pathSeparator;
+	
+			JasperExportManager.exportReportToPdfFile(jasperPrint,dataDirectory);
+			
+			 //If user is not authorized - he should be thrown out from here itself
+	         
+	        //Authorized user will download the file
+	        Path file = Paths.get(tempFolder, "factura"+factura.getId()+".pdf");
+	        if (Files.exists(file)) 
+	        {
+	            String mimeType = URLConnection.guessContentTypeFromName(tempFolder+"factura"+factura.getId()+".pdf");
+	            if (mimeType == null) mimeType = "application/octet-stream";
+	            response.setContentType(mimeType);
+	            response.setHeader("Content-Disposition", String.format("inline; filename=\"" + "factura"+factura.getId()+".pdf" + "\""));
+	            try
+	            {
+	                Files.copy(file, response.getOutputStream());
+	                response.getOutputStream().flush();
+					Files.delete(file);
 	            } 
 	            catch (IOException ex) {
 	                ex.printStackTrace();

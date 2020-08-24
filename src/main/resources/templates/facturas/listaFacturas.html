@@ -72,7 +72,7 @@
 				                  <td th:text="${factura.total_itbis}"></td>
 				                  <td th:text="${factura.total_venta}"></td>
 				                  <td>
-				                     <a th:href="@{/facturas/download/{id} (id=${factura.id})}" class="btn btn-success btn-sm" data-toggle="tooltip" data-placement="top" title="Descargar" role="button"><i class="fa fa-print" aria-hidden="true"></i></a>
+				                     <a th:href="@{/facturas/print/{id} (id=${factura.id})}" th:target="_blank" class="btn btn-success btn-sm" data-toggle="tooltip" data-placement="top" title="Imprimir" role="button"><i class="fa fa-print" aria-hidden="true"></i></a>
 				                  	<a onclick="return confirm('¿Estas seguro?')" class="btn btn-danger btn-sm" data-toggle="tooltip" data-placement="top" title="Eliminar" role="button"><i class="fa fa-trash" aria-hidden="true"></i></a>
 				                  </td>
 				                </tr>
