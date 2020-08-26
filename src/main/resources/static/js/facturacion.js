@@ -65,35 +65,31 @@ function seleccionado(valor, id) {
 $("#articulos").focusout(
 		function() {
 			idArticuloBuscado = $("#articulos").val();
-
+			$("#nombreArticuloSerial").val("");
 			$('#articulos').hide();
 			//Datos del articulo seleccionado
 			$.get("/articulos/ajax/getInfoArticulo/" + idArticuloBuscado,
 					function(fragment) {
 						$('#articuloBuscado').replaceWith(fragment);
 						//validamos el tipo de articulo
-						if ($("#tipoArticulo").val() == "SI") {
-							
-						}else{
+						if ($("#tipoArticulo").val() != "SI") {
 							$('#cantidadSinSerial').prop('max', $('#disponibleModal').val());
 						}
-						//$('#cantidadProducto').prop('max', $('#disponibleModal').val());
+						
+						//Verificamos el tipo del articulo (Con serial, Sin serial)
+						if ($("#tipoArticulo").val() == "SI") {
+							//llenamos la lista de seriales según el artículo
+							$('#addMultiSerial').load(
+									"/articulos/ajax/getSerialesForArticulo/"
+											+ idArticuloBuscado,function(){
+												//Mostramos el modal para agregar seriales
+												$("#nombreArticuloSerial").val($("#articulo").val());
+												$('#serialesModal').modal('show');
+											});
+						} else {
+							$('#articuloModal').modal('show'); //TODO:ggonzalez
+						}
 					});
-			//Valores iniciales en 0
-			$("#precioRango").val(0);
-			$("#cantidadProducto").val(0);
-			//Verificamos el tipo del articulo (Con serial, Sin serial)
-			if ($("#tipoArticulo").val() == "SI") {
-				//llenamos la lista de seriales según el artículo
-				$('#addMultiSerial').load(
-						"/articulos/ajax/getSerialesForArticulo/"
-								+ idArticuloBuscado,function(){
-									//Mostramos el modal para agregar seriales
-									$('#serialesModal').modal('show');
-								});
-			} else {
-				$('#articuloModal').modal('show'); //TODO:ggonzalez
-			}
 		});
 
 //Cuando el producto tenga el foco aparece la lista
@@ -124,45 +120,96 @@ function cambioCantidadSinSerial() {
 	}
 }
 
+function addSerialList(){
+	var count = 0;
+	var countActive = 0;
+	var seriales = [];
+	var serialesActive = [];
+	var total = $("#totalPrecioConSerial").val();
+	var temporalPrice = $("#precioConSerial").val();
+	if(total==""){
+		total = 0;
+	}
+	if(temporalPrice==""){
+		temporalPrice = 0;
+	}
+	//verificamos los seriales seleccionados para agregar y calcular el precio
+	 $('#addMultiSerial li').each(function (i) {
+		  countActive += $(this).hasClass("active");
+          var index = $(this).index();
+          seriales.push($(this).text());
+		  if($(this).hasClass("active")){
+			  serialesActive.push($(this).text());
+		  }
+           count++;
+     });
+	 var clienteId = $("#selectCliente").val();
+	 if(!clienteId){
+		 clienteId = 0;
+	 }
+	 
+	 //calculamos el precio de los seriales preseleccionados
+//	alert("total activos para guardar: "+countActive);
+
+	 $("#cantidadYprecio").load("/articulos/ajax/obtenerInfoDeSeriales/", { 
+		 'clienteId': clienteId, 
+         'seriales': serialesActive.toString()
+    },function() {
+    	var newPrice = parseFloat(temporalPrice) + parseFloat($("#precioConSerial").val());
+    	$("#nombreArticuloSerial").val($("#articulo").val());
+    	$("#precioConSerial").val(newPrice);
+		$("#totalPrecioConSerial").val(newPrice);
+    });
+}
+
+function minusSerialList(){
+	var count = 0;
+	var countActive = 0;
+	var seriales = [];
+	var serialesActive = [];
+	var total = $("#totalPrecioConSerial").val();
+	var temporalPrice = $("#precioConSerial").val();
+	if(total==""){
+		total = 0;
+	}
+	if(temporalPrice==""){
+		temporalPrice = 0;
+	}
+	//verificamos los seriales seleccionados para agregar y calcular el precio
+	 $('#serialesSeleccionados li').each(function (i) {
+		  countActive += $(this).hasClass("active");
+          var index = $(this).index();
+          seriales.push($(this).text());
+		  if($(this).hasClass("active")){
+			  serialesActive.push($(this).text());
+		  }
+           count++;
+     });
+	 var clienteId = $("#selectCliente").val();
+	 if(!clienteId){
+		 clienteId = 0;
+	 }
+	 
+	 //calculamos el precio de los seriales preseleccionados
+//	alert("total activos para guardar: "+countActive);
+
+	 $("#cantidadYprecio").load("/articulos/ajax/obtenerInfoDeSeriales/", { 
+		 'clienteId': clienteId, 
+         'seriales': serialesActive.toString()
+    },function() {
+    	var newPrice = parseFloat(temporalPrice) - parseFloat($("#precioConSerial").val());
+    	$("#precioConSerial").val(newPrice);
+		$("#totalPrecioConSerial").val(newPrice);
+		$("#nombreArticuloSerial").val($("#articulo").val());
+    });
+}
+
 function cambioPrecioSinSerial() {
 	var cantidad = $("#cantidadSinSerial").val();
 	var idArticulo = $("#idArticuloBuscado").val();
 	var total = $("#cantidadSinSerial").val() * $('#precioSinSerial').val();
 	$("#totalPrecioSinSerial").val(total);
 }
-
-//Cuando seleccione alguna cantidad del articulo, el precio cambia segun el articulo (max,min,mayor)
-//$("#cantidadProducto").on(
-//		'change keyup',
-//		function() {
-//			//Valor actual
-//			var acct = $("#cantidadProducto").val();
-//			if (acct == "") {
-//				$('#cantidadProducto').val(0);
-//				$('#precioRango').val(0);
-//			} else {
-//				var idArticulo = $("#idArticuloBuscado").val();
-//				//calculamos el precio del articulo según el rango
-//				//para el calculo del precio verificamos si hay algun cliente seleccionado
-//				var idCliente = $("#selectCliente").val();
-//				if(idCliente!=""){
-//					//Si el cliente esta seleccionado verificamos el precio
-//					$.get("/articulos/ajax/getPriceWhitClient/" + idArticulo + "/" + acct + "/" + idCliente,
-//							function(fragment) {
-//								$('#precioRango').replaceWith(fragment);
-//								//activamos el input de precio para que se pueda modificar
-//								$("#precioRango").removeAttr('disabled');
-//							});
-//				}else{
-//					//desactivamos el input para que no se pueda modificar
-//					$("#precioRango").attr('disabled','disabled');
-//					$.get("/articulos/ajax/getPrice/" + idArticulo + "/" + acct,
-//							function(fragment) {
-//								$('#precioRango').replaceWith(fragment);
-//							});
-//				}
-//			}
-//		});
 
 //Cambiar vendedor
 $("#selectVendedor").change(function(){
@@ -414,243 +461,116 @@ function agregarArticuloSinSerial(){
 	}
 }
 
-////Evento para agregar articulo a la factura //TODO:GGONZALEZ LOGICA PARA SERIALES
-//$("#agregarArticuloFactura").click(function(e) {
-//	e.preventDefault();
-//	var idArticulo = idArticuloBuscado;
-//	var cantidad = $("#cantidadProducto").val();
-//	var precio = $("#precioRango").val();
-//	
-//if(cantidad>0){		
-//	// obtenemos el valor del itbis
-//	var valorItbis = 0;
-//	var pagaItbis = $("#pagaItbis").val();
-//	var incluyeItbis = $("#incluyeItbis").val();
-//	var valorItbis = $("#valorItbis").val();
-//	
-//	if(incluyeItbis == 1){
-//		valorItbis = $("#valorItbis").val();
-//	}
-//	
-//	// verificacion para articulos con imei
-//	if($("#tipoArticulo").val() == "SI"){
-//		var count = 0;
-//		var seriales = [];
-//		// Evento cuando se pasen los seriales a la derecha
-//		 $('#serialesSeleccionados li').each(function (i) {
-//	           var index = $(this).index();
-//	           seriales.push($(this).text());
-//	           count++;
-//	       });
-//		 // Si no selecciona ningun serial mostrar mensaje de alerta
-//		if(count==0){
-//			Swal.fire({
-//				  title: 'Advertencia!',
-//				  text: 'Debe seleccionar al menos un serial para este articulo',
-//				  position: 'top',
-//				  icon: 'warning',
-//				  confirmButtonText: 'Cool'
-//			})
-//		}else{
-//			// Selecciona al menos un serial
-//			// validaciones del precio del articulo con serial si tiene cliente
-//			// seleccionado
-//			var idCliente = $("#selectCliente").val();
-//			if(!idCliente){
-//				idCliente = 0;
-//			}
-//			var comprobanteFiscalId = $("#selectComprobanteFiscal").val();
-//			var temporalPrice = $("#temporalPrice").val();
-//			var idDetalle = $("#detalleArticuloId").val();
-//			// verificamos si selecciona varios seriales
-//				// Si selecciona mas de un serial verificamos si tienen el mismo
-//				// precio,
-//				// de lo contrario mostramos modal
-//				$("#responsePreciosSeriales").load("/articulos/ajax/verificarPreciosDeSeriales/",{
-//					 'idDetalle': idDetalle,
-//					 'idArticulo': idArticulo, 
-//					 'cantidad': cantidad,
-//					 'precio': precio,
-//					 'idCliente': idCliente,
-//					 'realPrice': temporalPrice,
-//					 'seriales': seriales.toString()
-//				},function(){
-//					if($("#autorizado").val()==0){
-//						var estatusDistinctSerials = $("#estatusDistinctSerials").val();
-//						if(estatusDistinctSerials == 1){
-//							$("#ditinctSerialPriceModal").modal("show");
-//						}else{
-//							// seriales con precio igual
-//							// verificamos que el precio no sea menor que el
-//							// precio minimo
-//							$("#responsePreciosSerialesNotMinimo").load("/articulos/ajax/verificarPreciosDeSerialesNotMinimo/",{
-//								 'idDetalle': idDetalle,
-//								 'idArticulo': idArticulo, 
-//								 'precio': precio,
-//								 'cantidad': cantidad,
-//								 'idCliente': idCliente,
-//								 'seriales': seriales.toString()
-//							},function(){
-//								// si la validacion es correcta autorizamos
-//								var estatus = $("#estatusUpdateSerialNotMinimo").val();
-//								if(estatus == "1"){
-//									// es menor
-//									Swal.fire({
-//										  title: 'Advertencia!',
-//										  text: 'El precio no puede ser menor al precio minimo',
-//										  position: 'top',
-//										  icon: 'warning',
-//										  confirmButtonText: 'Cool'
-//									})
-//								}else{
-//									$("#autorizado").val(1);
-//								}						
-//							});
-//						}
-//					}
-//					
-//					// verificamos si esta autorizado para que agregue el
-//					// articulo con serial a la factura
-//					if($("#autorizado").val()==1){
-//						 $.post("/articulos/ajax/addArticuloConSerial/",
-//									{
-//										idArticulo: idArticulo,
-//										cantidad: cantidad,
-//									    idCliente: idCliente,
-//										precio: precio,
-//										realPrice: temporalPrice,
-//										comprobanteFiscalId: comprobanteFiscalId,
-//										seriales: seriales.toString(),
-//										columnas: columnas.toString()
-//									},
-//									function(data, status){
-//										console.log("Articulo agregado a la facturacion");
-//										// remover la lista de los seriales
-//										// seleccionados
-//										$('#serialesSeleccionados li').remove();
-//										$("#cantidadProducto").val("0");
-//										$("#precioRango").val("");
-//										factura_detalle_items(incluyeItbis);
-//										$("#autorizado").val(0);
-//										location.reload();
-//								});
-//					}else{
-//						$("#autorizado").val(0);
-//					}
-//				});
-//			// }
-//		}
-//	}else{
-//		// verificacion para articulos sin Imei
-//		var nombre = $("#nombreArticuloBuscado").val();
-//		var minimo = $("#precioMinimo").val();
-//		minimo = parseFloat(minimo);
-//		var mayor = $("#precioMayor").val();
-//		mayor = parseFloat(mayor);
-//		var conItbis = $("#conItbis").val();
-//		var disponible = $("#disponibleModal").val();
-//		var maximo =  $("#precioMaximo").val();
-//		maximo = parseFloat(maximo);
-//		var precio = $("#precioRango").val();
-//		precio = parseFloat(precio);
-//		var error = 0;
-//		
-//		// validaciones del precio del articulo si tiene cliente seleccionado
-//		var idCliente = $("#selectCliente").val();
-//		if(idCliente!=""){
-//			var precioCliente = $("#precioCliente").val();
-//			// verificamos el precio del cliente y hacemos las comparaciones
-//			if(precioCliente == "precio_1"){
-//				if(precio>=maximo){
-//					error=0;
-//				}else{
-//					// si el cliente tiene precio maximo se puede bajar al
-//					// minimo pero nunca menos de ahi
-//					// a menos que se cumpla la condicion de cantidad
-//					if(precio==minimo){
-//						error=0;
-//					}else{
-//						if(precio<minimo){
-//							Swal.fire({
-//								  title: 'Advertencia!',
-//								  text: 'El precio no puede ser menor al precio minimo',
-//								  position: 'top',
-//								  icon: 'warning',
-//								  confirmButtonText: 'Cool'
-//							})
-//							error++;
-//						}
-//					}
-//				}
-//			}
-//			
-//			if(precioCliente == "precio_2"){
-//				if(precio>=minimo){
-//					error=0;
-//				}else{
-//					Swal.fire({
-//						  title: 'Advertencia!',
-//						  text: 'El precio no puede ser menor al precio minimo',
-//						  position: 'top',
-//						  icon: 'warning',
-//						  confirmButtonText: 'Cool'
-//					})
-//					error++;
-//				}
-//			}
-//			
-//			if(precioCliente == "precio_3"){
-//				if(precio>=mayor){
-//					error=0;
-//				}else{
-//					Swal.fire({
-//						  title: 'Advertencia!',
-//						  text: 'El precio no puede ser menor al precio x mayor',
-//						  position: 'top',
-//						  icon: 'warning',
-//						  confirmButtonText: 'Cool'
-//					})
-//					error++;
-//				}
-//			}
-//		}
-//
-//		// si no hay errores agregamos el registro
-//		if(error==0){
-//			  // verificamos si el comprobante fiscal paga itbis
-//			 if(pagaItbis==1){
-//				 conItbis = "SI";
-//				 // verificamos si el comprobante incluye itbis en el precio
-//				 var realPrice = precio;
-//				 if(incluyeItbis==1){
-//					 precio = precio - (precio * (valorItbis/100));
-//				 }
-//			 }else{
-//				 valorItbis=0;
-//				 var realPrice = 0;
-//			 }
-//			  $.post("/articulos/ajax/addArticuloSinSerial/",
-//						{
-//						  idArticulo: idArticulo,
-//						  cantidad: cantidad,
-//						  precio: precio,
-//						  conItbis: conItbis,
-//						  disponible: disponible,
-//						  valorItbis: valorItbis,
-//						  incluyeItbis: incluyeItbis,
-//						  realPrice: realPrice,
-//						  maximo: maximo
-//						},
-//						function(data, status){
-//							console.log("Articulo agregado a la facturacion");
-//							$("#cantidadProducto").val("0");
-//							$("#precioRango").val("");
-//							factura_detalle_items(incluyeItbis);
-//					});
-//		}
-//	}
-//}	
-//});
+$("#guardarSerialesDelProducto").click(function(e){
+	e.preventDefault();
+	var idArticulo = idArticuloBuscado;
+	var count = 0;
+	var seriales = [];
+	var pagaItbis = $("#pagaItbis").val();
+	var incluyeItbis = $("#incluyeItbis").val();
+	var valorItbis = 0;
+	var articulo = $("#nombreArticuloSerial").val();
+	if(incluyeItbis == 1){
+		valorItbis = $("#valorItbis").val();
+	}
+	var precio =  $("#precioConSerial").val();
+	var total = $("#totalPrecioConSerial").val();
+	
+	 $('#serialesSeleccionados li').each(function (i) {
+	    var index = $(this).index();
+	    seriales.push($(this).text());
+	    count++;
+	});
+	
+	if(count>0){	
+		// validaciones del precio del articulo con serial si tiene cliente seleccionado
+		var idCliente = $("#selectCliente").val();
+		if(!idCliente){
+			idCliente = 0;
+		}
+		var comprobanteFiscalId = $("#selectComprobanteFiscal").val();
+		var temporalPrice = $("#temporalPrice").val();
+		
+		if($("#autorizado").val()!=1){
+			//Si selecciona mas de un serial verificamos si tienen el mismo precio
+			$("#responsePreciosSeriales").load("/articulos/ajax/verificarPreciosDeSeriales/",{
+				 'idArticulo': idArticulo, 
+				 'cantidad': count,
+				 'precio': precio,
+				 'idCliente': idCliente,
+				 'realPrice': total,
+				 'seriales': seriales.toString()
+			},function(){
+				var estatusDistinctSerials = $("#estatusDistinctSerials").val();
+				//si los seriales tienen distinto precio mostramos el modal para perzonalizar valores
+				if(estatusDistinctSerials == 1){
+					$("#ditinctSerialPriceModal").modal("show");
+				}else{
+					// seriales con precio igual. verificamos que el precio no sea menor que el precio minimo
+					$("#responsePreciosSerialesNotMinimo").load("/articulos/ajax/verificarPreciosDeSerialesNotMinimo/",{
+						 'idArticulo': idArticulo, 
+						 'precio': precio,
+						 'cantidad': count,
+						 'idCliente': idCliente,
+						 'seriales': seriales.toString()
+					},function(){
+						// si la validacion es correcta autorizamos
+						var estatus = $("#estatusUpdateSerialNotMinimo").val();
+						if(estatus == "1"){
+							// es menor
+							Swal.fire({
+								  title: 'Advertencia!',
+								  text: 'El precio no puede ser menor al precio minimo',
+								  position: 'top',
+								  icon: 'warning',
+								  confirmButtonText: 'Cool'
+							})
+						}else{
+							 $.post("/articulos/ajax/addArticuloConSerial/",
+										{
+											idArticulo: idArticulo,
+											cantidad: count,
+										    idCliente: idCliente,
+											precio: precio,
+											realPrice: total,
+											comprobanteFiscalId: comprobanteFiscalId,
+											seriales: seriales.toString(),
+											columnas: columnas.toString()
+										},
+										function(data, status){
+											location.reload();
+							  });
+						}	
+					});
+				}
+			});
+		}else{
+			alert("Estoy autorizado");
+			 $.post("/articulos/ajax/addArticuloConSerial/",
+						{
+							idArticulo: idArticulo,
+							cantidad: count,
+						    idCliente: idCliente,
+							precio: precio,
+							realPrice: total,
+							comprobanteFiscalId: comprobanteFiscalId,
+							seriales: seriales.toString(),
+							columnas: columnas.toString()
+						},
+						function(data, status){
+							location.reload();
+			  });
+		}
+	}else{
+		Swal.fire({
+			  title: 'Advertencia!',
+			  text: 'Debe seleccionar al menos un serial para este articulo',
+			  position: 'top',
+			  icon: 'warning',
+			  confirmButtonText: 'Cool'
+		})
+	}
+});
 
 $("#guardarCostoSeriales").click(function(e) {
 	e.preventDefault();	
@@ -686,7 +606,7 @@ $("#guardarCostoSeriales").click(function(e) {
 			$("#autorizado").val(0);
 		}else{
 			var sumaSeriales = $("#sumaSeriales").val();
-			$("#precioRango").val(sumaSeriales);
+			$("#precioConSerial").val(sumaSeriales);
 			$("#ditinctSerialPriceModal").modal("hide");
 			$("#autorizado").val(1);
 		}
@@ -857,30 +777,6 @@ function eliminarArticuloFactura(idDetalle){
 			})
 	}
 }
-
-$("#guardarSerialesDelProducto").click(function(e) {
-	var count = 0;
-	var seriales = [];
-	//Evento cuando se pasen los seriales a la derecha
-	 $('#serialesSeleccionados li').each(function (i) {
-           var index = $(this).index();
-           seriales.push($(this).text());
-           count++;
-       });
-	 var clienteId = $("#selectCliente").val();
-	 if(!clienteId){
-		 clienteId = 0;
-	 }
-	 $("#cantidadYprecio").load("/articulos/ajax/obtenerInfoDeSeriales/", { 
-		 'clienteId': clienteId, 
-         'seriales': seriales.toString()
-    },function() {
-		//habilitamos que pueda modificar el precio
-		$("#precioRango").removeAttr('disabled');
-		$("#temporalPrice").val($("#precioRango").val());
-    });
-});
-
 
 $("#btnNCF").click(function(e) {
 	$("#ncfModal").modal("show");

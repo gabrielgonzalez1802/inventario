@@ -132,7 +132,7 @@
              	 <div class="col-md-3"> 
                   <div class="form-group">
                     <label for="imei" id="lblImei">Imei</label>
-                   	<select class="form-control" th:field="*{imei}" id="imei">
+                   	<select class="form-control" th:field="*{imei}" id="imei" disabled="disabled">
 					  <option value="SI">Si</option>
                       <option value="NO">No</option>
                     </select>
@@ -149,7 +149,7 @@
                 </div>
                <div class="col-md-3"> 
                   <div class="form-group">
-                    <label for="gama">Gama</label>
+                    <label for="gama" id="lblGama">Gama</label>
                      <select class="form-control" th:field="*{gama}" id="gama">
 					  <option value="BAJA">baja</option>
                       <option value="MEDIA">media</option>
@@ -269,6 +269,11 @@
 		
 		//hr
 		$("#hrPrice").hide();
+	}
+	
+	if($("#imei").val()=="NO"){
+		$("#lblGama").hide();
+		$("#gama").hide();
 	}
 	
    		 var _mSelect2 = $("#js-example-basic-multiple").select2();

@@ -182,7 +182,7 @@
 		</div>
 
 <!-- Modal Add Seriales-->
-<div id="serialesModal" class="modal fade" role="dialog">
+<div id="serialesModal" class="modal fade" role="dialog" data-backdrop="static">
   <div class="modal-dialog modal-lg">
 
     <!-- Modal content-->
@@ -193,13 +193,20 @@
       </div>
       <div class="modal-body">
 		<div class="row">
-				<!--  <label>Cantidad:</label>  -->
-				<input id="cantidadConSerial" class="form-control" type="hidden" min="0">
-			<div class="col col-md-6">
-				<label>Precio:</label> <input id="precioConSerial" class="form-control" type="number" min="0">
-			</div>
-			<div class="col col-md-6">
-				<label>Total:</label> <input id="totalPrecioConSerial" class="form-control" type="number" min="0" disabled="disabled">
+			<div id="cantidadYprecio">
+					<!--  <label>Cantidad:</label>  -->
+					<input id="cantidadConSerial" class="form-control" type="hidden" min="0">
+				<div class="col col-md-6">
+					<input type="hidden" id="cantidadConSerial" th:value="${cantidadConSerial}">
+					<label>Nombre del art&iacute;culo:</label> <input id="nombreArticuloSerial" class="form-control" type="text" disabled="disabled">
+				</div>	
+				<div class="col col-md-3">
+					<input type="hidden" id="cantidadConSerial" th:value="${cantidadConSerial}">
+					<label>Precio:</label> <input id="precioConSerial" th:value="${precioConSerial}" class="form-control" type="number" min="0">
+				</div>
+				<div class="col col-md-3">
+					<label>Total:</label> <input id="totalPrecioConSerial" class="form-control" type="number" min="0" disabled="disabled">
+				</div>
 			</div>
 		</div>
 		<hr>
@@ -228,10 +235,10 @@
         </div>
 
         <div class="list-arrows col-md-1 text-center">
-        	<button class="btn btn-standar btn-sm move-right">
+        	<button class="btn btn-standar btn-sm move-right" onclick="javascript:addSerialList()">
                 <span class="glyphicon glyphicon-chevron-right"></span>
             </button>
-            <button class="btn btn-standar btn-sm move-left">
+            <button class="btn btn-standar btn-sm move-left" onclick="javascript:minusSerialList()">
                 <span class="glyphicon glyphicon-chevron-left"></span>
             </button>
         </div>
@@ -258,7 +265,8 @@
 	</div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-standar" id="guardarSerialesDelProducto" data-dismiss="modal">Guardar</button>
+        <button type="button" class="btn btn-warning" data-dismiss="modal">Regresar</button>
+        <button type="button" class="btn btn-standar" id="guardarSerialesDelProducto">Guardar</button>
       </div>
     </div>
 
