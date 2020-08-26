@@ -2,6 +2,7 @@ package com.developergg.app.model;
 
 public class DetalleFactura {
 	private Integer id;
+	private String codigo;
 	private String originalTable;
 	private Integer cantidad;
 	private String descripcion;
@@ -51,11 +52,16 @@ public class DetalleFactura {
 	public void setSubtotal(Double subtotal) {
 		this.subtotal = subtotal;
 	}
-	
+	public String getCodigo() {
+		return codigo;
+	}
+	public void setCodigo(String codigo) {
+		this.codigo = codigo;
+	}
 	@Override
 	public String toString() {
-		return "DetalleFactura [id=" + id + ", originalTable=" + originalTable + ", cantidad=" + cantidad
-				+ ", descripcion=" + descripcion + ", precio=" + precio + ", itbis=" + itbis + ", subtotal=" + subtotal
-				+ "]";
+		return "DetalleFactura [id=" + id + ", codigo=" + codigo + ", originalTable=" + originalTable + ", cantidad="
+				+ cantidad + ", descripcion=" + descripcion + ", precio=" + precio + ", itbis=" + itbis + ", subtotal="
+				+ subtotal + "]";
 	}
 }

@@ -1,7 +1,7 @@
 //peticiones iniciales
 var incluyeItbis = 0;
 var columnas = [];
-$('#articulos').load("/articulos/ajax/getAll",function(){
+//$('#articulos').load("/articulos/ajax/getAll",function(){
 		//verificamos si la factura tiene un cliente asociado
 		$("#clienteAcct").load("/articulos/ajax/getClienteAcct/",function(){
 			var clienteAcct = $("#actualCliente").val();
@@ -25,7 +25,7 @@ $('#articulos').load("/articulos/ajax/getAll",function(){
 				}
 			});
 		});
-});
+//});
 
 var idArticuloBuscado;
 
@@ -48,6 +48,78 @@ $("#articulo").keyup(function(e) {
 		$('#articulos').load("/articulos/ajax/getAll/" + txtFind);
 	} else {
 		$('#articulos').load("/articulos/ajax/getAll");
+	}
+});
+
+
+var seleccionado = $("#articulos").select2();
+
+//Evento cuando se seleccine un articulo
+$('#articulos').on("select2:select", function(e) { 
+	var txtFind = $('#articulos :selected').text();
+	if(txtFind!=""){
+		txtFind = txtFind.replace(/ /g, "_");
+		idArticuloBuscado = seleccionado.val();
+		var valor = $('#articulos :selected').text();
+		$("#articulo").val(valor);
+//	    alert("seleccione: "+seleccionado.val()+" texto: "+$('#articulos :selected').text());
+		//verificamos el tipo de articulo
+		$.get("/articulos/ajax/getType/" + idArticuloBuscado, function(fragment) {
+			$('#tipoArticulo').replaceWith(fragment);
+			
+			idArticuloBuscado = $("#articulos").val();
+			$("#nombreArticuloSerial").val("");
+			//Datos del articulo seleccionado
+			$.get("/articulos/ajax/getInfoArticulo/" + idArticuloBuscado,
+					function(fragment) {
+						$('#articuloBuscado').replaceWith(fragment);
+
+						//validamos el tipo de articulo
+						if ($("#tipoArticulo").val() != "SI") {
+							$('#cantidadSinSerial').prop('max', $('#disponibleModal').val());
+						}
+						
+						//Verificamos el tipo del articulo (Con serial, Sin serial)
+						if ($("#tipoArticulo").val() == "SI") {
+							//llenamos la lista de seriales según el artículo
+							$('#addMultiSerial').load(
+									"/articulos/ajax/getSerialesForArticulo/"
+											+ idArticuloBuscado,function(){
+												//Mostramos el modal para agregar seriales
+												var nombreArticulo = $("#articulo").val();
+												let indice = nombreArticulo.indexOf("-");
+												// Cortar desde 0 hasta la aparición del primer -
+												let extraida = nombreArticulo.substring(0, indice);
+												$("#nombreArticuloSerial").val(extraida);
+												$('#serialesModal').modal('show');
+											});
+						} else {
+							$("#cantidadSinSerial").val(1);
+							var cantidad = $("#cantidadSinSerial").val();
+							var idArticulo = $("#idArticuloBuscado").val();
+							//para el calculo del precio verificamos si hay algun cliente seleccionado
+							var idCliente = $("#selectCliente").val();
+							if(idCliente!=""){
+								//Si el cliente esta seleccionado verificamos el precio
+								$.get("/articulos/ajax/getPriceWhitClient/" + idArticulo + "/" + cantidad + "/" + idCliente,
+										function(fragment) {
+											$('#precioSinSerial').replaceWith(fragment);
+											var total = $("#cantidadSinSerial").val() * $('#precioSinSerial').val();
+											$("#totalPrecioSinSerial").val(total);
+										});
+							}else{
+								$.get("/articulos/ajax/getPrice/" + idArticulo + "/" + cantidad,
+										function(fragment) {
+											$('#precioSinSerial').replaceWith(fragment);
+											var total = $("#cantidadSinSerial").val() * $('#precioSinSerial').val();
+											$("#totalPrecioSinSerial").val(total);
+										});
+							}
+							
+							$('#articuloModal').modal('show');
+						}
+					});
+		});
 	}
 });
 

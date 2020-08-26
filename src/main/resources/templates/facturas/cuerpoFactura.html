@@ -9,6 +9,7 @@
 		<table class="table table-hover">
 			<thead>
 				<tr style="background-color: #17a2b8;color:#fff">
+					<th class="text-center">C&oacute;digo</th>
 					<th class="text-center">Descripci&oacute;n</th>
 					<th>Cantidad</th>
 					<th class="text-center">Precio</th>
@@ -20,6 +21,7 @@
 			<tbody class="items">
 				<!-- detalles  -->
 				<tr th:each="detalles:${facturaDetalles}">
+					<td th:text="${detalles.articulo.codigo}" class="text-center">C&oacute;digo</td>
 					<td th:if="${detalles.articulo.imei == 'SI'}" style="cursor: pointer;" class="text-center" th:onclick="'modalSerialesDetalleFactura(\'' + ${detalles.id} + '\');'" th:text="${detalles.articulo.nombre}">Descripcion del articulo</td>
 					<td th:unless="${detalles.articulo.imei == 'SI'}" class="text-center" th:text="${detalles.articulo.nombre}">Descripcion del articulo</td>
 					<td th:text="${detalles.cantidad}">Cantidad de articulo</td>
@@ -30,6 +32,7 @@
 				</tr><!--  Fin detalles -->
 				<!--  Servicios  -->
 				<tr th:each="servicio : ${facturaServicios}">
+					<td></td>
 					<td th:text="${servicio.descripcion}" class="text-center">Nombre del Servicio</td>
 					<td th:text="${servicio.cantidad}">Cantidad del Servicio</td>
 					<td th:text="${servicio.precio}" class="text-center">Precio del Servicio</td>
@@ -38,12 +41,12 @@
 					<td class='text-right'><a href="#" th:onclick="'eliminarServicioFactura(\'' + ${servicio.id} + '\');'"> <i class="icono fa fa-trash text-danger"></i> </a></td>			
 				</tr>
 				<tr>
-					<td colspan="4" class="text-right">Subtotal $ Itbis</td>
+					<td colspan="5" class="text-right">Subtotal $ Itbis</td>
 					<th th:text="${subTotalItbis}" id="subTotalItbis" class="text-right">Subtotal $ Itbi</th>
 					<td></td>
 				</tr>
 				<tr>
-					<td colspan="4" class="text-right"><b><em><span style="font-size: 16px;">TOTAL</span></em></b></td>
+					<td colspan="5" class="text-right"><b><em><span style="font-size: 16px;">TOTAL</span></em></b></td>
 					<th th:text="${total}" class="text-right" id="precioTotal">precio total</th>
 					<td></td>
 				</tr>

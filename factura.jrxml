@@ -93,6 +93,7 @@
 		<field name="precio" class="java.lang.Double"/>
 		<field name="itbis" class="java.lang.Double"/>
 		<field name="subtotal" class="java.lang.Double"/>
+		<field name="codigo" class="java.lang.String"/>
 		<variable name="itbis1" class="java.lang.Double" resetType="Column" calculation="Sum">
 			<variableExpression><![CDATA[$F{itbis}]]></variableExpression>
 		</variable>
@@ -389,14 +390,37 @@ WHERE f.id_factura = $P{idFactura}]]>
 					<datasetRun subDataset="DetalleFactura" uuid="6c718bd0-01f9-4d6f-8b8d-f8b3819106e8">
 						<dataSourceExpression><![CDATA[$P{detalleFactura}]]></dataSourceExpression>
 					</datasetRun>
-					<jr:column width="80" uuid="2a5f4c6b-bfc8-4296-a53b-e4e7039351d2">
+					<jr:column width="20" uuid="0ac15fcd-8b58-4b6d-8d66-a5be88796005">
 						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column1"/>
+						<jr:tableFooter style="Table_CH" height="20" rowSpan="1"/>
+						<jr:columnHeader style="Table_CH" height="20" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="20" height="20" uuid="1ff9f838-ba5c-4a4a-b8b0-48dc1a16f806"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="6"/>
+								</textElement>
+								<text><![CDATA[Código]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:columnFooter style="Table_CH" height="20" rowSpan="1"/>
+						<jr:detailCell style="Table_TD" height="20">
+							<textField isBlankWhenNull="true">
+								<reportElement x="0" y="0" width="20" height="20" uuid="4ae42329-9836-4669-85e5-e58c0afba37c"/>
+								<textElement>
+									<font size="6"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{codigo}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="80" uuid="2a5f4c6b-bfc8-4296-a53b-e4e7039351d2">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column2"/>
 						<jr:tableFooter style="Table_CH" height="20" rowSpan="1"/>
 						<jr:columnHeader style="Table_CH" height="20" rowSpan="1">
 							<staticText>
 								<reportElement x="0" y="0" width="80" height="20" uuid="7478aebd-55d6-4913-a837-d176463d048c"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
-									<font size="8"/>
+									<font size="6"/>
 								</textElement>
 								<text><![CDATA[Descripción]]></text>
 							</staticText>
@@ -405,21 +429,21 @@ WHERE f.id_factura = $P{idFactura}]]>
 						<jr:detailCell style="Table_TD" height="20">
 							<textField>
 								<reportElement x="0" y="0" width="80" height="20" uuid="ff03c7b9-b81b-4e6d-84f4-d605fb312161"/>
-								<textElement textAlignment="Center" verticalAlignment="Middle">
-									<font size="8"/>
+								<textElement textAlignment="Left" verticalAlignment="Middle">
+									<font size="6"/>
 								</textElement>
 								<textFieldExpression><![CDATA[$F{descripcion}]]></textFieldExpression>
 							</textField>
 						</jr:detailCell>
 					</jr:column>
 					<jr:column width="20" uuid="cc25d307-d61a-44b7-96b1-d0e8366f0a1b">
-						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column2"/>
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column3"/>
 						<jr:tableFooter style="Table_CH" height="20" rowSpan="1"/>
 						<jr:columnHeader style="Table_CH" height="20" rowSpan="1">
 							<staticText>
 								<reportElement x="0" y="0" width="20" height="20" uuid="3ebcb15a-128c-4226-ab9b-7bd15269fb86"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
-									<font size="8"/>
+									<font size="6"/>
 								</textElement>
 								<text><![CDATA[Cantidad]]></text>
 							</staticText>
@@ -429,20 +453,20 @@ WHERE f.id_factura = $P{idFactura}]]>
 							<textField>
 								<reportElement x="0" y="0" width="20" height="20" uuid="39f78a2b-a0f5-452b-be4f-dc764a5d4fa8"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
-									<font size="8"/>
+									<font size="6"/>
 								</textElement>
 								<textFieldExpression><![CDATA[$F{cantidad}]]></textFieldExpression>
 							</textField>
 						</jr:detailCell>
 					</jr:column>
-					<jr:column width="30" uuid="c3760b07-f328-47f3-8895-8d60982c1c89">
-						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column3"/>
+					<jr:column width="20" uuid="c3760b07-f328-47f3-8895-8d60982c1c89">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column4"/>
 						<jr:tableFooter style="Table_CH" height="20" rowSpan="1"/>
 						<jr:columnHeader style="Table_CH" height="20" rowSpan="1">
 							<staticText>
-								<reportElement x="0" y="0" width="30" height="20" uuid="bdae6ac3-b4b2-48d7-9202-f0ad7fc0160c"/>
+								<reportElement x="0" y="0" width="20" height="20" uuid="bdae6ac3-b4b2-48d7-9202-f0ad7fc0160c"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
-									<font size="8"/>
+									<font size="6"/>
 								</textElement>
 								<text><![CDATA[Precio]]></text>
 							</staticText>
@@ -450,60 +474,60 @@ WHERE f.id_factura = $P{idFactura}]]>
 						<jr:columnFooter style="Table_CH" height="20" rowSpan="1"/>
 						<jr:detailCell style="Table_TD" height="20">
 							<textField>
-								<reportElement x="0" y="0" width="30" height="20" uuid="1e12008b-663f-463b-a46c-cd9a87724486"/>
+								<reportElement x="0" y="0" width="20" height="20" uuid="1e12008b-663f-463b-a46c-cd9a87724486"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
-									<font size="8"/>
+									<font size="6"/>
 								</textElement>
 								<textFieldExpression><![CDATA[$F{precio}]]></textFieldExpression>
 							</textField>
 						</jr:detailCell>
 					</jr:column>
-					<jr:column width="30" uuid="3d8232da-5d1e-4029-8910-a232abfc42a1">
-						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column4"/>
+					<jr:column width="20" uuid="3d8232da-5d1e-4029-8910-a232abfc42a1">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column5"/>
 						<jr:tableFooter style="Table_TH" height="20" rowSpan="1">
 							<staticText>
-								<reportElement style="Table_CH" x="0" y="0" width="30" height="20" uuid="799153f5-fc07-4c39-b875-4395046e7321"/>
+								<reportElement style="Table_CH" x="0" y="0" width="20" height="20" uuid="799153f5-fc07-4c39-b875-4395046e7321"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
-									<font size="8" isBold="true" isItalic="true"/>
+									<font size="6" isBold="true" isItalic="true"/>
 								</textElement>
 								<text><![CDATA[Total]]></text>
 							</staticText>
 						</jr:tableFooter>
 						<jr:columnHeader style="Table_CH" height="20" rowSpan="1">
 							<staticText>
-								<reportElement x="0" y="0" width="30" height="20" uuid="1a4cd649-8e7f-41c8-aad4-928e0e322921"/>
+								<reportElement x="0" y="0" width="20" height="20" uuid="1a4cd649-8e7f-41c8-aad4-928e0e322921"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
-									<font size="8"/>
+									<font size="6"/>
 								</textElement>
 								<text><![CDATA[Itbis]]></text>
 							</staticText>
 						</jr:columnHeader>
 						<jr:columnFooter style="Table_CH" height="20" rowSpan="1">
 							<staticText>
-								<reportElement x="0" y="0" width="30" height="20" uuid="2ad0bf49-dcfb-4bfe-b09d-31463ce82703"/>
+								<reportElement x="0" y="0" width="20" height="20" uuid="2ad0bf49-dcfb-4bfe-b09d-31463ce82703"/>
 								<textElement verticalAlignment="Middle">
-									<font size="8" isBold="true"/>
+									<font size="6" isBold="true"/>
 								</textElement>
 								<text><![CDATA[Subtotal $ Itbis]]></text>
 							</staticText>
 						</jr:columnFooter>
 						<jr:detailCell style="Table_CH" height="20">
 							<textField>
-								<reportElement style="Table 2_CH" x="0" y="0" width="30" height="20" uuid="d27c9cf3-354d-4a13-9b78-f1c182916777"/>
+								<reportElement style="Table 2_CH" x="0" y="0" width="20" height="20" uuid="d27c9cf3-354d-4a13-9b78-f1c182916777"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
-									<font size="8"/>
+									<font size="6"/>
 								</textElement>
 								<textFieldExpression><![CDATA[$F{itbis}]]></textFieldExpression>
 							</textField>
 						</jr:detailCell>
 					</jr:column>
 					<jr:column width="20" uuid="75e3ba7b-13bc-4db3-b75e-522cbf97c03d">
-						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column5"/>
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column6"/>
 						<jr:tableFooter style="Table_CH" height="20" rowSpan="1">
 							<textField>
 								<reportElement key="" style="Table_CH" x="0" y="0" width="20" height="20" uuid="bb280a07-5cba-413d-8274-dae55ceb7882"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
-									<font size="9"/>
+									<font size="6"/>
 								</textElement>
 								<textFieldExpression><![CDATA[$V{subtotal1}]]></textFieldExpression>
 							</textField>
@@ -512,7 +536,7 @@ WHERE f.id_factura = $P{idFactura}]]>
 							<staticText>
 								<reportElement x="0" y="0" width="20" height="20" uuid="c473aa44-564c-407f-8eb4-2465ebc71c61"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
-									<font size="8"/>
+									<font size="6"/>
 								</textElement>
 								<text><![CDATA[Subtotal]]></text>
 							</staticText>
@@ -521,7 +545,7 @@ WHERE f.id_factura = $P{idFactura}]]>
 							<textField>
 								<reportElement x="0" y="0" width="20" height="20" uuid="68d4b708-be6f-4447-ae3c-c3a574f326e6"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
-									<font size="9"/>
+									<font size="6"/>
 								</textElement>
 								<textFieldExpression><![CDATA[$V{itbis2}]]></textFieldExpression>
 							</textField>
@@ -530,7 +554,7 @@ WHERE f.id_factura = $P{idFactura}]]>
 							<textField>
 								<reportElement style="Table 2_CH" x="0" y="0" width="20" height="20" uuid="9a3f0978-e8ec-40c4-967f-db1970f69689"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
-									<font size="8"/>
+									<font size="6"/>
 								</textElement>
 								<textFieldExpression><![CDATA[$F{subtotal}]]></textFieldExpression>
 							</textField>

@@ -82,6 +82,7 @@
 		}
   </style>
   <link rel="stylesheet" type="text/css" th:href="@{/css/swal.css}">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" rel="stylesheet"/>
   </head>
   <body>
      <br>
@@ -139,30 +140,17 @@
                     <input type="hidden" id="responseAddArticuloSinSerial">
                     <input type="hidden" id="tipoArticulo" th:value="${tipoArticulo}">
                     <label for="nombre">Lista de Productos</label>
-                    <input type="text" class="form-control" name="artuculo" id="articulo" placeholder="Buscar por Imei, Art&iacute;culo y C&oacute;digo">
-                     <select class="form-control" id="articulos" onclick="javascript:seleccionado(this.options[this.selectedIndex].text,this.options[this.selectedIndex].value);">
-                   		 <option th:fragment="listaArticulos" 
+                    <input type="hidden" class="form-control" name="artuculo" id="articulo" placeholder="Buscar por Imei, Art&iacute;culo y C&oacute;digo">
+					<select class="form-control" id="articulos">
+						<option value="">Busqueda por art&iacute;culo, c&oacute;digo y serial</option>
+                   		 <option
                    		 th:each="art : ${listaArticulos}" 
                    		 th:value="${art.id}" 
                    		 th:text="${art.nombre}" />
                     </select>
+
                   </div>
                 </div>
-<!--                 <div id="cantidadYprecio"> -->
-<!-- 	                <div class="col-md-2">  -->
-<!-- 	                	<label for="cantidad">Cantidad</label> -->
-<!-- 	                	<input type="number" th:value="${cantidad}" class="form-control" min="0" name="cantidad" id="cantidadProducto"> -->
-<!-- 	                </div> -->
-<!-- 	                 <input type="hidden" class="form-control" id="temporalPrice" disabled> -->
-<!-- 	                 <div class="col-md-2">  -->
-<!-- 	                	<label for="cantidad">Precio</label> -->
-<!-- 	                	<input type="number" class="form-control" id="precioRango" name="precio" th:value="${precioArticulo}" disabled> -->
-<!-- 	                </div> -->
-<!--                 </div> -->
-<!--                 <div class="col-md-2">  -->
-<!--                 	 <br> -->
-<!--                		 <button id="agregarArticuloFactura" class="btn btn-standar" style="margin-top: 5px;"> Agregar </button> -->
-<!--                 </div>   -->
                 <div class="col-md-2" id="divButtonSaveFact"> 
                 	<br>
                		 <button id="guardarFactura" class="btn btn-success pull-right" style="margin-top: 5px;"> Guardar </button>
@@ -840,6 +828,7 @@
 	</div>
 	<script th:src="@{/js/jquery.min.js}"></script>
 	<script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
 	<span th:if="${msg != null}" class="alert alert-success" role="alert">
 		<script type="text/javascript">
 		Swal.fire({

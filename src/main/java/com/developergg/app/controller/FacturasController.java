@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.developergg.app.model.Articulo;
 import com.developergg.app.model.ArticuloAjuste;
 import com.developergg.app.model.ArticuloSerial;
 import com.developergg.app.model.Cliente;
@@ -53,6 +54,7 @@ import com.developergg.app.model.Usuario;
 import com.developergg.app.model.Vendedor;
 import com.developergg.app.service.IArticulosAjustesService;
 import com.developergg.app.service.IArticulosSeriales;
+import com.developergg.app.service.IArticulosService;
 import com.developergg.app.service.IClientesService;
 import com.developergg.app.service.IComprobantesFiscalesService;
 import com.developergg.app.service.ICondicionesPagoService;
@@ -133,6 +135,9 @@ public class FacturasController {
 	private IVendedoresService serviceVendedores;
 	
 	@Autowired
+	private IArticulosService serviceArticulos;
+	
+	@Autowired
 	private DataSource dataSource;
 	
 	@Value("${inventario.ruta.imagenes}")
@@ -187,7 +192,37 @@ public class FacturasController {
 		if(facturaTemp.getCliente()==null) {
 			facturaTemp.setCliente(new Cliente());
 		}
+		
+		//Lista de articulos - codigo - seriales
+		List<Articulo> lista = serviceArticulos.buscarPorTienda(usuario.getAlmacen().getPropietario())
+				.stream().filter(p -> p.getEliminado() == 0).collect(Collectors.toList());
+		
+		List<Articulo> listaDefinitive = new LinkedList<>();
+				
+		for (Articulo articulo : lista) {
+			//verificamos si el articulo no tiene serial
+			if(articulo.getImei().equalsIgnoreCase("NO")||(articulo.getImei().equals("0"))) {
+				articulo.setNombre(articulo.getNombre()+" - "+articulo.getCodigo());
+				listaDefinitive.add(articulo);
+			}else {
+				String tempSerials = "";
+				//verificamos los seriales del articulo
+				List<ArticuloSerial> articuloSerials = serviceArticulosSeriales
+						.buscarPorArticuloAlmacen(articulo, usuario.getAlmacen()).stream()
+						.filter(s -> s.getEstado().equalsIgnoreCase("Disponible"))
+						.collect(Collectors.toList());
+				if(!articuloSerials.isEmpty()) {
+					for (ArticuloSerial serial : articuloSerials) {
+						tempSerials+=serial.getSerial()+" - ";
+					}
+					tempSerials = tempSerials.substring(0, tempSerials.length() - 2);
+					articulo.setNombre(articulo.getNombre()+" - "+articulo.getCodigo() + " - "+tempSerials);
+					listaDefinitive.add(articulo);
+				}
+			}
+		}
 
+		model.addAttribute("listaArticulos", listaDefinitive);
 		model.addAttribute("vendedores", listaVendedores);
 		model.addAttribute("condicionesPago", condicionesPago);
 		model.addAttribute("formaPagos", formaPagos);
@@ -423,6 +458,7 @@ public class FacturasController {
 			for (FacturaDetalle facturaDetalle : serviFacturaDetalles) {
 				DetalleFactura detalleFacturaArticulo = new DetalleFactura();
 				detalleFacturaArticulo.setId(facturaDetalle.getId());
+				detalleFacturaArticulo.setCodigo(facturaDetalle.getArticulo().getCodigo());
 				detalleFacturaArticulo.setOriginalTable("factura_detalle");
 				detalleFacturaArticulo.setCantidad(facturaDetalle.getCantidad());
 				detalleFacturaArticulo.setDescripcion(facturaDetalle.getArticulo().getNombre());
@@ -437,6 +473,7 @@ public class FacturasController {
 			for (FacturaDetalleServicio facturaDetalleServicio : detalleServicios) {
 				DetalleFactura detalleFacturaServicio = new DetalleFactura();
 				detalleFacturaServicio.setId(facturaDetalleServicio.getId());
+				detalleFacturaServicio.setCodigo("");
 				detalleFacturaServicio.setOriginalTable("factura_detalle_servicio");
 				detalleFacturaServicio.setCantidad(facturaDetalleServicio.getCantidad());
 				detalleFacturaServicio.setDescripcion(facturaDetalleServicio.getDescripcion());
@@ -509,6 +546,7 @@ public class FacturasController {
 			for (FacturaDetalle facturaDetalle : serviFacturaDetalles) {
 				DetalleFactura detalleFacturaArticulo = new DetalleFactura();
 				detalleFacturaArticulo.setId(facturaDetalle.getId());
+				detalleFacturaArticulo.setCodigo(facturaDetalle.getArticulo().getCodigo());
 				detalleFacturaArticulo.setOriginalTable("factura_detalle");
 				detalleFacturaArticulo.setCantidad(facturaDetalle.getCantidad());
 				detalleFacturaArticulo.setDescripcion(facturaDetalle.getArticulo().getNombre());
@@ -523,6 +561,7 @@ public class FacturasController {
 			for (FacturaDetalleServicio facturaDetalleServicio : detalleServicios) {
 				DetalleFactura detalleFacturaServicio = new DetalleFactura();
 				detalleFacturaServicio.setId(facturaDetalleServicio.getId());
+				detalleFacturaServicio.setOriginalTable("");
 				detalleFacturaServicio.setOriginalTable("factura_detalle_servicio");
 				detalleFacturaServicio.setCantidad(facturaDetalleServicio.getCantidad());
 				detalleFacturaServicio.setDescripcion(facturaDetalleServicio.getDescripcion());
