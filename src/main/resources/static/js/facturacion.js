@@ -545,7 +545,6 @@ $("#guardarSerialesDelProducto").click(function(e){
 				}
 			});
 		}else{
-			alert("Estoy autorizado");
 			 $.post("/articulos/ajax/addArticuloConSerial/",
 						{
 							idArticulo: idArticulo,
