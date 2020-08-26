@@ -225,8 +225,30 @@ public class ArticulosController {
 	public String saveArticulosSinSerial(ArticuloAjuste articuloAjuste, Model model, HttpSession session,
 			RedirectAttributes attributes) {
 		Usuario usuario = (Usuario) session.getAttribute("usuario");
+		//Actualizamos el articulo
 		articuloAjuste.setCosto(articuloAjuste.getArticulo().getCosto());
 		Articulo articulo = serviceArticulos.buscarPorId(articuloAjuste.getArticulo().getId());
+		int difPrecios = 0;
+		//verificamos si hay diferencias en los montos para actualizarlos
+		if(!articulo.getCosto().equals(articuloAjuste.getArticulo().getCosto())) {
+			articulo.setCosto(articuloAjuste.getArticulo().getCosto());
+			difPrecios++;
+		}
+		if(!articulo.getPrecio_maximo().equals(articuloAjuste.getArticulo().getPrecio_maximo())) {
+			articulo.setPrecio_maximo(articuloAjuste.getArticulo().getPrecio_maximo());
+			difPrecios++;
+		}
+		if(!articulo.getPrecio_minimo().equals(articuloAjuste.getArticulo().getPrecio_minimo())) {
+			articulo.setPrecio_minimo(articuloAjuste.getArticulo().getPrecio_minimo());
+			difPrecios++;
+		}
+		if(!articulo.getPrecio_mayor().equals(articuloAjuste.getArticulo().getPrecio_mayor())) {
+			articulo.setPrecio_mayor(articuloAjuste.getArticulo().getPrecio_mayor());
+			difPrecios++;
+		}
+		if(difPrecios>0) {
+			serviceArticulos.guardar(articulo);
+		}
 		// verificar si el registro tiene inventario
 		List<ArticuloAjuste> lista = serviceArticulosAjustes.buscarPorArticuloYAlmacen(articulo, usuario.getAlmacen());
 		//Caso para entradas y salidas
@@ -494,7 +516,7 @@ public class ArticulosController {
 		} 
 		
 		model.addAttribute("precioArticulo", precio);
-		return "facturas/factura :: #precioRango";
+		return "facturas/factura :: #precioSinSerial";
 	}
 	
 	@GetMapping("/ajax/getPriceWhitClient/{id}/{cant}/{idCliente}")
@@ -513,7 +535,7 @@ public class ArticulosController {
 			precio = articulo.getPrecio_mayor();
 		}
 		model.addAttribute("precioArticulo", precio);
-		return "facturas/factura :: #precioRango";
+		return "facturas/factura :: #precioSinSerial";
 	}
 	
 	@GetMapping("/ajax/getPriceWhitClientWhitSerial/{id}/{cant}/{idCliente}")
@@ -587,7 +609,7 @@ public class ArticulosController {
 	
 	@PostMapping("/ajax/addArticuloSinSerial/")	
 	public String agregarArticuloSinSerial(HttpSession session, @RequestParam("idArticulo") Integer idArticulo,
-			@RequestParam("cantidad") Integer cantidad, @RequestParam("precio") Double precio,
+			@RequestParam("cantidad") Integer cantidad, @RequestParam("precioAcct") Double precio,
 			@RequestParam("conItbis") String conItbis, @RequestParam("disponible") Integer disponible,
 			@RequestParam("maximo") Double maximo, @RequestParam("valorItbis") Double valorItbis,
 			@RequestParam("incluyeItbis") Integer incluyeItbis, @RequestParam("realPrice") Double realPrice) {

@@ -89,6 +89,27 @@
                   </div>
                 </div>
               </div>
+              
+             <div class="row">
+                <div class="col-md-4"> 
+                  <div class="form-group">
+                    <label for="cantidad">Precio Maximo</label>
+                    <input type="number" min="0" class="form-control" th:field="*{articulo.precio_maximo}" placeholder="Precio Maximo" required="required">
+                  </div>
+                </div>
+                <div class="col-md-4"> 
+                  <div class="form-group">
+                    <label for="cantidad">Precio Minimo</label>
+                    <input type="number" min="0" class="form-control" th:field="*{articulo.precio_minimo}" placeholder="Precio Minimo" required="required">
+                  </div>
+                </div>
+                 <div class="col-md-3"> 
+                  <div class="form-group">
+                    <label for="cantidad">Precio Mayor</label>
+                    <input type="number" min="0" class="form-control" th:field="*{articulo.precio_mayor}" placeholder="Precio Mayor" required="required">
+                  </div>
+                </div>
+              </div>
                                                                    
               <input type="submit" class="btn btn-lg btn-primary" value="Guardar"> 
             </form>	

@@ -124,7 +124,7 @@
 		  <div class="panel-body all">
 		     <form  method="post" action="#" id="formCreateInvoice">            
               <div class="row">
-                <div class="col-md-4"> 
+                <div class="col-md-8"> 
                   <div class="form-group">
                   	<div id="responseAddSerial">
                   		  <input type="hidden" id="AddSerialStatus" th:value="${response}">
@@ -148,21 +148,21 @@
                     </select>
                   </div>
                 </div>
-                <div id="cantidadYprecio">
-	                <div class="col-md-2"> 
-	                	<label for="cantidad">Cantidad</label>
-	                	<input type="number" th:value="${cantidad}" class="form-control" min="0" name="cantidad" id="cantidadProducto">
-	                </div>
-	                 <input type="hidden" class="form-control" id="temporalPrice" disabled>
-	                 <div class="col-md-2"> 
-	                	<label for="cantidad">Precio</label>
-	                	<input type="number" class="form-control" id="precioRango" name="precio" th:value="${precioArticulo}" disabled>
-	                </div>
-                </div>
-                <div class="col-md-2"> 
-                	 <br>
-               		 <button id="agregarArticuloFactura" class="btn btn-standar" style="margin-top: 5px;"> Agregar </button>
-                </div>  
+<!--                 <div id="cantidadYprecio"> -->
+<!-- 	                <div class="col-md-2">  -->
+<!-- 	                	<label for="cantidad">Cantidad</label> -->
+<!-- 	                	<input type="number" th:value="${cantidad}" class="form-control" min="0" name="cantidad" id="cantidadProducto"> -->
+<!-- 	                </div> -->
+<!-- 	                 <input type="hidden" class="form-control" id="temporalPrice" disabled> -->
+<!-- 	                 <div class="col-md-2">  -->
+<!-- 	                	<label for="cantidad">Precio</label> -->
+<!-- 	                	<input type="number" class="form-control" id="precioRango" name="precio" th:value="${precioArticulo}" disabled> -->
+<!-- 	                </div> -->
+<!--                 </div> -->
+<!--                 <div class="col-md-2">  -->
+<!--                 	 <br> -->
+<!--                		 <button id="agregarArticuloFactura" class="btn btn-standar" style="margin-top: 5px;"> Agregar </button> -->
+<!--                 </div>   -->
                 <div class="col-md-2" id="divButtonSaveFact"> 
                 	<br>
                		 <button id="guardarFactura" class="btn btn-success pull-right" style="margin-top: 5px;"> Guardar </button>
@@ -192,8 +192,18 @@
         <h4 class="modal-title">Seriales Disponibles</h4>
       </div>
       <div class="modal-body">
-       	<div class="row">
-
+		<div class="row">
+				<!--  <label>Cantidad:</label>  -->
+				<input id="cantidadConSerial" class="form-control" type="hidden" min="0">
+			<div class="col col-md-6">
+				<label>Precio:</label> <input id="precioConSerial" class="form-control" type="number" min="0">
+			</div>
+			<div class="col col-md-6">
+				<label>Total:</label> <input id="totalPrecioConSerial" class="form-control" type="number" min="0" disabled="disabled">
+			</div>
+		</div>
+		<hr>
+		<div class="row">
         <div class="dual-list list-left col-md-5">
             <div class="well text-right">
                 <div class="row">
@@ -255,52 +265,52 @@
   </div>
 </div>	
 
-<!-- Modal Información del articulo-->
-<div id="articuloModal" class="modal fade" role="dialog">
+<!-- Modal articulo sin serial-->
+<div id="articuloModal" class="modal fade" role="dialog" data-backdrop="static">
   <div class="modal-dialog">
 
     <!-- Modal content-->
     <div class="modal-content all">
       <div class="modal-header bg-primary">
         <button type="button" class="close" data-dismiss="modal">&times;</button>
-        <h3 class="modal-title">Informaci&oacute;n del art&iacute;culo</h3>
+        <h3 class="modal-title">Art&iacute;culo seleccionado</h3>
       </div>
       <div class="modal-body">
 			<div id="articuloBuscado">
 				<form>
 					<div class="row">
-						<div class="col col-md-12">
+						<div class="col col-md-8">
 							<input type="hidden" th:value="${idArticuloBuscado}" id="idArticuloBuscado">
 							<input type="hidden" th:value="${conItbis}" id="conItbis">
 							<div class="form-group">
-								 <label>Nombre</label>
+								 <label>Nombre del art&iacute;culo</label>
 								 <input th:value="${nombreArticuloBuscado}" id="nombreArticuloBuscado" class="form-control" type="text" disabled="disabled">
 							</div>
 						</div>
-					</div>
-					<div class="row">
 						<div class="col col-md-3">
 							<div class="form-group">
 								<label>Disponible</label>
 	                       		<input th:value="${existencia}" id="disponibleModal" class="form-control" type="number" disabled="disabled">
 							</div>
 						</div>
+					</div>
+					<div class="row">
 						<div class="col col-md-3">
 							<div class="form-group">
-								 <label>Precio M&aacute;ximo</label>
-	                      		 <input th:value="${precioMaximo}" id="precioMaximo" class="form-control" type="number" disabled="disabled">
+								<!--  <label>Precio M&aacute;ximo</label> --> 
+	                      		 <input th:value="${precioMaximo}" id="precioMaximo" class="form-control" type="hidden" disabled="disabled">
 							</div>
 						</div>
 						<div class="col col-md-3">
 							<div class="form-group">
-								<label>Precio M&iacute;nimo:</label>
-	                      		<input th:value="${precioMinimo}" id="precioMinimo" class="form-control" type="number" disabled="disabled">
+							    <!-- <label>Precio M&iacute;nimo:</label> --> 
+	                      		<input th:value="${precioMinimo}" id="precioMinimo" class="form-control" type="hidden" disabled="disabled">
 							</div>
 						</div>
 						<div class="col col-md-3">
 							<div class="form-group">
-								 <label>Precio x Mayor:</label>
-	                      		 <input th:value="${precioMayor}" id="precioMayor" class="form-control" type="number" disabled="disabled">
+								 <!--  <label>Precio x Mayor:</label> --> 
+	                      		 <input th:value="${precioMayor}" id="precioMayor" class="form-control" type="hidden" disabled="disabled">
 							</div>
 							<!-- Rangos -->
 							<input th:value="${minMax}" id="minMax" type="hidden">
@@ -311,11 +321,26 @@
 							<input th:value="${maxMay}" id="maxMay" type="hidden">
 						</div>
 					</div>
+					<div class="row">
+						<div class="col col-md-4">
+							 <label>Cantidad:</label>
+	                      	<input id="cantidadSinSerial" oninput="javascript:cambioCantidadSinSerial()" class="form-control" type="number" min="1">
+						</div>
+						<div class="col col-md-4">
+							 <label>Precio:</label>
+	                      	<input id="precioSinSerial" oninput="javascript:cambioPrecioSinSerial()" th:value="${precioArticulo}" class="form-control" type="number" min="0">
+						</div>
+						<div class="col col-md-4">
+							 <label>Total:</label>
+	                      	<input id="totalPrecioSinSerial" class="form-control" type="number" min="0" disabled="disabled">
+						</div>
+					</div>	
            		 </form>
 		</div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-standar" data-dismiss="modal">Regresar</button>
+        <button type="button" class="btn btn-warning" data-dismiss="modal">Regresar</button>
+        <button type="button" class="btn btn-standar" onclick="javascript:agregarArticuloSinSerial()">Agregar</button>
       </div>
     </div>
 
