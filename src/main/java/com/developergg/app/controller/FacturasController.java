@@ -625,5 +625,36 @@ public class FacturasController {
 	        }
 		}
 	}
+	
+	@GetMapping("/cancelarFactura")
+	public String cancelarFactura(HttpSession session) {
+		Usuario usuario = (Usuario) session.getAttribute("usuario");
+		FacturaTemp facturaTemp = serviceFacturasTemp.buscarPorUsuario(usuario);
+		List<FacturaDetalleTemp> facturaDetallesTemp = facturasDetallesTempService.buscarPorUsuarioAlmacen(usuario, usuario.getAlmacen());
+		List<FacturaDetallePagoTemp> detallesPagosTemp = serviceFacturaDetallesPagosTemp.buscarPorFacturaTemp(facturaTemp); 
+		List<FacturaServicioTemp> facturasServicioTemp = facturasServiciosTempService.buscarPorUsuarioAlmacen(usuario, usuario.getAlmacen());
+		List<FacturaSerialTemp> listaSerialesTemp = serviceFacturasSerialesTemp.buscarPorFacturaTemp(facturaTemp);
+		
+		//borramos registros temporales
+		if(!listaSerialesTemp.isEmpty()) {
+			//borramos los articulos con serial
+			serviceFacturasSerialesTemp.eliminarListaSeriales(listaSerialesTemp);
+		}
+		if(!facturaDetallesTemp.isEmpty()) {
+			//borramos detalles de articulos
+			facturasDetallesTempService.eliminarListadoDetalles(facturaDetallesTemp);
+		}
+		if(!facturasServicioTemp.isEmpty()) {
+			//borramos los servicios
+			facturasServiciosTempService.eliminarListaServicios(facturasServicioTemp);
+		}
+		if(!detallesPagosTemp.isEmpty()) {
+			//borramos los pagos
+			serviceFacturaDetallesPagosTemp.eliminarListaPagos(detallesPagosTemp);
+		}
+		//Borramos la factura temporal
+		serviceFacturasTemp.eliminar(facturaTemp); 	
+		return "redirect:/facturas/create";
+	}
 
 }
