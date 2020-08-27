@@ -404,65 +404,65 @@ public class ArticulosController {
 		return "articulos/formularioSinSerial";
 	}
 	
-	@GetMapping("/ajax/getAll")
-	public String listaArticulosAjax(Model model, HttpSession session) {
-		Usuario usuario = (Usuario) session.getAttribute("usuario");
-		if(lista==null) {
-			//articulos por tienda que no esten eliminados
-			lista = serviceArticulos.buscarPorTienda(usuario.getAlmacen().getPropietario())
-					.stream().filter(p -> p.getEliminado() == 0).collect(Collectors.toList());
-		}
-		model.addAttribute("listaArticulos", lista);
-		return "facturas/factura :: listaArticulos";
-	}
+//	@GetMapping("/ajax/getAll")
+//	public String listaArticulosAjax(Model model, HttpSession session) {
+//		Usuario usuario = (Usuario) session.getAttribute("usuario");
+//		if(lista==null) {
+//			//articulos por tienda que no esten eliminados
+//			lista = serviceArticulos.buscarPorTienda(usuario.getAlmacen().getPropietario())
+//					.stream().filter(p -> p.getEliminado() == 0).collect(Collectors.toList());
+//		}
+//		model.addAttribute("listaArticulos", lista);
+//		return "facturas/factura :: listaArticulos";
+//	}
 	
-	@GetMapping("/ajax/getAll/{txt}")
-	public String listaArticulosAjaxWhitTxt(@PathVariable("txt") String txt, Model model, HttpSession session) {
-		Usuario usuario = (Usuario) session.getAttribute("usuario");
-		List<Articulo> articuloExistente = null;
-		//buscamos a partir de 3 caracteres
-		if(txt.contains("_")) {
-			txt = txt.replace("_", " ");
-		}
-		if(txt.length()>2) {
-			//Buscamos los articulos por nombre o codigo y propietario que no este eliminado
-			articuloExistente = serviceArticulos.buscarPorNombreOrCodigo(txt, usuario.getAlmacen().getPropietario()).
-					stream().filter(a -> a.getEliminado() == 0).collect(Collectors.toList());
-			//Buscamos los seriales por almacen que no esten eliminados
-			List<ArticuloSerial> seriales = serviceArticulosSeriales.buscarPorSerialAndAlmacen(txt, usuario.getAlmacen()).
-					stream().filter(s -> (s.getEliminado() == 0 && s.getEstado().equalsIgnoreCase("Disponible"))).collect(Collectors.toList());
-			if(!articuloExistente.isEmpty()) {
-				for (Articulo articulo : articuloExistente) {
-					//Buscamos el articulo por serial
-					if(articulo.getImei().equals("SI")) {
-						//verificamos si en la lista de seriales ya se encuentra el articulo
-						for (ArticuloSerial articuloSerial : seriales) {											
-							if(articuloSerial.getArticulo().getId()==articulo.getId()) {
-								seriales.remove(articuloSerial);
-							}
-						}
-					}else {
-						//Verificamos el inventario de los articulos que no tienen imei
-						List<ArticuloAjuste> articulosAjustes = serviceArticulosAjustes.buscarPorArticuloYAlmacen(articulo, usuario.getAlmacen());
-						if(articulosAjustes.isEmpty()) {
-							articuloExistente.remove(articulo);
-						}
-					}
-				}
-			}
-			
-			//si la lista de seriales tiene articulos los incluimos en la lista de articulos
-			if(!seriales.isEmpty()) {
-				for (ArticuloSerial articuloSerial : seriales) {
-					articuloExistente.add(articuloSerial.getArticulo());
-				}
-			}
-			
-		}
-		
-		model.addAttribute("listaArticulos", articuloExistente);
-		return "facturas/factura :: listaArticulos";
-	}
+//	@GetMapping("/ajax/getAll/{txt}")
+//	public String listaArticulosAjaxWhitTxt(@PathVariable("txt") String txt, Model model, HttpSession session) {
+//		Usuario usuario = (Usuario) session.getAttribute("usuario");
+//		List<Articulo> articuloExistente = null;
+//		//buscamos a partir de 3 caracteres
+//		if(txt.contains("_")) {
+//			txt = txt.replace("_", " ");
+//		}
+//		if(txt.length()>2) {
+//			//Buscamos los articulos por nombre o codigo y propietario que no este eliminado
+//			articuloExistente = serviceArticulos.buscarPorNombreOrCodigo(txt, usuario.getAlmacen().getPropietario()).
+//					stream().filter(a -> a.getEliminado() == 0).collect(Collectors.toList());
+//			//Buscamos los seriales por almacen que no esten eliminados
+//			List<ArticuloSerial> seriales = serviceArticulosSeriales.buscarPorSerialAndAlmacen(txt, usuario.getAlmacen()).
+//					stream().filter(s -> (s.getEliminado() == 0 && s.getEstado().equalsIgnoreCase("Disponible"))).collect(Collectors.toList());
+//			if(!articuloExistente.isEmpty()) {
+//				for (Articulo articulo : articuloExistente) {
+//					//Buscamos el articulo por serial
+//					if(articulo.getImei().equals("SI")) {
+//						//verificamos si en la lista de seriales ya se encuentra el articulo
+//						for (ArticuloSerial articuloSerial : seriales) {											
+//							if(articuloSerial.getArticulo().getId()==articulo.getId()) {
+//								seriales.remove(articuloSerial);
+//							}
+//						}
+//					}else {
+//						//Verificamos el inventario de los articulos que no tienen imei
+//						List<ArticuloAjuste> articulosAjustes = serviceArticulosAjustes.buscarPorArticuloYAlmacen(articulo, usuario.getAlmacen());
+//						if(articulosAjustes.isEmpty()) {
+//							articuloExistente.remove(articulo);
+//						}
+//					}
+//				}
+//			}
+//			
+//			//si la lista de seriales tiene articulos los incluimos en la lista de articulos
+//			if(!seriales.isEmpty()) {
+//				for (ArticuloSerial articuloSerial : seriales) {
+//					articuloExistente.add(articuloSerial.getArticulo());
+//				}
+//			}
+//			
+//		}
+//		
+//		model.addAttribute("listaArticulos", articuloExistente);
+//		return "facturas/factura :: listaArticulos";
+//	}
 	
 	@GetMapping("/ajax/getType/{id}")
 	public String obtenerTipoDeArticuloAjax(@PathVariable("id") Integer idArticulo, Model model, HttpSession session) {
@@ -503,6 +503,7 @@ public class ArticulosController {
 				articulo.setCantidad(newArticuloAjuste.getDisponible());
 			}
 		}
+		model.addAttribute("tipoArticulo", articulo.getImei());
 		model.addAttribute("idArticuloBuscado", articulo.getId());
 		model.addAttribute("conItbis", articulo.getItbis());
 		model.addAttribute("nombreArticuloBuscado", articulo.getNombre());

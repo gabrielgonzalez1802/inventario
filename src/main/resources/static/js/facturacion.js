@@ -1,36 +1,34 @@
 //peticiones iniciales
 var incluyeItbis = 0;
 var columnas = [];
-//$('#articulos').load("/articulos/ajax/getAll",function(){
-		//verificamos si la factura tiene un cliente asociado
-		$("#clienteAcct").load("/articulos/ajax/getClienteAcct/",function(){
-			var clienteAcct = $("#actualCliente").val();
-			var rncClienteAcct = $("#actualRnc").val();
-			if(clienteAcct!="0"){
-				$("#selectCliente").val(clienteAcct);
-				$("#rncCliente").val(clienteAcct);
-			}
-			//Verificamos si la factura tiene un vendedor asociado
-			$("#vendedorAcct").load("/articulos/ajax/getVendedorAcct/",function(){
-				var vendedorAcct = $("#actualVendedor").val();
-				if(vendedorAcct!="0"){
-					$("#selectVendedor").val(vendedorAcct);
-				}
-				var idComprobanteFiscal = $("#selectComprobanteFiscal").val();
-				if(idComprobanteFiscal){
-					$("#comprobanteFiscalInfo").load("/articulos/ajax/getComprobanteFiscal/"+idComprobanteFiscal,function(){
-						incluyeItbis = $("#incluyeItbis").val();
-						factura_detalle_items(incluyeItbis);
-					});
-				}
+var seleccionado = $("#articulos").select2();
+//al principio tomara el foco
+focusSelectArticuloNew();
+//verificamos si la factura tiene un cliente asociado
+$("#clienteAcct").load("/articulos/ajax/getClienteAcct/",function(){
+	var clienteAcct = $("#actualCliente").val();
+	var rncClienteAcct = $("#actualRnc").val();
+	if(clienteAcct!="0"){
+		$("#selectCliente").val(clienteAcct);
+		$("#rncCliente").val(clienteAcct);
+	}
+	// Verificamos si la factura tiene un vendedor asociado
+	$("#vendedorAcct").load("/articulos/ajax/getVendedorAcct/",function(){
+		var vendedorAcct = $("#actualVendedor").val();
+		if(vendedorAcct!="0"){
+			$("#selectVendedor").val(vendedorAcct);
+		}
+		var idComprobanteFiscal = $("#selectComprobanteFiscal").val();
+		if(idComprobanteFiscal){
+			$("#comprobanteFiscalInfo").load("/articulos/ajax/getComprobanteFiscal/"+idComprobanteFiscal,function(){
+				incluyeItbis = $("#incluyeItbis").val();
+				factura_detalle_items(incluyeItbis);
 			});
-		});
-//});
-
+		}
+	});
+});
+		
 var idArticuloBuscado;
-
-//Cuando inicie por primera vez la lista estara oculta
-$('#articulos').hide();
 
 $("#selectComprobanteFiscal").change(function(){
 	var comprobanteFiscalID = $("#selectComprobanteFiscal").val();
@@ -40,40 +38,19 @@ $("#selectComprobanteFiscal").change(function(){
 	});
 });
 
-//evento de teclado para el buscador de articulos
-$("#articulo").keyup(function(e) {
-	var txtFind = $("#articulo").val();
-	txtFind = txtFind.replace(/ /g, "_");
-	if (txtFind != "") {
-		$('#articulos').load("/articulos/ajax/getAll/" + txtFind);
-	} else {
-		$('#articulos').load("/articulos/ajax/getAll");
-	}
-});
-
-
-var seleccionado = $("#articulos").select2();
-
 //Evento cuando se seleccine un articulo
 $('#articulos').on("select2:select", function(e) { 
-	var txtFind = $('#articulos :selected').text();
-	if(txtFind!=""){
-		txtFind = txtFind.replace(/ /g, "_");
+	if(seleccionado.val()!=""){
 		idArticuloBuscado = seleccionado.val();
 		var valor = $('#articulos :selected').text();
 		$("#articulo").val(valor);
 //	    alert("seleccione: "+seleccionado.val()+" texto: "+$('#articulos :selected').text());
-		//verificamos el tipo de articulo
-		$.get("/articulos/ajax/getType/" + idArticuloBuscado, function(fragment) {
-			$('#tipoArticulo').replaceWith(fragment);
-			
-			idArticuloBuscado = $("#articulos").val();
-			$("#nombreArticuloSerial").val("");
 			//Datos del articulo seleccionado
 			$.get("/articulos/ajax/getInfoArticulo/" + idArticuloBuscado,
 					function(fragment) {
 						$('#articuloBuscado').replaceWith(fragment);
-
+						idArticuloBuscado = $("#articulos").val();
+						$("#nombreArticuloSerial").val("");
 						//validamos el tipo de articulo
 						if ($("#tipoArticulo").val() != "SI") {
 							$('#cantidadSinSerial').prop('max', $('#disponibleModal').val());
@@ -97,10 +74,10 @@ $('#articulos').on("select2:select", function(e) {
 							$("#cantidadSinSerial").val(1);
 							var cantidad = $("#cantidadSinSerial").val();
 							var idArticulo = $("#idArticuloBuscado").val();
-							//para el calculo del precio verificamos si hay algun cliente seleccionado
+//							//para el calculo del precio verificamos si hay algun cliente seleccionado
 							var idCliente = $("#selectCliente").val();
 							if(idCliente!=""){
-								//Si el cliente esta seleccionado verificamos el precio
+//								//Si el cliente esta seleccionado verificamos el precio
 								$.get("/articulos/ajax/getPriceWhitClient/" + idArticulo + "/" + cantidad + "/" + idCliente,
 										function(fragment) {
 											$('#precioSinSerial').replaceWith(fragment);
@@ -115,58 +92,10 @@ $('#articulos').on("select2:select", function(e) {
 											$("#totalPrecioSinSerial").val(total);
 										});
 							}
-							
 							$('#articuloModal').modal('show');
 						}
 					});
-		});
 	}
-});
-
-//funcion para controlar el producto buscado
-function seleccionado(valor, id) {
-	idArticuloBuscado = id;
-	$("#articulo").val(valor);
-	//verificamos el tipo de articulo
-	$.get("/articulos/ajax/getType/" + id, function(fragment) {
-		$('#tipoArticulo').replaceWith(fragment);
-	});
-}
-
-//Cuando la lista de productos pierda el foco se oculta la lista
-$("#articulos").focusout(
-		function() {
-			idArticuloBuscado = $("#articulos").val();
-			$("#nombreArticuloSerial").val("");
-			$('#articulos').hide();
-			//Datos del articulo seleccionado
-			$.get("/articulos/ajax/getInfoArticulo/" + idArticuloBuscado,
-					function(fragment) {
-						$('#articuloBuscado').replaceWith(fragment);
-						//validamos el tipo de articulo
-						if ($("#tipoArticulo").val() != "SI") {
-							$('#cantidadSinSerial').prop('max', $('#disponibleModal').val());
-						}
-						
-						//Verificamos el tipo del articulo (Con serial, Sin serial)
-						if ($("#tipoArticulo").val() == "SI") {
-							//llenamos la lista de seriales según el artículo
-							$('#addMultiSerial').load(
-									"/articulos/ajax/getSerialesForArticulo/"
-											+ idArticuloBuscado,function(){
-												//Mostramos el modal para agregar seriales
-												$("#nombreArticuloSerial").val($("#articulo").val());
-												$('#serialesModal').modal('show');
-											});
-						} else {
-							$('#articuloModal').modal('show'); //TODO:ggonzalez
-						}
-					});
-		});
-
-//Cuando el producto tenga el foco aparece la lista
-$("#articulo").focusin(function() {
-	$('#articulos').show();
 });
 
 function cambioCantidadSinSerial() {
@@ -188,6 +117,15 @@ function cambioCantidadSinSerial() {
 					$('#precioSinSerial').replaceWith(fragment);
 					var total = $("#cantidadSinSerial").val() * $('#precioSinSerial').val();
 					$("#totalPrecioSinSerial").val(total);
+					if(total=="0"){
+						Swal.fire({
+							  title: 'Advertencia!',
+							  text: 'La cantidad seleccionada no se encuentra en el rango de precios del articulo, Puede ajustar el precio manualmente',
+							  position: 'top',
+							  icon: 'warning',
+							  confirmButtonText: 'Cool'
+						})
+					}
 				});
 	}
 }
@@ -402,6 +340,7 @@ $("#btnAddService").click(function(e) {
 			console.log("Servicio guardado");
 			factura_detalle_items(incluyeItbis);
 			servicio_limpiar();
+			focusSelectArticuloNew();
 		});
 });
 
@@ -493,6 +432,25 @@ function agregarArticuloSinSerial(){
 					error++;
 				}
 			}
+		}else{
+			//Si no tiene cliente seleccionado se hace las comparaciones por el precio mayor y solo puede bajar hasta el minimo
+			if(precio>=mayor){
+				error=0;
+			}else{
+				//verificamos que sea mayor o igual al minimo
+				if(precio>=minimo){
+					error=0;
+				}else{
+					Swal.fire({
+						  title: 'Advertencia!',
+						  text: 'El precio no puede ser menor al precio minimo',
+						  position: 'top',
+						  icon: 'warning',
+						  confirmButtonText: 'Cool'
+					})
+					error++;
+				}
+			}
 		}
 
 		// si no hay errores agregamos el registro
@@ -528,6 +486,7 @@ function agregarArticuloSinSerial(){
 							$("#totalPrecioSinSerial").val("");
 							$("#articuloModal").modal("hide");
 							factura_detalle_items(incluyeItbis);
+							focusSelectArticuloNew();
 					});
 		}
 	}
@@ -1044,6 +1003,13 @@ $("#btnGuardarFactura").click(function(e) {
 		}
 	}
 });
+
+function focusSelectArticuloNew(){
+	$('#articulos').val('').trigger('change.select2');
+	$('#articulos').select2('focus');
+	$('#articulos').select2('focus');
+//	$('#articulos').select2('open');
+}
 
 
 

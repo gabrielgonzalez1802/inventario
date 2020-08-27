@@ -138,6 +138,9 @@ public class FacturasController {
 	private IArticulosService serviceArticulos;
 	
 	@Autowired
+	private IArticulosAjustesService serviceArticulosAjustes;
+	
+	@Autowired
 	private DataSource dataSource;
 	
 	@Value("${inventario.ruta.imagenes}")
@@ -202,8 +205,18 @@ public class FacturasController {
 		for (Articulo articulo : lista) {
 			//verificamos si el articulo no tiene serial
 			if(articulo.getImei().equalsIgnoreCase("NO")||(articulo.getImei().equals("0"))) {
+				//Verificamos que tenga inventario en la tienda
+				List<ArticuloAjuste> articulosAjustes = serviceArticulosAjustes.buscarPorArticuloYAlmacen(articulo, usuario.getAlmacen());
+				if(articulosAjustes.isEmpty()) {
+					articulo.setCantidad(0);
+				}else {
+					ArticuloAjuste newArticuloAjuste = articulosAjustes.get(articulosAjustes.size()-1);
+					articulo.setCantidad(newArticuloAjuste.getDisponible());
+				}
 				articulo.setNombre(articulo.getNombre()+" - "+articulo.getCodigo());
-				listaDefinitive.add(articulo);
+				if(articulo.getCantidad()>0) {
+					listaDefinitive.add(articulo);
+				}
 			}else {
 				String tempSerials = "";
 				//verificamos los seriales del articulo

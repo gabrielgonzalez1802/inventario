@@ -138,7 +138,6 @@
                   	<input type="hidden" id="responseDeleteService">
                     <input type="hidden" id="responseAddArticuloConSerial">
                     <input type="hidden" id="responseAddArticuloSinSerial">
-                    <input type="hidden" id="tipoArticulo" th:value="${tipoArticulo}">
                     <label for="nombre">Lista de Productos</label>
                     <input type="hidden" class="form-control" name="artuculo" id="articulo" placeholder="Buscar por Imei, Art&iacute;culo y C&oacute;digo">
 					<select class="form-control" id="articulos">
@@ -315,6 +314,9 @@
 							<input th:value="${maxMin}" id="maxMin" type="hidden">
 							<input th:value="${minMay}" id="minMay" type="hidden">
 							<input th:value="${maxMay}" id="maxMay" type="hidden">
+							
+							<!-- Tipo articulo -->
+							<input type="hidden" id="tipoArticulo" th:value="${tipoArticulo}">
 						</div>
 					</div>
 					<div class="row">
