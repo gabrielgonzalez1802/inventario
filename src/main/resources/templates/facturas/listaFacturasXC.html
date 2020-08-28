@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <title>Sistema Celulares</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" sizes="64x64" th:href="@{/img/icon.png}">
+    <link rel="stylesheet" type="text/css" th:href="@{/bootstrap/css/bootstrap.min.css}">
+	<link rel="stylesheet" type="text/css" th:href="@{/css/sticky-dark-top-nav.css}">
+    <!-- Font-icon css-->
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+ 	<link rel="stylesheet" type="text/css" th:href="@{/css/sticky-dark-top-nav.css}">
+ 	<link rel="stylesheet" type="text/css" th:href="@{/css/Minimal-tabs.css}">
+ 	<link rel="stylesheet" type="text/css" th:href="@{/css/dashboard.css}">
+ 	<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css">
+ 	<link rel="stylesheet" type="text/css" th:href="@{/fontawesom/css/all.min.css}">
+ 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+ 	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap" rel="stylesheet">
+ 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+ 	<link rel="stylesheet" type="text/css" th:href="@{/css/swal.css}">
+ 	<style>
+.table-primary, .table-primary>th, .table-primary>td {
+	background-color: #25396d;
+	color: #ffff;
+}
+
+.table-primary th, .table-primary td, .table-primary thead th,
+	.table-primary tbody+tbody {
+	border-color: #25396d;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.current,
+	.dataTables_wrapper .dataTables_paginate .paginate_button.current:hover
+{
+	  background-image: linear-gradient(#54b4eb, #2FA4E7 60%, #1d9ce5);
+}
+.dataTables_wrapper .dataTables_paginate .paginate_button.current, .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+    color: #fffdfd !important;
+    border-color: #2FA4E7;
+}
+</style>
+  </head>
+  <body>
+     <span th:insert="fragments/topMenu :: menu-principal"></span> 
+     <br>
+	<div class="container text-white">
+		<div class="card text-primary border rounded">
+			<div class="card-body" style="margin-top: 0px;">
+				<h1 class="card-title" style="font-size: 16px;">Lista de Facturas Pendientes por Cobrar</h1>
+				<br>
+
+<!-- Modal abonar a factura -->
+ <div class="modal" id="abonoModal">
+    <div class="modal-dialog modal-md" data-backdrop="static">
+      <div class="modal-content all">
+      
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h4 class="modal-title"><span style="color:#fff;">Forma de Pago</span></h4>
+<!--           <button type="button" class="close" data-dismiss="modal">&times;</button> -->
+        </div>
+        
+        <!-- Modal body -->
+        <div class="modal-body">
+          	<form>
+          		<input id="responseDeletePago" type="hidden">
+				<div id="nuevoPago">
+					<input type="hidden" id="responseAddPago" th:value="${responseAddPago}">
+
+					<div class="row">
+						<div class="col col-md-5">
+							<div class="form-group">
+								<select class="form-control" id="selectFormaPago">
+									<option th:each="formaPago:${formasPago}" 
+										th:value="${formaPago.id}" th:text="${formaPago.nombre}"/>
+								</select>
+							</div>
+						</div>
+						
+						<div class="col col-md-4">
+							<div class="form-group">
+	                       		<input class="form-control" type="number" min="1" placeholder="Monto" id="montoFormaPago">
+							</div>
+						</div>
+						
+						<div class="col col-md-2">
+							<div class="form-group">
+	                       		<button class="btn btn-success" id="btnAgregarPago"> Agregar </button>
+							</div>
+						</div>
+					</div>
+					
+					<br>
+					<div class="row">
+						<div class="col col-md-12">
+							<div id="cuerpoPago">
+								<!--  load data ajax -->
+							</div>	
+						</div>	
+					</div>
+				</div>	
+           </form>
+        </div>
+        
+        <!-- Modal footer -->
+        <div class="modal-footer">
+            <button type="button" class="btn btn-info" id="btnRegresar">Regresar</button>
+        </div>
+        
+      </div>
+    </div>
+ </div>				
+
+					<table class="table table-striped" id="tabla">
+							<thead>
+								<tr class="table-primary">
+									<th>No. Factura</th>
+									<th>Fecha</th>
+									<th>Vencimiento</th>
+									<th>NCF</th>
+									<th>Condici&oacute;n</th>
+									<th>Cliente</th>
+									<th>Abonado</th>
+									<th>Restante</th>
+									<th>Total Factura</th>
+									<th></th>
+								</tr>
+							</thead>
+							<tbody>
+								 <tr th:each="factura:${facturas}">
+								  <td th:text="${factura.codigo}"></td> 
+				                  <td th:text="${#dates.format(factura.fecha, 'dd-MM-yyyy')}"></td>
+				                  <td th:text="${#dates.format(factura.vencimiento, 'dd-MM-yyyy')}"></td>
+				                  <td th:text="${factura.ncf}"></td> 
+				                  <td th:text="${factura.condicion}"></td> 
+				                  <td th:text="${factura.nombre_cliente}"></td>
+				                  <td th:text="${factura.abono}"></td>
+				                  <td th:text="${factura.total_venta} - ${factura.abono}"></td>
+				                  <td th:text="${factura.total_venta}"></td>
+				                  <td>
+				                    <a th:href="@{/facturas/print/{id} (id=${factura.id})}" th:target="_blank" class="btn btn-success btn-sm" data-toggle="tooltip" data-placement="top" title="Imprimir" role="button"><i class="fa fa-print" aria-hidden="true"></i></a>
+				                  	<a th:onclick="'abonar(\'' + ${factura.id} + '\');'" class="btn btn-primary btn-sm" data-toggle="tooltip" data-placement="top" title="Abonar" role="button"><i class="fa fa-money" aria-hidden="true"></i></a>
+				                  </td>
+				                </tr>
+							</tbody>
+						</table>
+			</div>
+			<a class="card-link" href="#"></a>
+		</div>
+	</div>
+	<script th:src="@{/js/jquery.min.js}"></script>
+    <script th:src="@{/bootstrap/js/bootstrap.min.js}"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+	<script type="text/javascript">
+	$(document).ready(function() {
+		$('#tabla').DataTable({
+			"scrollY": "400px",
+			    "language": {
+			        "sProcessing":    "Procesando...",
+			        "sLengthMenu":    "Mostrar _MENU_ registros",
+			        "sZeroRecords":   "No se encontraron resultados",
+			        "sEmptyTable":    "Ningún dato disponible en esta tabla",
+			        "sInfo":          "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+			        "sInfoEmpty":     "Mostrando registros del 0 al 0 de un total de 0 registros",
+			        "sInfoFiltered":  "(filtrado de un total de _MAX_ registros)",
+			        "sInfoPostFix":   "",
+			        "sSearch":        "Buscar:",
+			        "sUrl":           "",
+			        "sInfoThousands":  ",",
+			        "sLoadingRecords": "Cargando...",
+			        "oPaginate": {
+			            "sFirst":    "Primero",
+			            "sLast":    "Último",
+			            "sNext":    "Siguiente",
+			            "sPrevious": "Anterior"
+			        },
+			        "oAria": {
+			            "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+			        }
+			    }
+		});
+	});
+	var idFactura;
+	
+	function abonar(id){
+		idFactura = id;
+		$('#cuerpoPago').load("/facturas/ajax/loadCuerpoFacturaPago/"+idFactura,function(){
+			if($("#mostrarCambio").val()==0){
+				$("#totalCambioPagos").hide();
+			}else{
+				$("#totalCambioPagos").show();
+			}
+			$('#abonoModal').modal({backdrop: 'static', keyboard: false})
+			$("#abonoModal").modal("show");
+		});
+	}
+	
+	$("#btnAgregarPago").click(function(e) {
+		e.preventDefault();
+		var formaPago = $("#selectFormaPago").val();
+		var montoFormaPago = $("#montoFormaPago").val();
+		if(montoFormaPago<0){
+			Swal.fire({
+				title : 'Advertencia!',
+				text : 'El monto no puede ser negativo',
+				position : 'top',
+				icon : 'warning',
+				confirmButtonText : 'Cool'
+			})
+			$("#montoFormaPago").val("");
+		}else{
+			 $.post("/formasPago/ajax/addPagoFacturaCXC/", {
+					 'formaPago' : formaPago,
+					 'montoFormaPago': montoFormaPago,
+					 'idFactura': idFactura
+			   },function(response){
+					$('#responseAddPago').replaceWith(response);
+					if($("#responseAddPago").val() == 0){
+						Swal.fire({
+							title : 'Advertencia!',
+							text : 'El monto no puede ser mayor al total de la factura',
+							position : 'top',
+							icon : 'warning',
+							confirmButtonText : 'Cool'
+						})
+					}
+					$("#montoFormaPago").val("");
+					$('#cuerpoPago').load("/facturas/ajax/loadCuerpoFacturaPago/"+idFactura,function(){});
+					if($("#mostrarCambio").val()==0){
+						$("#totalCambioPagos").hide();
+					}else{
+						$("#totalCambioPagos").show();
+					}
+			   });
+		}
+	});
+	
+	function eliminarPagoFactura(idPagoFactura){
+		$.post("/formasPago/ajax/deletePagoCxC/", {
+			 'idPagoFactura': idPagoFactura
+	   },function(response){
+			$('#cuerpoPago').load("/facturas/ajax/loadCuerpoFacturaPago/"+idFactura,function(){
+				if($("#mostrarCambio").val()==0){
+					$("#totalCambioPagos").hide();
+				}else{
+					$("#totalCambioPagos").show();
+				}
+			});
+	   });
+	}
+	
+	$("#btnRegresar").click(function(e) {
+		location.href = '/facturas/cxc';
+	});
+	
+	
+	</script>
+	 <span th:insert="fragments/footer :: footer"></span>  
+</body>
+</html>

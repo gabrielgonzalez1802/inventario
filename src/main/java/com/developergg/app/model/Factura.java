@@ -60,7 +60,7 @@ public class Factura {
 	@JoinColumn(name = "id_almacen")
 	private Almacen almacen;
 	
-	private Double abono;
+	private Double abono = 0.0;
 	private Integer credito = 0;
 	
 	private Integer cuotas;

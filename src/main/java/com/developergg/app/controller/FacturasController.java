@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
+import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -153,6 +154,8 @@ public class FacturasController {
 	
 	private String tempFolder =  System.getProperty("java.io.tmpdir");
 	private String pathSeparator = System.getProperty("file.separator");
+	
+	DecimalFormat df2 = new DecimalFormat("###.##");
 	
 	@GetMapping("/")
 	public String mostrarFacturas(Model model, HttpSession session) {
@@ -672,6 +675,59 @@ public class FacturasController {
 		//Borramos la factura temporal
 		serviceFacturasTemp.eliminar(facturaTemp); 	
 		return "redirect:/facturas/create";
+	}
+	
+	@GetMapping("/cxc")
+	public String listaFacturasPendientesPorPago(Model model,HttpSession session) {
+		Usuario usuario = (Usuario) session.getAttribute("usuario");
+		//Listamos las facturas de credito que esten pendientes por abono
+		List<Factura> facturas = serviceFacturas.buscarPorAlmacen(usuario.getAlmacen()).
+				stream().filter(f -> 
+					f.getCondicionPago().getDia()>0 && f.getAbono()<f.getTotal_venta()
+				).collect(Collectors.toList());
+		List<FormaPago> formasPago = serviceFormasPagos.buscarPorAlmacen(usuario.getAlmacen());
+		model.addAttribute("formasPago", formasPago);
+		model.addAttribute("facturas", facturas);
+		return "facturas/listaFacturasXC";
+	}
+	
+	@GetMapping("/ajax/loadCuerpoFacturaPago/{idFactura}")
+	public String getPagoTemp(Model model, HttpSession session, @PathVariable("idFactura") Integer idFactura) {
+		Factura factura = serviceFacturas.buscarPorId(idFactura);
+		if(factura!=null) {
+			List<FacturaPago> listaPagos = serviceFacturasPagosService.buscarPorFactura(factura);
+			
+			Double totalPagos = 0.0;
+			Double totalRestaPagos = 0.0;
+			Double totalCambioPagos = 0.0;
+			Integer mostrarCambio = 0;
+			Double precioTotal = factura.getTotal_venta();
+			
+			if(!listaPagos.isEmpty()) {
+				for (FacturaPago pago : listaPagos) {
+					totalPagos+=pago.getCantidad();
+				}
+				if(totalPagos<precioTotal) {
+					totalRestaPagos = precioTotal-totalPagos;
+				}else if(totalPagos>precioTotal) {
+					totalCambioPagos = (precioTotal-totalPagos)*-1;
+				}
+				
+				//si el ultimo pago es efectivo mostramos el cambio
+				if(listaPagos.get(listaPagos.size()-1).getFormaPago().getNombre().equalsIgnoreCase("efectivo")) {
+					mostrarCambio = 1;
+				}
+			}else {
+				totalRestaPagos = precioTotal;
+			}
+			
+			model.addAttribute("mostrarCambio", mostrarCambio);
+			model.addAttribute("listaPagos", listaPagos);
+			model.addAttribute("totalPagos", df2.format(totalPagos));
+			model.addAttribute("totalRestaPagos", df2.format(totalRestaPagos));
+			model.addAttribute("totalCambioPagos", df2.format(totalCambioPagos));
+		}
+		return "facturas/cuerpoPagoXC :: cuerpoPago";
 	}
 
 }
