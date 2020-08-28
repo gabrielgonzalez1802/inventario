@@ -772,6 +772,11 @@
     <!-- Modal content-->
     <div class="modal-content all">
       <div class="modal-body">
+      		<!-- Condicion de pago -->
+      		<div id="condicionPagoInfo">
+      			<input type="hidden" th:value="${idCondicionPago}" id="idCondicionPago">
+      			<input type="hidden" th:value="${tipoCondicionPago}" id="tipoCondicionPago">
+      		</div>
       		<!-- Data persistence of comprobante fiscal -->
 			<div id="comprobanteFiscalInfo">
 				<input type="hidden" th:value="${idComprobanteFiscal}" id="idComprobanteFiscal"> 

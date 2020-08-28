@@ -16,7 +16,7 @@ public class CondicionPago {
 	private Integer id;
 	
 	private String nombre;
-	private String descripcion;
+	private Integer dia;
 	
 	public Integer getId() {
 		return id;
@@ -30,15 +30,14 @@ public class CondicionPago {
 	public void setNombre(String nombre) {
 		this.nombre = nombre;
 	}
-	public String getDescripcion() {
-		return descripcion;
+	public Integer getDia() {
+		return dia;
 	}
-	public void setDescripcion(String descripcion) {
-		this.descripcion = descripcion;
+	public void setDia(Integer dia) {
+		this.dia = dia;
 	}
-	
 	@Override
 	public String toString() {
-		return "CondicionPago [id=" + id + ", nombre=" + nombre + ", descripcion=" + descripcion + "]";
+		return "CondicionPago [id=" + id + ", nombre=" + nombre + ", dia=" + dia + "]";
 	}
 }

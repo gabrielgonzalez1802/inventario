@@ -30,6 +30,7 @@ import com.developergg.app.model.ArticuloSerial;
 import com.developergg.app.model.Categoria;
 import com.developergg.app.model.Cliente;
 import com.developergg.app.model.ComprobanteFiscal;
+import com.developergg.app.model.CondicionPago;
 import com.developergg.app.model.FacturaDetallePagoTemp;
 import com.developergg.app.model.FacturaDetalleTemp;
 import com.developergg.app.model.FacturaSerialTemp;
@@ -45,6 +46,7 @@ import com.developergg.app.service.IArticulosService;
 import com.developergg.app.service.ICategoriasService;
 import com.developergg.app.service.IClientesService;
 import com.developergg.app.service.IComprobantesFiscalesService;
+import com.developergg.app.service.ICondicionesPagoService;
 import com.developergg.app.service.IFacturasDetallesPagoTempService;
 import com.developergg.app.service.IFacturasDetallesTempService;
 import com.developergg.app.service.IFacturasSerialesTempService;
@@ -92,6 +94,9 @@ public class ArticulosController {
 	
 	@Autowired
 	private IFacturasDetallesPagoTempService serviceDetallesPagosTemp;
+	
+	@Autowired
+	private ICondicionesPagoService serviceCondicionesPago;
 	
 	@Value("${inventario.ruta.imagenes}")
 	private String ruta;

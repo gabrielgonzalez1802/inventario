@@ -6,7 +6,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.HashMap;
@@ -261,12 +263,14 @@ public class FacturasController {
 	@PostMapping("/ajax/updateCondicionPagoFactura")
 	public String modificarCondicionPago(Model model, HttpSession session,
 			@RequestParam("condicionPagoID") Integer condicionPagoID) {
-		Usuario usuario = (Usuario) session.getAttribute("usuario");
 		CondicionPago condicionPago = serviceCondicionesPago.buscarPorId(condicionPagoID);
+		Usuario usuario = (Usuario) session.getAttribute("usuario");
 		FacturaTemp facturaTemp = serviceFacturasTemp.buscarPorUsuario(usuario);
 		facturaTemp.setCondicionPago(condicionPago);
 		serviceFacturasTemp.guardar(facturaTemp);
-		return "facturas/factura :: #responseUpdateCondicion";
+		model.addAttribute("idCondicionPago", facturaTemp.getCondicionPago().getId());
+		model.addAttribute("tipoCondicionPago",facturaTemp.getCondicionPago().getNombre());
+		return "facturas/factura :: #condicionPagoInfo";
 	}
 
 	@PostMapping("/ajax/guardarFactura")
@@ -278,13 +282,13 @@ public class FacturasController {
 		FacturaTemp facturaTemp = serviceFacturasTemp.buscarPorUsuario(usuario);
 		List<FacturaDetalleTemp> facturaDetallesTemp = facturasDetallesTempService.buscarPorUsuarioAlmacen(usuario, usuario.getAlmacen());
 		
-		// validacion para condicion de pago contado
-//		if (facturaTemp.getCondicionPago().getNombre().equalsIgnoreCase("contado")) {
-//
-//		}
-
 		int tempCode = 1;
-
+		int credito = 0;
+		
+		// validacion para condicion de pago contado
+		if (!facturaTemp.getCondicionPago().getNombre().equalsIgnoreCase("contado")) {
+			credito = 1;
+		}
 		// Lista de facturas por almacen
 		List<Factura> listaFacturas = serviceFacturas.buscarPorAlmacen(usuario.getAlmacen());
 		if (!listaFacturas.isEmpty()) {
@@ -323,22 +327,35 @@ public class FacturasController {
 		factura.setVendedor(facturaTemp.getVendedor());
 		factura.setAlmacen(usuario.getAlmacen());
 		//factura.setAbono(abono); //validar
-		//factura.setCredito(credito); //validar
+		factura.setCredito(credito); 
 		//factura.setCuotas(); //validar
 		//factura.setTaller(taller); //se agregara cuando se complete la parte del taller
 		//forma_pago,avance_taller,total_itbis
 		factura.setTotal_itbis(total_itbis);
+		
+		if(credito==1) {
+			//default time zone
+			ZoneId defaultZoneId = ZoneId.systemDefault();
+			LocalDate date = LocalDate.now();
+			LocalDate newDate = date.plusDays(facturaTemp.getCondicionPago().getDia());
+			Date vencimiento = Date.from(newDate.atStartOfDay(defaultZoneId).toInstant());
+			factura.setVencimiento(vencimiento);
+		}
+		
 		serviceFacturas.guardar(factura);
 		
 		//detalles del pago
 		List<FacturaDetallePagoTemp> detallesPagosTemp = serviceFacturaDetallesPagosTemp.buscarPorFacturaTemp(facturaTemp); 
-		for (FacturaDetallePagoTemp facturaDetallePagoTemp : detallesPagosTemp) {
-			FacturaPago facturaPago = new FacturaPago();
-			facturaPago.setFactura(factura);
-			facturaPago.setFormaPago(facturaDetallePagoTemp.getFormaPago());
-			facturaPago.setCantidad(facturaDetallePagoTemp.getMonto());
-			//facturaPago.setAplicado(); //verificar
-			serviceFacturasPagosService.guardar(facturaPago);
+		
+		if(credito==0) {
+			for (FacturaDetallePagoTemp facturaDetallePagoTemp : detallesPagosTemp) {
+				FacturaPago facturaPago = new FacturaPago();
+				facturaPago.setFactura(factura);
+				facturaPago.setFormaPago(facturaDetallePagoTemp.getFormaPago());
+				facturaPago.setCantidad(facturaDetallePagoTemp.getMonto());
+				//facturaPago.setAplicado(); //verificar
+				serviceFacturasPagosService.guardar(facturaPago);
+			}
 		}
 
 		//TODO:GGONZALEZ logica del taller

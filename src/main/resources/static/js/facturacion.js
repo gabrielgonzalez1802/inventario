@@ -24,6 +24,10 @@ $("#clienteAcct").load("/articulos/ajax/getClienteAcct/",function(){
 				incluyeItbis = $("#incluyeItbis").val();
 				factura_detalle_items(incluyeItbis);
 			});
+			//tipo de condicion de pago
+			if($("#selectCondicionPago").val() == 1){
+				$("#tipoCondicionPago").val("contado");
+			}
 		}
 	});
 });
@@ -822,6 +826,8 @@ $("#selectCondicionPago").change(function(){
 	 $.post("/facturas/ajax/updateCondicionPagoFactura/", {
 		 'condicionPagoID' : condicionPago
 	 },function(data){
+		 $('#condicionPagoInfo').replaceWith(data);
+			// tipo de condicion de pago
 		 console.log("condicion cambiada");
 	 });
 });
@@ -867,15 +873,25 @@ function limpiarTaller(){
 }
 
 $(document).on('keydown', null, 'f8', function(){
-	//cargamos los detalles de pago en la factura
 	if($("#guardarFactura").is(':visible')){
-		factura_pagos_detalle_items();
+		//verificamos si es distinto de contado
+		if($("#tipoCondicionPago").val().toLowerCase() != "contado"){
+			guardarFacturaCredito();
+		}else{
+			//cargamos los detalles de pago en la factura
+			factura_pagos_detalle_items();
+		}
 	}
 });     
 $("#guardarFactura").click(function(e) {
 	e.preventDefault();
-	//cargamos los detalles de pago en la factura
-	factura_pagos_detalle_items();
+	//verificamos si es distinto de contado
+	if($("#tipoCondicionPago").val().toLowerCase() != "contado"){
+		guardarFacturaCredito();
+	}else{
+		//cargamos los detalles de pago en la factura
+		factura_pagos_detalle_items();
+	}
 });
 
 //Carga el detalle de pago en la factura
@@ -883,9 +899,9 @@ function factura_pagos_detalle_items(){
 	var precioTotal = $("#precioTotal").text();
 	$('#cuerpoPago').load("/articulos/ajax/loadCuerpoFacturaPago/"+precioTotal,function(){
 		if($("#mostrarCambio").val()==0){
-			$("#totalCanbioPagos").hide();
+			$("#totalCambioPagos").hide();
 		}else{
-			$("#totalCanbioPagos").show();
+			$("#totalCambioPagos").show();
 		}
 		$("#pagoModal").modal("show");
 	});
@@ -895,9 +911,9 @@ function factura_pagos_detalle_itemsNotModalOpen(){
 	var precioTotal = $("#precioTotal").text();
 	$('#cuerpoPago').load("/articulos/ajax/loadCuerpoFacturaPago/"+precioTotal,function(){
 		if($("#mostrarCambio").val()==0){
-			$("#totalCanbioPagos").hide();
+			$("#totalCambioPagos").hide();
 		}else{
-			$("#totalCanbioPagos").show();
+			$("#totalCambioPagos").show();
 		}
 	});
 }
@@ -1017,6 +1033,59 @@ function focusSelectArticuloNew(){
 //	$('#articulos').select2('open');
 }
 
+function guardarFacturaCredito(){
+	//verificamos que la factura tenga los pagos completos para proceder a guardarla
+		//validacion, debe incluir cliente
+		if($("#facturaCliente").val()==""){
+			Swal.fire({
+				title : 'Advertencia!',
+				text : 'El cliente no puede estar vacio',
+				position : 'top',
+				icon : 'warning',
+				confirmButtonText : 'Cool'
+			})
+		}else{
+			//debe incluir RNC
+			if($("#facturaRnc").val()==""){
+				Swal.fire({
+					title : 'Advertencia!',
+					text : 'El RNC es necesario para guardar la factura',
+					position : 'top',
+					icon : 'warning',
+					confirmButtonText : 'Cool'
+				})
+			}else{
+				var total_venta = $("#precioTotal").text();
+				var total_itbis = $("#subTotalItbis").text();
+				var nombreCliente = $("#facturaCliente").val();
+				var telefonoCliente = $("#facturaTelefono").val();
+				var rncCliente = $("#facturaRnc").val();
+				//proceso de guardado de la factura
+				 $.post("/facturas/ajax/guardarFactura/",
+						{
+					 		'total_venta':total_venta,
+					 		'nombreCliente':nombreCliente,
+					 		'telefonoCliente':telefonoCliente,
+					 		'rncCliente':rncCliente,
+					 		'total_itbis':total_itbis
+						},function(response){
+					$('#responseGeneratedInvoice').replaceWith(response);
+					var invoiceId = $('#responseGeneratedInvoice').val();
+					if(invoiceId>0){
+						factura_detalle_items(incluyeItbis);
+						$("#pagoModal").modal("hide");
+						var a = document.createElement('a');
+						  a.target="_blank";
+						  a.href='/facturas/print/'+invoiceId;
+						  a.click();
+						setTimeout(function() {
+							location.href = '/facturas/';
+						}, 1000);
+					}
+			 	});
+			}
+		}
+}
 
 
 
