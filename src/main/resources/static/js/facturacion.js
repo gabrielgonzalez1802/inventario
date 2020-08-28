@@ -93,6 +93,7 @@ $('#articulos').on("select2:select", function(e) {
 										});
 							}
 							$('#articuloModal').modal('show');
+							$('#cantidadSinSerial').focus();
 						}
 					});
 	}
@@ -865,6 +866,12 @@ function limpiarTaller(){
 	$("#avanceTaller").val("");
 }
 
+$(document).on('keydown', null, 'f8', function(){
+	//cargamos los detalles de pago en la factura
+	if($("#guardarFactura").is(':visible')){
+		factura_pagos_detalle_items();
+	}
+});     
 $("#guardarFactura").click(function(e) {
 	e.preventDefault();
 	//cargamos los detalles de pago en la factura
@@ -1006,7 +1013,6 @@ $("#btnGuardarFactura").click(function(e) {
 
 function focusSelectArticuloNew(){
 	$('#articulos').val('').trigger('change.select2');
-	$('#articulos').select2('focus');
 	$('#articulos').select2('focus');
 //	$('#articulos').select2('open');
 }
