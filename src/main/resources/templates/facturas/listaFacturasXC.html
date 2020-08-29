@@ -238,7 +238,7 @@
 	});
 	
 	function eliminarPagoFactura(idPagoFactura){
-		$.post("/formasPago/ajax/deletePagoTemporal/", {
+		$.post("/formasPago/ajax/deletePagoTemporalCxC/", {
 			 'idPagoFactura': idPagoFactura
 	   },function(response){
 			$('#cuerpoPago').load("/facturas/ajax/loadCuerpoFacturaPago/"+idFactura,function(){
