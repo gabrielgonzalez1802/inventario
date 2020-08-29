@@ -34,6 +34,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.developergg.app.model.AbonoCxC;
+import com.developergg.app.model.AbonoCxCDetalle;
 import com.developergg.app.model.Articulo;
 import com.developergg.app.model.ArticuloAjuste;
 import com.developergg.app.model.ArticuloSerial;
@@ -56,6 +58,8 @@ import com.developergg.app.model.Taller;
 import com.developergg.app.model.TipoEquipo;
 import com.developergg.app.model.Usuario;
 import com.developergg.app.model.Vendedor;
+import com.developergg.app.service.IAbonosCxCDetallesService;
+import com.developergg.app.service.IAbonosCxCService;
 import com.developergg.app.service.IArticulosAjustesService;
 import com.developergg.app.service.IArticulosSeriales;
 import com.developergg.app.service.IArticulosService;
@@ -147,6 +151,12 @@ public class FacturasController {
 	
 	@Autowired
 	private IArticulosAjustesService serviceArticulosAjustes;
+	
+	@Autowired
+	private IAbonosCxCService serviceAbonos;
+	
+	@Autowired
+	private IAbonosCxCDetallesService serviceAbonosDetalles;
 	
 	@Autowired
 	private DataSource dataSource;
@@ -696,40 +706,55 @@ public class FacturasController {
 		return "facturas/listaFacturasXC";
 	}
 	
-	@GetMapping("/ajax/loadCuerpoFacturaPago/{idFactura}")
+	@GetMapping("/ajax/loadCuerpoFacturaPagoCxC/{idFactura}")
 	public String getPagoTemp(Model model, HttpSession session, @PathVariable("idFactura") Integer idFactura) {
 		Factura factura = serviceFacturas.buscarPorId(idFactura);
+		//Verificamos los abonos de la factura
+		List<AbonoCxC> abonos = serviceAbonos.buscarPorFactura(factura);
+		List<AbonoCxCDetalle> abonoDetalles = null;
+		if(!abonos.isEmpty()) {
+			AbonoCxC abono = abonos.get(0);
+			abonoDetalles = serviceAbonosDetalles.buscarPorIngreso(abono);
+		}
+		
+		if(abonoDetalles == null) {
+			abonoDetalles = new LinkedList<AbonoCxCDetalle>();
+		}
+		
 		if(factura!=null) {
 			List<FacturaPagoTemp> listaPagosTemp = serviceFacturasPagoTemp.buscarPorFactura(factura);
 			
+			Double precioTotal = factura.getTotal_venta();
 			Double totalPagos = 0.0;
-			Double totalRestaPagos = 0.0;
+			Double totalRestaPagos = precioTotal-factura.getAbono();
 			Double totalCambioPagos = 0.0;
 			Integer mostrarCambio = 0;
-			Double precioTotal = factura.getTotal_venta();
 			
 			if(!listaPagosTemp.isEmpty()) {
 				for (FacturaPagoTemp pago : listaPagosTemp) {
 					totalPagos+=pago.getCantidad();
 				}
-				if(totalPagos<precioTotal) {
-					totalRestaPagos = precioTotal-totalPagos;
-				}else if(totalPagos>precioTotal) {
-					totalCambioPagos = (precioTotal-totalPagos)*-1;
+				if(totalPagos<totalRestaPagos) {
+					totalRestaPagos -= totalPagos;
+				}else if(totalPagos>totalRestaPagos) {
+					totalCambioPagos = totalPagos -totalRestaPagos;
+				}else {
+					totalRestaPagos = 0.0;
 				}
 				
 				//si el ultimo pago es efectivo mostramos el cambio
 				if(listaPagosTemp.get(listaPagosTemp.size()-1).getFormaPago().getNombre().equalsIgnoreCase("efectivo")) {
 					mostrarCambio = 1;
 				}
-			}else {
-				totalRestaPagos = precioTotal;
 			}
 			
+			model.addAttribute("nombreCliente",factura.getCliente().getNombre());
+			model.addAttribute("numFactura", factura.getCodigo());
+			model.addAttribute("detalles", abonoDetalles);
 			model.addAttribute("mostrarCambio", mostrarCambio);
 			model.addAttribute("listaPagosTemp", listaPagosTemp);
 			model.addAttribute("totalPagos", df2.format(totalPagos));
-			model.addAttribute("totalRestaPagos", df2.format(totalRestaPagos));
+			model.addAttribute("totalRestaPagos", totalCambioPagos>0? 0.0:df2.format(totalRestaPagos));
 			model.addAttribute("totalCambioPagos", df2.format(totalCambioPagos));
 		}
 		return "facturas/cuerpoPagoXC :: cuerpoPago";

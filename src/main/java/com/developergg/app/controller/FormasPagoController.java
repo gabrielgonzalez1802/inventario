@@ -170,6 +170,7 @@ public class FormasPagoController {
 		//verificamos si el ultimo pago de la lista es efectivo, de lo contrario debe cumplir el monto exacto
 		Double acumulado = 0.0;
 		boolean autorizado = false;
+		Double restante = factura.getTotal_venta()-factura.getAbono();
 		
 		if(!listaPagos.isEmpty()) {
 			for (FacturaPagoTemp facturaPago : listaPagos) {
@@ -177,7 +178,7 @@ public class FormasPagoController {
 			}
 			if(!listaPagos.get(listaPagos.size()-1).getFormaPago().getNombre().equalsIgnoreCase("efectivo")) {
 				//verificamos que el acumulado mas el nuevo monto no sea mayor al exacto de la factura
-				if((acumulado+monto)<=factura.getTotal_venta()) {
+				if((acumulado+monto)<=restante) {
 					autorizado = true;
 				}else {
 					//verificamos si el pago actual es efectivo
@@ -191,7 +192,7 @@ public class FormasPagoController {
 		}else {	
 			if(formaPago.getNombre().equalsIgnoreCase("Efectivo")) {
 				autorizado = true;
-			}else if(!formaPago.getNombre().equalsIgnoreCase("Efectivo") && monto<=factura.getTotal_venta()){
+			}else if(!formaPago.getNombre().equalsIgnoreCase("Efectivo") && monto<=restante){
 				autorizado = true;
 			}		
 		}

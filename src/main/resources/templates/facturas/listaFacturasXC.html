@@ -69,6 +69,20 @@
 					<input type="hidden" id="responseAddPago" th:value="${responseAddPago}">
 
 					<div class="row">
+						<div class="col col-md-4">
+							<div class="form-group">
+								<input class="form-control" type="text" placeholder="Factura" id="codeFactura" disabled="disabled">
+							</div>
+						</div>
+						
+						<div class="col col-md-8">
+							<div class="form-group">
+	                       		<input class="form-control" type="text" placeholder="Cliente" id="nameCliente" disabled="disabled">
+							</div>
+						</div>
+					</div>
+
+					<div class="row">
 						<div class="col col-md-5">
 							<div class="form-group">
 								<select class="form-control" id="selectFormaPago">
@@ -137,8 +151,8 @@
 				                  <td th:text="${factura.condicion}"></td> 
 				                  <td th:text="${factura.nombre_cliente}"></td>
 				                  <td th:text="${factura.abono}"></td>
-				                  <td th:text="${factura.total_venta} - ${factura.abono}"></td>
-				                  <td th:text="${factura.total_venta}"></td>
+				                  <td th:text="${#numbers.formatDecimal(factura.total_venta - factura.abono, 0, 'COMMA', 2, 'POINT')}"></td>
+				                  <td th:text="${#numbers.formatDecimal(factura.total_venta, 0, 'COMMA', 2, 'POINT')}"></td>
 				                  <td>
 				                    <a th:href="@{/facturas/print/{id} (id=${factura.id})}" th:target="_blank" class="btn btn-success btn-sm" data-toggle="tooltip" data-placement="top" title="Imprimir" role="button"><i class="fa fa-print" aria-hidden="true"></i></a>
 				                  	<a th:onclick="'abonar(\'' + ${factura.id} + '\');'" class="btn btn-primary btn-sm" data-toggle="tooltip" data-placement="top" title="Abonar" role="button"><i class="fa fa-money" aria-hidden="true"></i></a>
@@ -186,13 +200,15 @@
 	
 	function abonar(id){
 		idFactura = id;
-		$('#cuerpoPago').load("/facturas/ajax/loadCuerpoFacturaPago/"+idFactura,function(){
+		$('#cuerpoPago').load("/facturas/ajax/loadCuerpoFacturaPagoCxC/"+idFactura,function(){
 			if($("#mostrarCambio").val()==0){
 				$("#totalCambioPagos").hide();
 			}else{
 				$("#totalCambioPagos").show();
 			}
 			$('#abonoModal').modal({backdrop: 'static', keyboard: false})
+			$("#codeFactura").val($("#numFactura").val());
+			$("#nameCliente").val($("#nombreCliente").val());
 			$("#abonoModal").modal("show");
 		});
 	}
@@ -201,39 +217,50 @@
 		e.preventDefault();
 		var formaPago = $("#selectFormaPago").val();
 		var montoFormaPago = $("#montoFormaPago").val();
-		if(montoFormaPago<0){
+		var restaPago = parseFloat($("#totalRestaPagos").text());
+		if(restaPago>0){
+			if(montoFormaPago<0){
+				Swal.fire({
+					title : 'Advertencia!',
+					text : 'El monto no puede ser negativo',
+					position : 'top',
+					icon : 'warning',
+					confirmButtonText : 'Cool'
+				})
+				$("#montoFormaPago").val("");
+			}else{
+				 $.post("/formasPago/ajax/addPagoTempFacturaCXC/", {
+						 'formaPago' : formaPago,
+						 'montoFormaPago': montoFormaPago,
+						 'idFactura': idFactura
+				   },function(response){
+						$('#responseAddPago').replaceWith(response);
+						if($("#responseAddPago").val() == 0){
+							Swal.fire({
+								title : 'Advertencia!',
+								text : 'El monto no puede ser mayor al total de la factura',
+								position : 'top',
+								icon : 'warning',
+								confirmButtonText : 'Cool'
+							})
+						}
+						$("#montoFormaPago").val("");
+						$('#cuerpoPago').load("/facturas/ajax/loadCuerpoFacturaPagoCxC/"+idFactura,function(){});
+						if($("#mostrarCambio").val()==0){
+							$("#totalCambioPagos").hide();
+						}else{
+							$("#totalCambioPagos").show();
+						}
+				   });
+			}
+		}else{
 			Swal.fire({
 				title : 'Advertencia!',
-				text : 'El monto no puede ser negativo',
+				text : 'No tiene pagos restantes para esta factura, proceda a completar el pago',
 				position : 'top',
 				icon : 'warning',
 				confirmButtonText : 'Cool'
 			})
-			$("#montoFormaPago").val("");
-		}else{
-			 $.post("/formasPago/ajax/addPagoTempFacturaCXC/", {
-					 'formaPago' : formaPago,
-					 'montoFormaPago': montoFormaPago,
-					 'idFactura': idFactura
-			   },function(response){
-					$('#responseAddPago').replaceWith(response);
-					if($("#responseAddPago").val() == 0){
-						Swal.fire({
-							title : 'Advertencia!',
-							text : 'El monto no puede ser mayor al total de la factura',
-							position : 'top',
-							icon : 'warning',
-							confirmButtonText : 'Cool'
-						})
-					}
-					$("#montoFormaPago").val("");
-					$('#cuerpoPago').load("/facturas/ajax/loadCuerpoFacturaPago/"+idFactura,function(){});
-					if($("#mostrarCambio").val()==0){
-						$("#totalCambioPagos").hide();
-					}else{
-						$("#totalCambioPagos").show();
-					}
-			   });
 		}
 	});
 	
@@ -241,7 +268,7 @@
 		$.post("/formasPago/ajax/deletePagoTemporalCxC/", {
 			 'idPagoFactura': idPagoFactura
 	   },function(response){
-			$('#cuerpoPago').load("/facturas/ajax/loadCuerpoFacturaPago/"+idFactura,function(){
+			$('#cuerpoPago').load("/facturas/ajax/loadCuerpoFacturaPagoCxC/"+idFactura,function(){
 				if($("#mostrarCambio").val()==0){
 					$("#totalCambioPagos").hide();
 				}else{
@@ -255,7 +282,7 @@
 		$.post("/formasPago/ajax/deleteAllTemporalCxC/", {
 			 'idFactura': idFactura
 	   },function(response){
-			$('#cuerpoPago').load("/facturas/ajax/loadCuerpoFacturaPago/"+idFactura,function(){
+			$('#cuerpoPago').load("/facturas/ajax/loadCuerpoFacturaPagoCxC/"+idFactura,function(){
 				if($("#mostrarCambio").val()==0){
 					$("#totalCambioPagos").hide();
 				}else{
