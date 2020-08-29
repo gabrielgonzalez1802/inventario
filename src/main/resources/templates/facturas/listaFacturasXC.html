@@ -105,7 +105,8 @@
         
         <!-- Modal footer -->
         <div class="modal-footer">
-            <button type="button" class="btn btn-info" id="btnRegresar">Regresar</button>
+            <button type="button" class="btn btn-danger" id="btnCancelar">Cancelar</button>
+            <button type="button" class="btn btn-primary" id="btnGuardar">Guardar</button>
         </div>
         
       </div>
@@ -210,7 +211,7 @@
 			})
 			$("#montoFormaPago").val("");
 		}else{
-			 $.post("/formasPago/ajax/addPagoFacturaCXC/", {
+			 $.post("/formasPago/ajax/addPagoTempFacturaCXC/", {
 					 'formaPago' : formaPago,
 					 'montoFormaPago': montoFormaPago,
 					 'idFactura': idFactura
@@ -237,7 +238,7 @@
 	});
 	
 	function eliminarPagoFactura(idPagoFactura){
-		$.post("/formasPago/ajax/deletePagoCxC/", {
+		$.post("/formasPago/ajax/deletePagoTemporal/", {
 			 'idPagoFactura': idPagoFactura
 	   },function(response){
 			$('#cuerpoPago').load("/facturas/ajax/loadCuerpoFacturaPago/"+idFactura,function(){
@@ -250,10 +251,31 @@
 	   });
 	}
 	
-	$("#btnRegresar").click(function(e) {
-		location.href = '/facturas/cxc';
+	$("#btnCancelar").click(function(e) {
+		$.post("/formasPago/ajax/deleteAllTemporalCxC/", {
+			 'idFactura': idFactura
+	   },function(response){
+			$('#cuerpoPago').load("/facturas/ajax/loadCuerpoFacturaPago/"+idFactura,function(){
+				if($("#mostrarCambio").val()==0){
+					$("#totalCambioPagos").hide();
+				}else{
+					$("#totalCambioPagos").show();
+				}
+			});
+			setTimeout(function() {
+				$("#abonoModal").modal("hide");
+			}, 1000);
+	   });
 	});
 	
+	$("#btnGuardar").click(function(e) {
+		$.post("/formasPago/ajax/guardarAbonoCxC/", {
+			 'idFactura': idFactura
+	   },function(response){
+			location.href = '/facturas/cxc';
+	   });
+	});
+
 	
 	</script>
 	 <span th:insert="fragments/footer :: footer"></span>  

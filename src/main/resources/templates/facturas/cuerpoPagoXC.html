@@ -25,7 +25,7 @@
 						</tr>
 					</thead>
 					<tbody class="items">
-						<tr th:each="pago:${listaPagos}">
+						<tr th:each="pago:${listaPagosTemp}">
 							<td style="color: #fff;" th:text="${pago.formaPago.nombre}">Efectivo</td>
 							<td style="color: #fff;" th:text="${pago.cantidad}">0.0</td>
 							<td><a href="#" th:onclick="'eliminarPagoFactura(\'' + ${pago.id} + '\');'"><i class="icono fa fa-trash text-danger pull-right"></i></a></td>

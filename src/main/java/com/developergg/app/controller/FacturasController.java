@@ -47,6 +47,7 @@ import com.developergg.app.model.FacturaDetallePagoTemp;
 import com.developergg.app.model.FacturaDetalleServicio;
 import com.developergg.app.model.FacturaDetalleTemp;
 import com.developergg.app.model.FacturaPago;
+import com.developergg.app.model.FacturaPagoTemp;
 import com.developergg.app.model.FacturaSerialTemp;
 import com.developergg.app.model.FacturaServicioTemp;
 import com.developergg.app.model.FacturaTemp;
@@ -66,6 +67,7 @@ import com.developergg.app.service.IFacturasDetallesService;
 import com.developergg.app.service.IFacturasDetallesServiciosService;
 import com.developergg.app.service.IFacturasDetallesTempService;
 import com.developergg.app.service.IFacturasPagoService;
+import com.developergg.app.service.IFacturasPagoTempService;
 import com.developergg.app.service.IFacturasSerialesTempService;
 import com.developergg.app.service.IFacturasService;
 import com.developergg.app.service.IFacturasServiciosTempService;
@@ -112,6 +114,9 @@ public class FacturasController {
 	
 	@Autowired
 	private IFacturasPagoService serviceFacturasPagosService;
+	
+	@Autowired
+	private IFacturasPagoTempService serviceFacturasPagoTemp;
 	
 	@Autowired
 	private IFacturasDetallesTempService facturasDetallesTempService;
@@ -695,7 +700,7 @@ public class FacturasController {
 	public String getPagoTemp(Model model, HttpSession session, @PathVariable("idFactura") Integer idFactura) {
 		Factura factura = serviceFacturas.buscarPorId(idFactura);
 		if(factura!=null) {
-			List<FacturaPago> listaPagos = serviceFacturasPagosService.buscarPorFactura(factura);
+			List<FacturaPagoTemp> listaPagosTemp = serviceFacturasPagoTemp.buscarPorFactura(factura);
 			
 			Double totalPagos = 0.0;
 			Double totalRestaPagos = 0.0;
@@ -703,8 +708,8 @@ public class FacturasController {
 			Integer mostrarCambio = 0;
 			Double precioTotal = factura.getTotal_venta();
 			
-			if(!listaPagos.isEmpty()) {
-				for (FacturaPago pago : listaPagos) {
+			if(!listaPagosTemp.isEmpty()) {
+				for (FacturaPagoTemp pago : listaPagosTemp) {
 					totalPagos+=pago.getCantidad();
 				}
 				if(totalPagos<precioTotal) {
@@ -714,7 +719,7 @@ public class FacturasController {
 				}
 				
 				//si el ultimo pago es efectivo mostramos el cambio
-				if(listaPagos.get(listaPagos.size()-1).getFormaPago().getNombre().equalsIgnoreCase("efectivo")) {
+				if(listaPagosTemp.get(listaPagosTemp.size()-1).getFormaPago().getNombre().equalsIgnoreCase("efectivo")) {
 					mostrarCambio = 1;
 				}
 			}else {
@@ -722,7 +727,7 @@ public class FacturasController {
 			}
 			
 			model.addAttribute("mostrarCambio", mostrarCambio);
-			model.addAttribute("listaPagos", listaPagos);
+			model.addAttribute("listaPagosTemp", listaPagosTemp);
 			model.addAttribute("totalPagos", df2.format(totalPagos));
 			model.addAttribute("totalRestaPagos", df2.format(totalRestaPagos));
 			model.addAttribute("totalCambioPagos", df2.format(totalCambioPagos));
