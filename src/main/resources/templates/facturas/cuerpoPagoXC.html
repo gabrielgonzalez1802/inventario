@@ -47,12 +47,14 @@
 					<table class="table table-hover" style="width: 100%;">
 						<thead>
 							<tr style="background-color: #17a2b8; color: #fff">
+								<th>Fecha</th>
 								<th>Forma de pago</th>
 								<th>Abono</th>
 							</tr>
 						</thead>
 						<tbody class="items">
 							<tr th:each="detalle:${detalles}">
+								<td style="color: #fff;" th:text="${#dates.format(detalle.fecha, 'dd-MM-yyyy')}">Fecha</td>
 								<td style="color: #fff;" th:text="${detalle.formaPago.nombre}">Efectivo</td>
 								<td style="color: #fff;" th:text="${detalle.abono}">0.0</td>
 							</tr>
