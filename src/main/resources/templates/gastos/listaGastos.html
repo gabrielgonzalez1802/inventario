@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <title>Sistema Celulares</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" sizes="64x64" th:href="@{/img/icon.png}">
+    <link rel="stylesheet" type="text/css" th:href="@{/bootstrap/css/bootstrap.min.css}">
+	<link rel="stylesheet" type="text/css" th:href="@{/css/sticky-dark-top-nav.css}">
+    <!-- Font-icon css-->
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+ 	<link rel="stylesheet" type="text/css" th:href="@{/css/sticky-dark-top-nav.css}">
+ 	<link rel="stylesheet" type="text/css" th:href="@{/css/Minimal-tabs.css}">
+ 	<link rel="stylesheet" type="text/css" th:href="@{/css/dashboard.css}">
+ 	<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css">
+ 	<link rel="stylesheet" type="text/css" th:href="@{/fontawesom/css/all.min.css}">
+ 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+ 	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap" rel="stylesheet">
+ 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+ 	<link rel="stylesheet" type="text/css" th:href="@{/css/swal.css}">
+ 	<style>
+.table-primary, .table-primary>th, .table-primary>td {
+	background-color: #25396d;
+	color: #ffff;
+}
+
+.table-primary th, .table-primary td, .table-primary thead th,
+	.table-primary tbody+tbody {
+	border-color: #25396d;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.current,
+	.dataTables_wrapper .dataTables_paginate .paginate_button.current:hover
+{
+	  background-image: linear-gradient(#54b4eb, #2FA4E7 60%, #1d9ce5);
+}
+.dataTables_wrapper .dataTables_paginate .paginate_button.current, .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+    color: #fffdfd !important;
+    border-color: #2FA4E7;
+}
+</style>
+  </head>
+  <body>
+     <span th:insert="fragments/topMenu :: menu-principal"></span> 
+     <br>
+	<div class="container text-white">
+	
+<!-- Modal agregar gasto -->
+ <div class="modal" id="gastoModal">
+    <div class="modal-dialog modal-md" data-backdrop="static">
+      <div class="modal-content all">
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h4 class="modal-title"><span style="color:#fff;">Agregar Gasto</span></h4>
+        </div>
+        
+        <!-- Modal body -->
+        <div class="modal-body">
+          	<form>
+				<div id="gastos">
+					<input type="hidden" id="gastoGuardado">
+					<div class="row">
+						<div class="col col-md-12">
+							<div class="form-group">
+								<label>Nombre</label>
+								<input class="form-control" type="text" placeholder="Nombre" id="nombreGasto">
+							</div>
+						</div>
+					</div>
+					
+					<div class="row">
+						<div class="col col-md-6">
+							<div class="form-group">
+								<label>Tipo Gasto</label>
+	                       		<input class="form-control" type="text" placeholder="Tipo de gasto" id="tipoGasto">
+							</div>
+						</div>
+						<div class="col col-md-6">
+							<div class="form-group">
+								<label>Monto</label>
+								<input class="form-control" type="number" min="0" placeholder="Monto" id="montoGasto">
+							</div>
+						</div>
+					</div>
+					
+					<div class="row">
+						<div class="col col-md-12">
+							<div class="form-group">
+								<label>Descripci&oacute;n</label>
+	                       		<textarea class="form-control" id="decripcionGasto"></textarea>
+							</div>
+						</div>
+					</div>
+				</div>	
+           </form>
+        </div>
+        
+        <!-- Modal footer -->
+        <div class="modal-footer">
+            <button type="button" class="btn btn-warning" data-dismiss="modal">Regresar</button>
+            <button type="button" class="btn btn-primary" id="guardarGasto">Guardar</button>
+        </div>
+        
+      </div>
+    </div>
+ </div>		
+ 
+ <!-- Modal modificar gasto -->
+ <div class="modal" id="gastoEditModal">
+    <div class="modal-dialog modal-md" data-backdrop="static">
+      <div class="modal-content all">
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h4 class="modal-title"><span style="color:#fff;">Modificar Gasto</span></h4>
+        </div>
+        
+        <!-- Modal body -->
+        <div class="modal-body">
+          	<form>
+				<div id="modificarGasto">
+					<div class="row">
+						<div class="col col-md-12">
+							<div class="form-group">+
+								<input type="hidden" th:field="${gasto.id}" id="idGasto">
+								<label>Nombre</label>
+								<input class="form-control" th:field="${gasto.nombre}" type="text" placeholder="Nombre" id="nombreGastoEdit">
+							</div>
+						</div>
+					</div>
+					
+					<div class="row">
+						<div class="col col-md-6">
+							<div class="form-group">
+								<label>Tipo Gasto</label>
+	                       		<input class="form-control" th:field="${gasto.tipo_gasto}" type="text" placeholder="Tipo de gasto" id="tipoGastoEdit">
+							</div>
+						</div>
+						<div class="col col-md-6">
+							<div class="form-group">
+								<label>Monto</label>
+								<input class="form-control" th:field="${gasto.monto}" type="number" min="0" placeholder="Monto" id="montoGastoEdit">
+							</div>
+						</div>
+					</div>
+					
+					<div class="row">
+						<div class="col col-md-12">
+							<div class="form-group">
+								<label>Descripci&oacute;n</label>
+	                       		<textarea th:field="${gasto.descripcion}" class="form-control" id="decripcionGastoEdit"></textarea>
+							</div>
+						</div>
+					</div>
+				</div>	
+           </form>
+        </div>
+        
+        <!-- Modal footer -->
+        <div class="modal-footer">
+            <button type="button" class="btn btn-warning" data-dismiss="modal">Regresar</button>
+            <button type="button" class="btn btn-primary" id="btnModificarGasto">Guardar</button>
+        </div>
+        
+      </div>
+    </div>
+ </div>			
+	
+		<div class="card text-primary border rounded">
+			<div class="card-body" style="margin-top: 0px;">
+				<h1 class="card-title" style="font-size: 16px;">Lista de Gastos
+					<a class="btn btn-primary" style="float: right;" href="#" id="agregarGasto">Agregar</a>
+				</h1>
+				<br>
+					<table class="table table-striped" id="tabla">
+							<thead>
+								<tr class="table-primary">
+									<th>Fecha</th>
+									<th>Nombre</th>
+									<th>Tipo</th>
+									<th>Monto</th>
+									<th></th>
+								</tr>
+							</thead>
+							<tbody>
+								 <tr th:each="gasto:${listaGastos}">
+				                  <td th:text="${#dates.format(gasto.fecha, 'dd-MM-yyyy')}"></td>
+				                  <td th:text="${gasto.nombre}"></td> 
+				                   <td th:text="${gasto.tipo_gasto}"></td> 
+				                   <td th:text="${gasto.monto}"></td> 
+				                  <td>
+				                    <a href="#" th:onclick="'modalModificarGasto(\'' + ${gasto.id} + '\');'" class="btn btn-primary btn-sm" role="button" title="Editar el registro."><i class="fa fa-edit" aria-hidden="true"></i></a>
+				                 	<a th:href="@{/gastos/delete/{id} (id=${gasto.id})}" onclick="return confirm('¿Estas seguro de eliminar el registro?')" class="btn btn-danger btn-sm" role="button" title="Eliminar el registro."><i class="fa fa-trash" aria-hidden="true"></i></a>
+				                  </td>
+				                </tr>
+							</tbody>
+						</table>
+			</div>
+			<a class="card-link" href="#"></a>
+		</div>
+	</div>
+	<script th:src="@{/js/jquery.min.js}"></script>
+    <script th:src="@{/bootstrap/js/bootstrap.min.js}"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+	<script type="text/javascript">
+	$(document).ready(function() {
+		$('#tabla').DataTable({
+			"scrollY": "400px",
+			    "language": {
+			        "sProcessing":    "Procesando...",
+			        "sLengthMenu":    "Mostrar _MENU_ registros",
+			        "sZeroRecords":   "No se encontraron resultados",
+			        "sEmptyTable":    "Ningún dato disponible en esta tabla",
+			        "sInfo":          "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+			        "sInfoEmpty":     "Mostrando registros del 0 al 0 de un total de 0 registros",
+			        "sInfoFiltered":  "(filtrado de un total de _MAX_ registros)",
+			        "sInfoPostFix":   "",
+			        "sSearch":        "Buscar:",
+			        "sUrl":           "",
+			        "sInfoThousands":  ",",
+			        "sLoadingRecords": "Cargando...",
+			        "oPaginate": {
+			            "sFirst":    "Primero",
+			            "sLast":    "Último",
+			            "sNext":    "Siguiente",
+			            "sPrevious": "Anterior"
+			        },
+			        "oAria": {
+			            "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+			        }
+			    }
+		});
+	});
+	
+	$("#agregarGasto").click(function(e){
+		e.preventDefault();
+		$("#gastoModal").modal({backdrop: 'static', keyboard: false})
+		$("#gastoModal").modal("show");
+	});
+	
+	$("#guardarGasto").click(function(e){
+		var nombreGasto = $("#nombreGasto").val();
+		var tipoGasto = $("#tipoGasto").val(); 
+		var montoGasto = $("#montoGasto").val();
+		var decripcionGasto = $("#decripcionGasto").val();
+		if(!nombreGasto || montoGasto==0){
+			Swal.fire({
+				  title: 'Alerta!',
+				  position: 'top',
+				  text: 'El nombre y el monto no pueden estar vacios',
+				  icon: 'warning',
+				  confirmButtonText: 'Cool'
+			})
+		}else{
+			 $.post("/gastos/ajax/agregarGasto/", {
+				 'nombreGasto' : nombreGasto,
+				 'tipoGasto' : tipoGasto,
+				 'montoGasto' : montoGasto,
+				 'decripcionGasto' : decripcionGasto
+			 },function(data){
+				 location.reload();
+			 });
+		}
+	});
+	
+	function modalModificarGasto(idGasto){
+		 $.get("/gastos/ajax/getGasto/"+idGasto,function(data){
+			 $('#modificarGasto').replaceWith(data);
+			 $("#gastoEditModal").modal({backdrop: 'static', keyboard: false})
+			 $("#gastoEditModal").modal("show");
+		 });
+	}
+	
+	$("#btnModificarGasto").click(function(e){
+		var idGasto = $("#idGasto").val();
+		var nombreGasto = $("#nombreGastoEdit").val();
+		var tipoGasto = $("#tipoGastoEdit").val(); 
+		var montoGasto = $("#montoGastoEdit").val();
+		var decripcionGasto = $("#decripcionGastoEdit").val();
+		if(!nombreGasto || montoGasto==0){
+			Swal.fire({
+				  title: 'Alerta!',
+				  position: 'top',
+				  text: 'El nombre y el monto no pueden estar vacios',
+				  icon: 'warning',
+				  confirmButtonText: 'Cool'
+			})
+		}else{
+			 $.post("/gastos/ajax/modificarGasto/", {
+				 'idGasto' : idGasto,
+				 'nombreGasto' : nombreGasto,
+				 'tipoGasto' : tipoGasto,
+				 'montoGasto' : montoGasto,
+				 'decripcionGasto' : decripcionGasto
+			 },function(data){
+				 location.reload();
+			 });
+		}
+	});
+	</script>
+	 <span th:insert="fragments/footer :: footer"></span>  
+</body>
+</html>
