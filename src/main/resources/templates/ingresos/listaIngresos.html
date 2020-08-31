@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <title>Sistema Celulares</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" sizes="64x64" th:href="@{/img/icon.png}">
+    <link rel="stylesheet" type="text/css" th:href="@{/bootstrap/css/bootstrap.min.css}">
+	<link rel="stylesheet" type="text/css" th:href="@{/css/sticky-dark-top-nav.css}">
+    <!-- Font-icon css-->
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+ 	<link rel="stylesheet" type="text/css" th:href="@{/css/sticky-dark-top-nav.css}">
+ 	<link rel="stylesheet" type="text/css" th:href="@{/css/Minimal-tabs.css}">
+ 	<link rel="stylesheet" type="text/css" th:href="@{/css/dashboard.css}">
+ 	<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css">
+ 	<link rel="stylesheet" type="text/css" th:href="@{/fontawesom/css/all.min.css}">
+ 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+ 	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap" rel="stylesheet">
+ 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+ 	<link rel="stylesheet" type="text/css" th:href="@{/css/swal.css}">
+ 	<style>
+.table-primary, .table-primary>th, .table-primary>td {
+	background-color: #25396d;
+	color: #ffff;
+}
+
+.table-primary th, .table-primary td, .table-primary thead th,
+	.table-primary tbody+tbody {
+	border-color: #25396d;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.current,
+	.dataTables_wrapper .dataTables_paginate .paginate_button.current:hover
+{
+	  background-image: linear-gradient(#54b4eb, #2FA4E7 60%, #1d9ce5);
+}
+.dataTables_wrapper .dataTables_paginate .paginate_button.current, .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+    color: #fffdfd !important;
+    border-color: #2FA4E7;
+}
+</style>
+  </head>
+  <body>
+     <span th:insert="fragments/topMenu :: menu-principal"></span> 
+     <br>
+	<div class="container text-white">
+	
+<!-- Modal agregar ingreso -->
+ <div class="modal" id="ingresoModal">
+    <div class="modal-dialog modal-md" data-backdrop="static">
+      <div class="modal-content all">
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h4 class="modal-title"><span style="color:#fff;">Agregar ingreso</span></h4>
+        </div>
+        
+        <!-- Modal body -->
+        <div class="modal-body">
+          	<form>
+				<div id="ingresos">
+					<input type="hidden" id="ingresoGuardado">
+					<div class="row">
+						<div class="col col-md-12">
+							<div class="form-group">
+								<label>Nombre</label>
+								<input class="form-control" type="text" placeholder="Nombre" id="nombreIngreso">
+							</div>
+						</div>
+					</div>
+					
+					<div class="row">
+						<div class="col col-md-6">
+							<div class="form-group">
+								<label>Tipo ingreso</label>
+	                       		<input class="form-control" type="text" placeholder="Tipo de ingreso" id="tipoIngreso">
+							</div>
+						</div>
+						<div class="col col-md-6">
+							<div class="form-group">
+								<label>Monto</label>
+								<input class="form-control" type="number" min="0" placeholder="Monto" id="montoIngreso">
+							</div>
+						</div>
+					</div>
+					
+					<div class="row">
+						<div class="col col-md-12">
+							<div class="form-group">
+								<label>Descripci&oacute;n</label>
+	                       		<textarea class="form-control" id="decripcionIngreso"></textarea>
+							</div>
+						</div>
+					</div>
+				</div>	
+           </form>
+        </div>
+        
+        <!-- Modal footer -->
+        <div class="modal-footer">
+            <button type="button" class="btn btn-warning" data-dismiss="modal">Regresar</button>
+            <button type="button" class="btn btn-primary" id="guardarIngreso">Guardar</button>
+        </div>
+        
+      </div>
+    </div>
+ </div>		
+ 
+ <!-- Modal modificar ingreso -->
+ <div class="modal" id="ingresoEditModal">
+    <div class="modal-dialog modal-md" data-backdrop="static">
+      <div class="modal-content all">
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h4 class="modal-title"><span style="color:#fff;">Modificar Ingreso</span></h4>
+        </div>
+        
+        <!-- Modal body -->
+        <div class="modal-body">
+          	<form>
+				<div id="modificarIngreso">
+					<div class="row">
+						<div class="col col-md-12">
+							<div class="form-group">+
+								<input type="hidden" th:field="${ingreso.id}" id="idIngreso">
+								<label>Nombre</label>
+								<input class="form-control" th:field="${ingreso.nombre}" type="text" placeholder="Nombre" id="nombreIngresoEdit">
+							</div>
+						</div>
+					</div>
+					
+					<div class="row">
+						<div class="col col-md-6">
+							<div class="form-group">
+								<label>Tipo Ingreso</label>
+	                       		<input class="form-control" th:field="${ingreso.tipo_ingreso}" type="text" placeholder="Tipo de ingreso" id="tipoIngresoEdit">
+							</div>
+						</div>
+						<div class="col col-md-6">
+							<div class="form-group">
+								<label>Monto</label>
+								<input class="form-control" th:field="${ingreso.monto}" type="number" min="0" placeholder="Monto" id="montoIngresoEdit">
+							</div>
+						</div>
+					</div>
+					
+					<div class="row">
+						<div class="col col-md-12">
+							<div class="form-group">
+								<label>Descripci&oacute;n</label>
+	                       		<textarea th:field="${ingreso.descripcion}" class="form-control" id="decripcionIngresoEdit"></textarea>
+							</div>
+						</div>
+					</div>
+				</div>	
+           </form>
+        </div>
+        
+        <!-- Modal footer -->
+        <div class="modal-footer">
+            <button type="button" class="btn btn-warning" data-dismiss="modal">Regresar</button>
+            <button type="button" class="btn btn-primary" id="btnModificarIngreso">Guardar</button>
+        </div>
+        
+      </div>
+    </div>
+ </div>			
+	
+		<div class="card text-primary border rounded">
+			<div class="card-body" style="margin-top: 0px;">
+				<h1 class="card-title" style="font-size: 16px;">Lista de ingresos
+					<a class="btn btn-primary" style="float: right;" href="#" id="agregarIngreso">Agregar</a>
+				</h1>
+				<br>
+					<table class="table table-striped" id="tabla">
+							<thead>
+								<tr class="table-primary">
+									<th>Fecha</th>
+									<th>Nombre</th>
+									<th>Tipo</th>
+									<th>Monto</th>
+									<th></th>
+								</tr>
+							</thead>
+							<tbody>
+								 <tr th:each="ingreso:${listaIngresos}">
+				                  <td th:text="${#dates.format(ingreso.fecha, 'dd-MM-yyyy')}"></td>
+				                  <td th:text="${ingreso.nombre}"></td> 
+				                   <td th:text="${ingreso.tipo_ingreso}"></td> 
+				                   <td th:text="${ingreso.monto}"></td> 
+				                  <td>
+				                    <a href="#" th:onclick="'modalModificarIngreso(\'' + ${ingreso.id} + '\');'" class="btn btn-primary btn-sm" role="button" title="Editar el registro."><i class="fa fa-edit" aria-hidden="true"></i></a>
+				                 	<a th:href="@{/ingresos/delete/{id} (id=${ingreso.id})}" onclick="return confirm('¿Estas seguro de eliminar el registro?')" class="btn btn-danger btn-sm" role="button" title="Eliminar el registro."><i class="fa fa-trash" aria-hidden="true"></i></a>
+				                  </td>
+				                </tr>
+							</tbody>
+						</table>
+			</div>
+			<a class="card-link" href="#"></a>
+		</div>
+	</div>
+	<script th:src="@{/js/jquery.min.js}"></script>
+    <script th:src="@{/bootstrap/js/bootstrap.min.js}"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+	<script type="text/javascript">
+	$(document).ready(function() {
+		$('#tabla').DataTable({
+			"scrollY": "400px",
+			    "language": {
+			        "sProcessing":    "Procesando...",
+			        "sLengthMenu":    "Mostrar _MENU_ registros",
+			        "sZeroRecords":   "No se encontraron resultados",
+			        "sEmptyTable":    "Ningún dato disponible en esta tabla",
+			        "sInfo":          "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+			        "sInfoEmpty":     "Mostrando registros del 0 al 0 de un total de 0 registros",
+			        "sInfoFiltered":  "(filtrado de un total de _MAX_ registros)",
+			        "sInfoPostFix":   "",
+			        "sSearch":        "Buscar:",
+			        "sUrl":           "",
+			        "sInfoThousands":  ",",
+			        "sLoadingRecords": "Cargando...",
+			        "oPaginate": {
+			            "sFirst":    "Primero",
+			            "sLast":    "Último",
+			            "sNext":    "Siguiente",
+			            "sPrevious": "Anterior"
+			        },
+			        "oAria": {
+			            "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+			        }
+			    }
+		});
+	});
+	
+	$("#agregarIngreso").click(function(e){
+		e.preventDefault();
+		$("#ingresoModal").modal({backdrop: 'static', keyboard: false})
+		$("#ingresoModal").modal("show");
+	});
+	
+	$("#guardarIngreso").click(function(e){
+		var nombreIngreso = $("#nombreIngreso").val();
+		var tipoIngreso = $("#tipoIngreso").val(); 
+		var montoIngreso = $("#montoIngreso").val();
+		var decripcionIngreso = $("#decripcionIngreso").val();
+		if(!nombreIngreso || montoIngreso==0){
+			Swal.fire({
+				  title: 'Alerta!',
+				  position: 'top',
+				  text: 'El nombre y el monto no pueden estar vacios',
+				  icon: 'warning',
+				  confirmButtonText: 'Cool'
+			})
+		}else{
+			 $.post("/ingresos/ajax/agregarIngreso/", {
+				 'nombreIngreso' : nombreIngreso,
+				 'tipoIngreso' : tipoIngreso,
+				 'montoIngreso' : montoIngreso,
+				 'decripcionIngreso' : decripcionIngreso
+			 },function(data){
+				 location.reload();
+			 });
+		}
+	});
+	
+	function modalModificarIngreso(idIngreso){
+		 $.get("/ingresos/ajax/getIngreso/"+idIngreso,function(data){
+			 $('#modificarIngreso').replaceWith(data);
+			 $("#ingresoEditModal").modal({backdrop: 'static', keyboard: false})
+			 $("#ingresoEditModal").modal("show");
+		 });
+	}
+	
+	$("#btnModificarIngreso").click(function(e){
+		var idIngreso = $("#idIngreso").val();
+		var nombreIngreso = $("#nombreIngresoEdit").val();
+		var tipoIngreso = $("#tipoIngresoEdit").val(); 
+		var montoIngreso = $("#montoIngresoEdit").val();
+		var decripcionIngreso = $("#decripcionIngresoEdit").val();
+		if(!nombreIngreso || montoIngreso==0){
+			Swal.fire({
+				  title: 'Alerta!',
+				  position: 'top',
+				  text: 'El nombre y el monto no pueden estar vacios',
+				  icon: 'warning',
+				  confirmButtonText: 'Cool'
+			})
+		}else{
+			 $.post("/ingresos/ajax/modificarIngreso/", {
+				 'idIngreso' : idIngreso,
+				 'nombreIngreso' : nombreIngreso,
+				 'tipoIngreso' : tipoIngreso,
+				 'montoIngreso' : montoIngreso,
+				 'decripcionIngreso' : decripcionIngreso
+			 },function(data){
+				 location.reload();
+			 });
+		}
+	});
+	</script>
+	 <span th:insert="fragments/footer :: footer"></span>  
+</body>
+</html>

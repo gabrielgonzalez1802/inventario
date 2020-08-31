@@ -1,0 +1,12 @@
+package com.developergg.app.repository;
+
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.developergg.app.model.Almacen;
+import com.developergg.app.model.Ingreso;
+
+public interface IngresosRepository extends JpaRepository<Ingreso, Integer> {
+	List<Ingreso> findByAlmacen(Almacen almacen);
+}
