@@ -79,7 +79,7 @@
 					<div class="dropdown-menu" role="menu"
 						style="background-color: rgba(255, 255, 255, 0.9);">
 						<a class="dropdown-item pv4" role="presentation"
-							href="taller.html">Equipos</a><a class="dropdown-item pv5 pv6"
+							th:href="@{/talleres/}">Equipos</a><a class="dropdown-item pv5 pv6"
 							role="presentation" href="taller_articulos.html">Articulos</a>
 					</div></li>
 				<li class="nav-item dropdown"><a
@@ -142,14 +142,11 @@
 					<div class="dropdown-menu" role="menu"
 						style="background-color: rgba(255, 255, 255, 0.9);">
 						<a class="dropdown-item" role="presentation" th:href="@{/usuarios/}">Usuarios</a><a
-							class="dropdown-item" role="presentation" href="almacenes.html">Tiendas</a><a
+							class="dropdown-item" role="presentation" th:href="@{/almacenes/}">Tiendas</a><a
 							class="dropdown-item" role="presentation" th:href="@{/comprobantes/}">Comprobante
 							Grupos</a> <a class="dropdown-item" role="presentation"
-							th:href="@{/comprobantesFiscales/}">Comprobante Fiscales</a><a
-							class="dropdown-item" role="presentation"
-							href="ingreso_tipo.html">Tipo Ingresos</a><a
-							class="dropdown-item" role="presentation" href="gasto_tipo.html">Tipo
-							Gasto</a><a class="dropdown-item" role="presentation"
+							th:href="@{/comprobantesFiscales/}">Comprobante Fiscales</a>
+							<a class="dropdown-item" role="presentation"
 							id="nuevo_codigo" href="#">Codigo Activacion</a>
 					</div></li>
 				<li class="nav-item dropdown pv3"><a

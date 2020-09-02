@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <title>Sistema Celulares</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" sizes="64x64" th:href="@{/img/icon.png}">
+    <link rel="stylesheet" type="text/css" th:href="@{/bootstrap/css/bootstrap.min.css}">
+	<link rel="stylesheet" type="text/css" th:href="@{/css/sticky-dark-top-nav.css}">
+    <!-- Font-icon css-->
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+ 	<link rel="stylesheet" type="text/css" th:href="@{/css/sticky-dark-top-nav.css}">
+ 	<link rel="stylesheet" type="text/css" th:href="@{/css/Minimal-tabs.css}">
+ 	<link rel="stylesheet" type="text/css" th:href="@{/css/dashboard.css}">
+ 	<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css">
+ 	<link rel="stylesheet" type="text/css" th:href="@{/fontawesom/css/all.min.css}">
+ 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+ 	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap" rel="stylesheet">
+ 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+ 	<link rel="stylesheet" type="text/css" th:href="@{/css/swal.css}">
+ 	<style>
+.table-primary, .table-primary>th, .table-primary>td {
+	background-color: #25396d;
+	color: #ffff;
+}
+
+.table-primary th, .table-primary td, .table-primary thead th,
+	.table-primary tbody+tbody {
+	border-color: #25396d;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.current,
+	.dataTables_wrapper .dataTables_paginate .paginate_button.current:hover
+{
+	  background-image: linear-gradient(#54b4eb, #2FA4E7 60%, #1d9ce5);
+}
+.dataTables_wrapper .dataTables_paginate .paginate_button.current, .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+    color: #fffdfd !important;
+    border-color: #2FA4E7;
+}
+</style>
+  </head>
+  <body>
+     <span th:insert="fragments/topMenu :: menu-principal"></span> 
+     <br>
+	<div class="container text-white">
+ 	
+ <!-- Modal de agregar taller -->
+<div id="tallerModal" class="modal fade" role="dialog" data-backdrop="static">
+  <div class="modal-dialog">
+    <!-- Modal content-->
+    <div class="modal-content all">
+      <div class="modal-header bg-primary">
+<!--         <button type="button" class="close" data-dismiss="modal">&times;</button> -->
+        <h3 class="modal-title">Recepcion de Equipos</h3>
+      </div>
+      <div class="modal-body">
+			<div id="nuevoTaller">
+				<form th:object="${taller}" id="taller">
+					<div class="row">
+					<input type="hidden" id="responseAddRecepcion" th:value="${responseAddRecepcion}">
+						<div class="col col-md-6">
+							<div class="form-group">
+								 <label>Celular</label>
+								 <input th:field="*{celular}" class="form-control" id="celularTaller" type="text" placeholder="Celular" autocomplete="off">
+							</div>
+						</div>
+						<div class="col col-md-6">
+							<div class="form-group">
+								<label>Nombre Cliente</label>
+	                       		<input th:field="*{nombre}" class="form-control" id="nombreTaller" type="text" placeholder="Nombre Cliente" autocomplete="off">
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col col-md-6">
+							<div class="form-group">
+								<label>Cedula / RNC</label>
+	                       		<input th:field="*{cedula}" class="form-control" id="cedulaTaller" type="text" placeholder="Cedula" autocomplete="off">
+							</div>
+						</div>
+						<div class="col col-md-6">
+							<div class="form-group">
+								<label>Telefono</label>
+	                       		<input th:field="*{telefono}" class="form-control" id="telefonoTaller" type="text" placeholder="Telefono" autocomplete="off">
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col col-md-6">
+							<div class="form-group">
+								<label>Serial</label>
+	                       		<input th:field="*{serial}" class="form-control" id="serialTaller" type="text" placeholder="Serial" autocomplete="off">
+							</div>
+						</div>
+						<div class="col col-md-6">
+							<div class="form-group">
+								<label>Marca</label>
+	                       		<input th:field="*{marca}" class="form-control" id="marcaTaller" type="text" placeholder="Marca" autocomplete="off">
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col col-md-6">
+							<div class="form-group">
+								<label>Modelo</label>
+	                       		<input th:field="*{modelo}" class="form-control" id="modeloTaller" type="text" placeholder="Modelo" autocomplete="off">
+							</div>
+						</div>
+						<div class="col col-md-6">
+							<div class="form-group">
+								<label>Tipo Equipo</label>
+	                       		<Select th:field="*{tipoEquipo.id}" class="form-control" id="tipoEquipoTaller">
+	                       			<option th:each="tipoEquipo:${tiposEquipo}" 
+	                       					th:value="${tipoEquipo.id}" 
+	                       					th:text="${tipoEquipo.nombre}"></option>
+	                       		</Select>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col col-md-6">
+							<div class="form-group">
+								<label>Tipo Reparacion</label>
+	                       		<Select th:field="*{tipo_reparacion}" class="form-control" id="tipoReparacionTaller">
+	                       			 <option value="1">Taller</option>
+	                       			 <option value="2">Garantia</option>
+	                       			 <option value="3">Desbloqueo</option>
+	                       		</Select>
+							</div>
+						</div>
+						<div class="col col-md-6">
+							<div class="form-group">
+								<label>Problema</label>
+	                       		<textarea th:field="*{problema}" id="problemaTaller" class="form-control" rows="2" style="width:100%;overflow: scroll;resize: none;color: #000;" placeholder="Problema"></textarea>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col col-md-6">
+							<div class="form-group">
+								<label>Avance</label>
+	                       		<input th:field="*{avance}" class="form-control" min="0" id="avanceTaller" type="number" placeholder="Avance" autocomplete="off">
+							</div>
+						</div>
+					</div>
+           		 </form>
+		</div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-warning" data-dismiss="modal">Regresar</button>
+        <button type="button" class="btn btn-info" id="btnAddTaller">Agregar</button>
+      </div>
+    </div>
+  </div>
+</div>		
+ 
+  <!-- Modal Asignar Tecnico -->
+ <div class="modal" id="asignarTecnicoModal">
+    <div class="modal-dialog modal-md" data-backdrop="static">
+      <div class="modal-content all">
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h4 class="modal-title"><span style="color:#fff;">Datos del Equipo</span></h4>
+        </div>
+        
+        <!-- Modal body -->
+        <div class="modal-body">
+          	<form>
+				<div id="asignarTecnico">
+					<div class="row">
+						<input type="hidden" th:value="${infoTaller.id}" id="tallerId">
+						<div class="col col-md-5">
+							<div class="form-group">+
+								<label>Celular</label>
+								<input th:value="${infoTaller.celular}" id="tallerCelular" disabled="disabled" class="form-control" type="text" placeholder="Celular">
+							</div>
+						</div>
+						<div class="col col-md-7">
+							<div class="form-group">+
+								<input type="hidden">
+								<label>Nombre Cliente</label>
+								<input th:value="${infoTaller.nombre}" id="tallerNombre" disabled="disabled" class="form-control" type="text" placeholder="Nombre">
+							</div>
+						</div>
+					</div>
+					
+					<div class="row">
+						<div class="col col-md-6">
+							<div class="form-group">
+								<label>Cedula / RNC</label>
+	                       		<input th:value="${infoTaller.cedula}" id="tallerRNC" class="form-control" type="text" disabled="disabled" placeholder="Cedula / RNC">
+							</div>
+						</div>
+						<div class="col col-md-6">
+							<div class="form-group">
+								<label>Telefono</label>
+	                       		<input th:value="${infoTaller.telefono}" id="tallerTelefono" class="form-control" type="text" disabled="disabled" placeholder="Telefono">
+							</div>
+						</div>
+					</div>
+					
+					<div class="row">
+						<div class="col col-md-6">
+							<div class="form-group">
+								<label>Serial</label>
+	                       		<input th:value="${infoTaller.serial}" id="tallerSerial" class="form-control" type="text" disabled="disabled" placeholder="Serial">
+							</div>
+						</div>
+						<div class="col col-md-6">
+							<div class="form-group">
+								<label>Marca</label>
+	                       		<input th:value="${infoTaller.marca}" id="tallerMarca" class="form-control" type="text" disabled="disabled" placeholder="Marca">
+							</div>
+						</div>
+					</div>
+					
+					<div class="row">
+						<div class="col col-md-6">
+							<div class="form-group">
+								<label>Modelo</label>
+	                       		<input th:value="${infoTaller.modelo}" id="tallerModelo" class="form-control" type="text" disabled="disabled" placeholder="Modelo">
+							</div>
+						</div>
+						<div class="col col-md-6">
+							<div class="form-group">
+								<label>Tipo Equipo</label>
+	                       		<input th:value="${infoTaller.tipoEquipo.nombre}" id="tallerTipoEquipo" class="form-control" type="text" disabled="disabled" placeholder="Tipo Equipo">
+							</div>
+						</div>
+					</div>
+					
+					<div class="row">
+						<div class="col col-md-6">
+							<div class="form-group">
+								<label>Tipo Reparacion</label>
+	                       		<input th:value="${infoTaller.tipo_reparacion}" id="tallerTipoReparacion" class="form-control" type="text" disabled="disabled" placeholder="Tipo Reparacion">
+							</div>
+						</div>
+						<div class="col col-md-6">
+							<div class="form-group">
+								<label>Problema</label>
+	                       		<input th:value="${infoTaller.problema}" id="tallerProblema" class="form-control" type="text" disabled="disabled" placeholder="Problema">
+							</div>
+						</div>
+					</div>
+				</div>
+				
+				<input type="hidden" id="responseAsignarTecnico" th:value="${responseAsignarTecnico}">
+
+				<div class="row">
+					<div class="col col-md-12">
+						<div class="form-group">
+							<label>Tecnico</label>
+							 <select id="selectTecnico" style="width: 100%">
+								<option th:each="tec:${tecnicos}" th:value="${tec.id}"
+								th:text="${tec.nombre}"></option>
+							</select>
+						</div>
+					</div>
+				</div>
+			</form>
+        </div>
+        
+        <!-- Modal footer -->
+        <div class="modal-footer">
+            <button type="button" class="btn btn-warning" data-dismiss="modal">Regresar</button>
+            <button type="button" class="btn btn-primary" id="asignarTrabajo">Asignar trabajo</button>
+        </div>
+        
+      </div>
+    </div>
+ </div>		
+	
+		<div class="card text-primary border rounded">
+			<div class="card-body" style="margin-top: 0px;">
+				<h1 class="card-title" style="font-size: 16px;">Consulta de taller
+					<a class="btn btn-primary" style="float: right;" href="#" id="agregarTaller">Agregar</a>
+				</h1>
+				<br>
+					<table class="table table-striped" id="tabla">
+							<thead>
+								<tr class="table-primary">
+									<th>Fecha</th>
+									<th>Nombre</th>
+									<th>Tel&eacute;fono</th>
+									<th>Tipo Equipo</th>
+									<th>Serial</th>
+									<th>Estado</th>
+									<th>Tipo Reparaci&oacute;n</th>
+									<th>Asignado</th>
+									<th></th>
+								</tr>
+							</thead>
+							<tbody>
+								 <tr th:each="taller:${listaTaller}">
+				                  <td th:text="${#dates.format(taller.fecha, 'dd-MM-yyyy')}"></td>
+				                  <td th:text="${taller.nombre}"></td> 
+				                   <td th:text="${taller.telefono}"></td> 
+				                   <td th:text="${taller.tipoEquipo.nombre}"></td> 
+				                   <td th:text="${taller.serial}"></td>
+				                   <td th:text="${taller.estado}"></td>
+				                   <td th:text="${taller.tipo_reparacion}"></td>
+				                   <td th:text="${taller.asignado.nombre}"></td>
+				                  <td>
+<!-- 				                    <a href="#" th:onclick="'modalModificarIngreso(\'' + ${taller.id} + '\');'" class="btn btn-primary btn-sm" data-toggle="tooltip" data-placement="top" role="button" title="Modificar"><i class="fa fa-edit" aria-hidden="true"></i></a> -->
+				                    <a th:if="${taller.asignado.nombre != null}" href="#" th:onclick="'modalModificarIngreso(\'' + ${taller.id} + '\');'" class="btn btn-info btn-sm" data-toggle="tooltip" data-placement="top" role="button" title="Procesar"><i class="fa fa-share" aria-hidden="true"></i></a>
+				                 	<a th:unless="${taller.asignado.nombre != null}" href="#" th:onclick="'modalAsignarTecnico(\'' + ${taller.id} + '\');'" class="btn btn-info btn-sm" data-toggle="tooltip" data-placement="top" role="button" title="Asignar Tecnico"><i class="fa fa-share" aria-hidden="true"></i></a>
+<!-- 				                 	<a href="#" onclick="return confirm('¿Estas seguro de eliminar el registro?')" data-toggle="tooltip" data-placement="top" class="btn btn-danger btn-sm" role="button" title="Eliminar el registro"><i class="fa fa-trash" aria-hidden="true"></i></a> -->
+				                  </td>
+				                </tr>
+							</tbody>
+						</table>
+			</div>
+			<a class="card-link" href="#"></a>
+		</div>
+	</div>
+	<script th:src="@{/js/jquery.min.js}"></script>
+    <script th:src="@{/bootstrap/js/bootstrap.min.js}"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+	<script type="text/javascript">
+	$(document).ready(function() {
+		$('#tabla').DataTable({
+			"scrollY": "400px",
+			    "language": {
+			        "sProcessing":    "Procesando...",
+			        "sLengthMenu":    "Mostrar _MENU_ registros",
+			        "sZeroRecords":   "No se encontraron resultados",
+			        "sEmptyTable":    "Ningún dato disponible en esta tabla",
+			        "sInfo":          "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+			        "sInfoEmpty":     "Mostrando registros del 0 al 0 de un total de 0 registros",
+			        "sInfoFiltered":  "(filtrado de un total de _MAX_ registros)",
+			        "sInfoPostFix":   "",
+			        "sSearch":        "Buscar:",
+			        "sUrl":           "",
+			        "sInfoThousands":  ",",
+			        "sLoadingRecords": "Cargando...",
+			        "oPaginate": {
+			            "sFirst":    "Primero",
+			            "sLast":    "Último",
+			            "sNext":    "Siguiente",
+			            "sPrevious": "Anterior"
+			        },
+			        "oAria": {
+			            "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+			        }
+			    }
+		});
+	});
+
+	$("#agregarTaller").click(function(e){
+		e.preventDefault();
+		$("#tallerModal").modal({backdrop: 'static', keyboard: false})
+		$("#tallerModal").modal("show");
+	});
+	
+	$("#btnAddTaller").click(function(e){
+		e.preventDefault();
+		
+		var nombre = $("#nombreTaller").val();
+		var cedula = $("#cedulaTaller").val();
+		var telefono = $("#telefonoTaller").val();
+		var problema = $("#problemaTaller").val();
+		
+		var error = 0;
+		
+		if(!problema){
+			Swal.fire({
+				title : 'Advertencia!',
+				text : 'El problema es requerido',
+				position : 'top',
+				icon : 'warning',
+				confirmButtonText : 'Cool'
+				})
+				error++;
+		}else{
+			if(!cedula){
+				Swal.fire({
+					title : 'Advertencia!',
+					text : 'La cedula es requerida',
+					position : 'top',
+					icon : 'warning',
+					confirmButtonText : 'Cool'
+					})
+					error++;
+			}else{
+				if(!telefono){
+					Swal.fire({
+						title : 'Advertencia!',
+						text : 'El telefono es requerido',
+						position : 'top',
+						icon : 'warning',
+						confirmButtonText : 'Cool'
+						})
+						error++;
+				}else{
+					if(!nombre){
+						Swal.fire({
+							title : 'Advertencia!',
+							text : 'El nombre es requerido',
+							position : 'top',
+							icon : 'warning',
+							confirmButtonText : 'Cool'
+							})
+							error++;
+					}
+				}
+			}
+		}
+		
+		if(error==0){
+			 $.post("/talleres/ajax/addTaller/", $("#taller").serialize(),
+				function(data, status){
+					$('#responseAddRecepcion').replaceWith(data);
+						if($('#responseAddRecepcion').val()==1){
+						 	Swal.fire({
+							title : 'Muy bien!',
+							text : 'Registro guardado',
+							position : 'top',
+							icon : 'success',
+							confirmButtonText : 'Cool'
+						})
+						setTimeout(function() {
+							 location.reload();		 
+						}, 2000);
+					}else{
+						Swal.fire({
+						title : 'Advertencia!',
+						text : 'El registro no pudo ser guardado',
+						position : 'top',
+						icon : 'warning',
+						confirmButtonText : 'Cool'
+					})
+				}
+			});
+		}
+	});
+	
+	$("#asignarTrabajo").click(function(e){
+		e.preventDefault();
+		var idTaller = $("#tallerId").val();
+		var idTecnico = $("#selectTecnico").val();
+	
+		if(!idTecnico){
+			Swal.fire({
+				  title: 'Alerta!',
+				  position: 'top',
+				  text: 'Debe seleccionar un tecnico',
+				  icon: 'warning',
+				  confirmButtonText: 'Cool'
+			})
+		}else{
+			 $.post("/talleres/ajax/asignarTecnico/", {
+				 'idTaller' : idTaller,
+				 'idTecnico' : idTecnico
+			 },function(data){
+				 $('#responseAsignarTecnico').replaceWith(data);
+				 if( $('#responseAsignarTecnico').val() == "1"){
+					 Swal.fire({
+						  title: 'Muy bien!',
+						  position: 'top',
+						  text: 'El tecnico ha sido asignado',
+						  icon: 'success',
+						  confirmButtonText: 'Cool'
+					})
+					setTimeout(function() {
+						 location.reload();		 
+					}, 2000);
+				 }else{
+					 Swal.fire({
+						  title: 'Error!',
+						  position: 'top',
+						  text: 'El tecnico no pudo ser asignado, intente mas tarde',
+						  icon: 'error',
+						  confirmButtonText: 'Cool'
+					})
+				 }
+			 });
+		}
+	});
+	
+	function modalAsignarTecnico(tallerId){
+		 $.get("/talleres/ajax/getInfo/"+tallerId,function(data){
+			 $('#asignarTecnico').replaceWith(data);
+			 $("#asignarTecnicoModal").modal({backdrop: 'static', keyboard: false})
+			 $("#asignarTecnicoModal").modal("show");
+		 });
+	}
+	
+	</script>
+	 <span th:insert="fragments/footer :: footer"></span>  
+</body>
+</html>

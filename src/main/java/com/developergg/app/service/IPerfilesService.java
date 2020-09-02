@@ -6,5 +6,6 @@ import com.developergg.app.model.Perfil;
 
 public interface IPerfilesService{
 	List<Perfil> buscarTodos();
+	Perfil buscarPorPerfil(String perfil);
 	Perfil buscarPorIdPerfil(Integer idPerfil);
 }

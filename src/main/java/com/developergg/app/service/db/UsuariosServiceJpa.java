@@ -6,6 +6,8 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.developergg.app.model.Almacen;
+import com.developergg.app.model.Perfil;
 import com.developergg.app.model.Usuario;
 import com.developergg.app.repository.UsuariosRepository;
 import com.developergg.app.service.IUsuariosService;
@@ -44,6 +46,11 @@ public class UsuariosServiceJpa implements IUsuariosService{
 			return optional.get();
 		}
 		return null;
+	}
+
+	@Override
+	public List<Usuario> buscarPorAlmacenAndPerfil(Almacen almacen, Perfil privilegio) {
+		return repo.findByAlmacenAndPrivilegio(almacen, privilegio);
 	}
 
 }

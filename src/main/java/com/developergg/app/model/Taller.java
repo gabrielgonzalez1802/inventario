@@ -48,7 +48,11 @@ public class Taller {
 	private String problema;
 	private Integer entregado = 0;
 	private Double avance = 0.0;
-	private Integer asignado = 0;
+	
+	@OneToOne
+	@JoinColumn(name = "asignado")
+	private Usuario asignado;
+	
 	private String motivo;
 	private Integer entregado_por;
 	private Date fecha_entrega;
@@ -167,12 +171,6 @@ public class Taller {
 	public void setAvance(Double avance) {
 		this.avance = avance;
 	}
-	public Integer getAsignado() {
-		return asignado;
-	}
-	public void setAsignado(Integer asignado) {
-		this.asignado = asignado;
-	}
 	public String getMotivo() {
 		return motivo;
 	}
@@ -191,7 +189,12 @@ public class Taller {
 	public void setFecha_entrega(Date fecha_entrega) {
 		this.fecha_entrega = fecha_entrega;
 	}
-	
+	public Usuario getAsignado() {
+		return asignado;
+	}
+	public void setAsignado(Usuario asignado) {
+		this.asignado = asignado;
+	}
 	@Override
 	public String toString() {
 		return "Taller [id=" + id + ", codigo=" + codigo + ", fecha=" + fecha + ", hora=" + hora + ", nombre=" + nombre

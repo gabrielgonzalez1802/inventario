@@ -14,7 +14,7 @@ import com.developergg.app.service.IPerfilesService;
 public class PerfilesServiceJpa implements IPerfilesService {
 	
 	@Autowired
-	PerfilesRepository repo;
+	private PerfilesRepository repo;
 
 	@Override
 	public List<Perfil> buscarTodos() {
@@ -29,6 +29,11 @@ public class PerfilesServiceJpa implements IPerfilesService {
 			return optional.get();
 		}
 		return null;
+	}
+
+	@Override
+	public Perfil buscarPorPerfil(String perfil) {
+		return repo.findByPerfil(perfil);
 	}
 
 }
