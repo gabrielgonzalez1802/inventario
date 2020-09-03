@@ -264,7 +264,8 @@ public class FacturasController {
 		}
 		
 		//Verificamos el listado en taller
-		List<Taller> listaTalleres = serviceTalleres.buscarPorAlmacen(usuario.getAlmacen());
+		List<Taller> listaTalleres = serviceTalleres.buscarPorAlmacen(usuario.getAlmacen()).
+				stream().filter(t -> t.getFacturaTemp() == null).collect(Collectors.toList());
 		
 		model.addAttribute("listaTalleres", listaTalleres);
 		model.addAttribute("listaArticulos", listaDefinitive);

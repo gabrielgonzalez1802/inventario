@@ -40,6 +40,16 @@
 					<td th:text="${servicio.subtotal}" class="text-right">SubTotal</td>
 					<td class='text-right'><a href="#" th:onclick="'eliminarServicioFactura(\'' + ${servicio.id} + '\');'"> <i class="icono fa fa-trash text-danger"></i> </a></td>			
 				</tr>
+				<!--  Talleres  -->
+				<tr th:each="taller : ${facturaTalleres}">
+					<td></td>
+					<td th:text="${taller.descripcion}" class="text-center">Nombre del taller</td>
+					<td th:text="${taller.cantidad}">Cantidad del Servicio</td>
+					<td th:text="${taller.precio}" class="text-center">Precio del taller</td>
+					<td class="text-right" th:text="${taller.itbis}">0.00</td>
+					<td th:text="${taller.subtotal}" class="text-right">SubTotal</td>
+					<td class='text-right'>&nbsp;</td>			
+				</tr>
 				<tr>
 					<td colspan="5" class="text-right">Subtotal $ Itbis</td>
 					<th th:text="${subTotalItbis}" id="subTotalItbis" class="text-right">Subtotal $ Itbi</th>

@@ -34,10 +34,12 @@ import com.developergg.app.model.FacturaDetallePagoTemp;
 import com.developergg.app.model.FacturaDetalleTemp;
 import com.developergg.app.model.FacturaSerialTemp;
 import com.developergg.app.model.FacturaServicioTemp;
+import com.developergg.app.model.FacturaTallerTemp;
 import com.developergg.app.model.FacturaTemp;
 import com.developergg.app.model.Propietario;
 import com.developergg.app.model.SerialTemporal;
 import com.developergg.app.model.Suplidor;
+import com.developergg.app.model.Taller;
 import com.developergg.app.model.Usuario;
 import com.developergg.app.service.IArticulosAjustesService;
 import com.developergg.app.service.IArticulosSeriales;
@@ -49,8 +51,10 @@ import com.developergg.app.service.IFacturasDetallesPagoTempService;
 import com.developergg.app.service.IFacturasDetallesTempService;
 import com.developergg.app.service.IFacturasSerialesTempService;
 import com.developergg.app.service.IFacturasServiciosTempService;
+import com.developergg.app.service.IFacturasTalleresTempService;
 import com.developergg.app.service.IFacturasTempService;
 import com.developergg.app.service.ISuplidoresService;
+import com.developergg.app.service.ITalleresService;
 import com.developergg.app.util.Utileria;
 
 @Controller
@@ -92,6 +96,12 @@ public class ArticulosController {
 	
 	@Autowired
 	private IFacturasDetallesPagoTempService serviceDetallesPagosTemp;
+	
+	@Autowired
+	private IFacturasTalleresTempService serviceFacturasTalleresTemp;
+	
+	@Autowired
+	private ITalleresService serviceTalleres;
 	
 	@Value("${inventario.ruta.imagenes}")
 	private String ruta;
@@ -402,66 +412,6 @@ public class ArticulosController {
 		return "articulos/formularioSinSerial";
 	}
 	
-//	@GetMapping("/ajax/getAll")
-//	public String listaArticulosAjax(Model model, HttpSession session) {
-//		Usuario usuario = (Usuario) session.getAttribute("usuario");
-//		if(lista==null) {
-//			//articulos por tienda que no esten eliminados
-//			lista = serviceArticulos.buscarPorTienda(usuario.getAlmacen().getPropietario())
-//					.stream().filter(p -> p.getEliminado() == 0).collect(Collectors.toList());
-//		}
-//		model.addAttribute("listaArticulos", lista);
-//		return "facturas/factura :: listaArticulos";
-//	}
-	
-//	@GetMapping("/ajax/getAll/{txt}")
-//	public String listaArticulosAjaxWhitTxt(@PathVariable("txt") String txt, Model model, HttpSession session) {
-//		Usuario usuario = (Usuario) session.getAttribute("usuario");
-//		List<Articulo> articuloExistente = null;
-//		//buscamos a partir de 3 caracteres
-//		if(txt.contains("_")) {
-//			txt = txt.replace("_", " ");
-//		}
-//		if(txt.length()>2) {
-//			//Buscamos los articulos por nombre o codigo y propietario que no este eliminado
-//			articuloExistente = serviceArticulos.buscarPorNombreOrCodigo(txt, usuario.getAlmacen().getPropietario()).
-//					stream().filter(a -> a.getEliminado() == 0).collect(Collectors.toList());
-//			//Buscamos los seriales por almacen que no esten eliminados
-//			List<ArticuloSerial> seriales = serviceArticulosSeriales.buscarPorSerialAndAlmacen(txt, usuario.getAlmacen()).
-//					stream().filter(s -> (s.getEliminado() == 0 && s.getEstado().equalsIgnoreCase("Disponible"))).collect(Collectors.toList());
-//			if(!articuloExistente.isEmpty()) {
-//				for (Articulo articulo : articuloExistente) {
-//					//Buscamos el articulo por serial
-//					if(articulo.getImei().equals("SI")) {
-//						//verificamos si en la lista de seriales ya se encuentra el articulo
-//						for (ArticuloSerial articuloSerial : seriales) {											
-//							if(articuloSerial.getArticulo().getId()==articulo.getId()) {
-//								seriales.remove(articuloSerial);
-//							}
-//						}
-//					}else {
-//						//Verificamos el inventario de los articulos que no tienen imei
-//						List<ArticuloAjuste> articulosAjustes = serviceArticulosAjustes.buscarPorArticuloYAlmacen(articulo, usuario.getAlmacen());
-//						if(articulosAjustes.isEmpty()) {
-//							articuloExistente.remove(articulo);
-//						}
-//					}
-//				}
-//			}
-//			
-//			//si la lista de seriales tiene articulos los incluimos en la lista de articulos
-//			if(!seriales.isEmpty()) {
-//				for (ArticuloSerial articuloSerial : seriales) {
-//					articuloExistente.add(articuloSerial.getArticulo());
-//				}
-//			}
-//			
-//		}
-//		
-//		model.addAttribute("listaArticulos", articuloExistente);
-//		return "facturas/factura :: listaArticulos";
-//	}
-	
 	@GetMapping("/ajax/getType/{id}")
 	public String obtenerTipoDeArticuloAjax(@PathVariable("id") Integer idArticulo, Model model, HttpSession session) {
 		//Buscamos el articulo a partir del id
@@ -583,7 +533,6 @@ public class ArticulosController {
 		servicioFac.setCantidad(cantidad);
 		
 		//Verificamos si el comprobante fiscal paga itbis
-		
 		if (factura.getComprobanteFiscal().getPaga_itbis() == 1) {
 			// verificamos si el comprobante fiscal incluye el itbis en el precio
 			if (factura.getComprobanteFiscal().getIncluye_itbis() == 1) {
@@ -1137,6 +1086,10 @@ public class ArticulosController {
 		FacturaTemp facturaTemp = serviceFacturasTemp.buscarPorUsuario(usuario);
 		//Buscamos los servicios en la factura
 		List<FacturaServicioTemp> facturaServiciosTemp = serviceServiciosTemp.buscarPorUsuarioAlmacen(usuario, usuario.getAlmacen());
+
+		//Buscamos los talleres en la factura
+		List<FacturaTallerTemp> facturaTalleresTemp = serviceFacturasTalleresTemp.buscarPorFacturaTemp(facturaTemp);
+		
 		Double total = 0.0;
 		Double subTotalItbis = 0.0;
 		//Calculamos el total
@@ -1215,6 +1168,44 @@ public class ArticulosController {
 			subTotalItbis+=facturaServicioTemp.getItbis();
 		}
 		
+		//Validaciones para talleres //FIXME: GGONZALEZ REVISAR
+		for (FacturaTallerTemp facturaTallerTemp : facturaTalleresTemp) {
+			//Verificamos si el comprobante fiscal paga itbis
+			if(facturaTemp.getComprobanteFiscal().getPaga_itbis() == 1) {
+				//verificamos si el comprobante fiscal incluye el itbis en el precio				
+				if(facturaTemp.getComprobanteFiscal().getIncluye_itbis() == 1) {
+					//realizamos las conversiones
+					String tempSv = "1."+facturaTemp.getComprobanteFiscal().getValor_itbis().intValue();
+					Double precioTempSv = facturaTallerTemp.getPrecio() / Double.parseDouble(tempSv);
+					Double itBisTempSv = (facturaTallerTemp.getCantidad() * precioTempSv) * (facturaTemp.getComprobanteFiscal().getValor_itbis()/100.00);
+					facturaTallerTemp.setPrecio(Double.parseDouble(df2.format(precioTempSv).replace(",", ".")));
+					facturaTallerTemp.setItbis(Double.parseDouble(df2.format(itBisTempSv).replace(",", ".")));
+					facturaTallerTemp.setSubtotal(Double.parseDouble(df2.format((facturaTallerTemp.getCantidad()*facturaTallerTemp.getPrecio())+facturaTallerTemp.getItbis()).replace(",", ".")));
+					total+=facturaTallerTemp.getSubtotal();
+				}else {
+					//realizamos las conversiones
+					Double itBisTempServ = (facturaTallerTemp.getCantidad() * facturaTallerTemp.getPrecio()) * (facturaTemp.getComprobanteFiscal().getValor_itbis()/100.00);
+					facturaTallerTemp.setPrecio(Double.parseDouble(df2.format(facturaTallerTemp.getPrecio()).replace(",", ".")));
+					facturaTallerTemp.setItbis(Double.parseDouble(df2.format(itBisTempServ).replace(",", ".")));
+					facturaTallerTemp.setSubtotal(Double.parseDouble(df2.format((facturaTallerTemp.getCantidad()*facturaTallerTemp.getPrecio())+facturaTallerTemp.getItbis()).replace(",", ".")));
+					total+=facturaTallerTemp.getSubtotal();
+				}
+			}else {
+				//verificamos si el valor inicial del comprobante fiscal en la factura incluye itbis
+				if(facturaTallerTemp.getComprobanteFiscal().getIncluye_itbis()==1) {
+					//realizamos las conversiones
+					facturaTallerTemp.setPrecio(Double.parseDouble(df2.format((facturaTallerTemp.getSubtotal()/facturaTallerTemp.getCantidad())).replace(",", ".")));
+					facturaTallerTemp.setItbis(Double.parseDouble(df2.format((facturaTallerTemp.getCantidad()*facturaTallerTemp.getPrecio())*(facturaTemp.getComprobanteFiscal().getValor_itbis()/100.00)).replace(",", ".")));
+					facturaTallerTemp.setSubtotal(Double.parseDouble(df2.format((facturaTallerTemp.getCantidad()*facturaTallerTemp.getPrecio())+facturaTallerTemp.getItbis()).replace(",", ".")));
+					total+=facturaTallerTemp.getSubtotal();
+				}else {
+					total+=facturaTallerTemp.getSubtotal();
+				}
+			}
+			subTotalItbis+=facturaTallerTemp.getItbis();
+		}
+		
+		model.addAttribute("facturaTalleres", facturaTalleresTemp);
 		model.addAttribute("facturaDetalles", facturaDetallesTemp);
 		model.addAttribute("facturaServicios", facturaServiciosTemp);
 		model.addAttribute("subTotalItbis", Double.parseDouble(df2.format(subTotalItbis).replace(",", ".")));

@@ -1093,7 +1093,15 @@ $("#btnVerTaleres").click(function(e){
 });
 
 function agregarAFactura(idTaller){
-	
+	//agregar servicios
+	  $.post("/facturasTalleresTemp/ajax/addDetailsTaller/",
+		{
+		  'idTaller': idTaller
+		},
+		function(data, status){
+			factura_detalle_items(incluyeItbis);
+			focusSelectArticuloNew();
+		});
 }
 
 

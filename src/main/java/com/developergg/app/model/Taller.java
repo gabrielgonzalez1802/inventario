@@ -10,7 +10,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 
 @Entity
 @Table(name = "taller")
@@ -32,6 +31,10 @@ public class Taller {
 	@OneToOne
 	@JoinColumn(name = "id_tipo_equipo")
 	private TipoEquipo tipoEquipo;
+
+	@OneToOne
+	@JoinColumn(name = "id_factura_temp")
+	private FacturaTemp facturaTemp;
 	
 	private String modelo;
 	private String serial;
@@ -204,14 +207,20 @@ public class Taller {
 	public void setTotal(Double total) {
 		this.total = total;
 	}
+	public FacturaTemp getFacturaTemp() {
+		return facturaTemp;
+	}
+	public void setFacturaTemp(FacturaTemp facturaTemp) {
+		this.facturaTemp = facturaTemp;
+	}
 	@Override
 	public String toString() {
 		return "Taller [id=" + id + ", codigo=" + codigo + ", fecha=" + fecha + ", hora=" + hora + ", nombre=" + nombre
 				+ ", cedula=" + cedula + ", telefono=" + telefono + ", celular=" + celular + ", marca=" + marca
-				+ ", tipoEquipo=" + tipoEquipo + ", modelo=" + modelo + ", serial=" + serial + ", tipo_reparacion="
-				+ tipo_reparacion + ", estado=" + estado + ", almacen=" + almacen + ", usuario=" + usuario
-				+ ", problema=" + problema + ", entregado=" + entregado + ", avance=" + avance + ", total=" + total
-				+ ", asignado=" + asignado + ", motivo=" + motivo + ", entregado_por=" + entregado_por
-				+ ", fecha_entrega=" + fecha_entrega + "]";
+				+ ", tipoEquipo=" + tipoEquipo + ", facturaTemp=" + facturaTemp + ", modelo=" + modelo + ", serial="
+				+ serial + ", tipo_reparacion=" + tipo_reparacion + ", estado=" + estado + ", almacen=" + almacen
+				+ ", usuario=" + usuario + ", problema=" + problema + ", entregado=" + entregado + ", avance=" + avance
+				+ ", total=" + total + ", asignado=" + asignado + ", motivo=" + motivo + ", entregado_por="
+				+ entregado_por + ", fecha_entrega=" + fecha_entrega + "]";
 	}
 }
