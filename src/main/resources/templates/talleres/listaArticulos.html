@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <title>Sistema Celulares</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" sizes="64x64" th:href="@{/img/icon.png}">
+    <link rel="stylesheet" type="text/css" th:href="@{/bootstrap/css/bootstrap.min.css}">
+	<link rel="stylesheet" type="text/css" th:href="@{/css/sticky-dark-top-nav.css}">
+    <!-- Font-icon css-->
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+ 	<link rel="stylesheet" type="text/css" th:href="@{/css/sticky-dark-top-nav.css}">
+ 	<link rel="stylesheet" type="text/css" th:href="@{/css/Minimal-tabs.css}">
+ 	<link rel="stylesheet" type="text/css" th:href="@{/css/dashboard.css}">
+ 	<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css">
+ 	<link rel="stylesheet" type="text/css" th:href="@{/fontawesom/css/all.min.css}">
+ 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+ 	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap" rel="stylesheet">
+ 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+ 	<link rel="stylesheet" type="text/css" th:href="@{/css/swal.css}">
+ 	<style>
+.table-primary, .table-primary>th, .table-primary>td {
+	background-color: #25396d;
+	color: #ffff;
+}
+
+.table-primary th, .table-primary td, .table-primary thead th,
+	.table-primary tbody+tbody {
+	border-color: #25396d;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.current,
+	.dataTables_wrapper .dataTables_paginate .paginate_button.current:hover
+{
+	  background-image: linear-gradient(#54b4eb, #2FA4E7 60%, #1d9ce5);
+}
+.dataTables_wrapper .dataTables_paginate .paginate_button.current, .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+    color: #fffdfd !important;
+    border-color: #2FA4E7;
+}
+</style>
+  </head>
+  <body>
+     <span th:insert="fragments/topMenu :: menu-principal"></span> 
+     <br>
+	<div class="container text-white">
+ 	
+ <!-- Modal de agregar articulo -->
+<div id="tallerModal" class="modal fade" role="dialog" data-backdrop="static">
+  <div class="modal-dialog">
+    <!-- Modal content-->
+    <div class="modal-content all">
+      <div class="modal-header bg-primary">
+<!--         <button type="button" class="close" data-dismiss="modal">&times;</button> -->
+        <h3 class="modal-title">Recepcion de Articulo</h3>
+      </div>
+      <div class="modal-body">
+			<div id="nuevoTaller">
+				<form th:object="${tallerArticulo}" id="tallerArticulo">
+					<div class="row">
+					<input type="hidden" id="responseAddRecepcion" th:value="${responseAddRecepcion}">
+						<div class="col col-md-12">
+							<div class="form-group">
+								 <label>Nombre</label>
+								 <input th:field="*{nombre}" class="form-control" id="nombreProducto" type="text" placeholder="Nombre" autocomplete="off">
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col col-md-4">
+							<div class="form-group">
+								<label>Cantidad</label>
+	                       		<input th:field="*{cantidad}" class="form-control" id="cantidadProducto" type="number" min="1" placeholder="Cantidad" autocomplete="off">
+							</div>
+						</div>
+						<div class="col col-md-4">
+							<div class="form-group">
+								<label>Costo</label>
+	                       		<input th:field="*{costo}" class="form-control" id="costoProducto" type="number" min="0" placeholder="Costo" autocomplete="off">
+							</div>
+						</div>
+						<div class="col col-md-4">
+							<div class="form-group">
+								<label>Precio</label>
+	                       		<input th:field="*{precio}" class="form-control" id="precioProducto" type="number" min="0" placeholder="Precio" autocomplete="off">
+							</div>
+						</div>
+					</div>
+           		 </form>
+		</div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-warning" data-dismiss="modal">Regresar</button>
+        <button type="button" class="btn btn-info" id="btnAddTallerArticulo">Agregar</button>
+      </div>
+    </div>
+  </div>
+</div>		
+	
+		<div class="card text-primary border rounded">
+			<div class="card-body" style="margin-top: 0px;">
+				<h1 class="card-title" style="font-size: 16px;">Consulta Articulos Taller
+					<a class="btn btn-primary" style="float: right;" href="#" id="agregarTaller">Agregar</a>
+				</h1>
+				<br>
+					<table class="table table-striped" id="tabla">
+							<thead>
+								<tr class="table-primary">
+									<th>Nombre</th>
+									<th>Disponible</th>
+									<th>Precio</th>
+									<th></th>
+								</tr>
+							</thead>
+							<tbody>
+								 <tr th:each="item:${listaTalleresArticulos}">
+				                  <td th:text="${item.nombre}"></td> 
+				                   <td th:text="${item.cantidad}"></td> 
+				                   <td th:text="${item.precio}"></td> 
+				                  <td>
+				                    <a th:if="${item.articulo.nombre != null}" th:href="@{/talleres/procesar/{id} (id = ${item.id})}" class="btn btn-info btn-sm" data-toggle="tooltip" data-placement="top" role="button" title="Procesar"><i class="fa fa-share" aria-hidden="true"></i></a>
+				                 	<a th:unless="${item.articulo.nombre != null}" href="#" th:onclick="'modalAsignarTecnico(\'' + ${item.id} + '\');'" class="btn btn-info btn-sm" data-toggle="tooltip" data-placement="top" role="button" title="Asignar Tecnico"><i class="fa fa-share" aria-hidden="true"></i></a>
+<!-- 				                 	<a href="#" onclick="return confirm('¿Estas seguro de eliminar el registro?')" data-toggle="tooltip" data-placement="top" class="btn btn-danger btn-sm" role="button" title="Eliminar el registro"><i class="fa fa-trash" aria-hidden="true"></i></a> -->
+				                  </td>
+				                </tr>
+							</tbody>
+						</table>
+			</div>
+			<a class="card-link" href="#"></a>
+		</div>
+	</div>
+	<script th:src="@{/js/jquery.min.js}"></script>
+    <script th:src="@{/bootstrap/js/bootstrap.min.js}"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+	<script type="text/javascript">
+	$(document).ready(function() {
+		$('#tabla').DataTable({
+			"scrollY": "400px",
+			    "language": {
+			        "sProcessing":    "Procesando...",
+			        "sLengthMenu":    "Mostrar _MENU_ registros",
+			        "sZeroRecords":   "No se encontraron resultados",
+			        "sEmptyTable":    "Ningún dato disponible en esta tabla",
+			        "sInfo":          "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+			        "sInfoEmpty":     "Mostrando registros del 0 al 0 de un total de 0 registros",
+			        "sInfoFiltered":  "(filtrado de un total de _MAX_ registros)",
+			        "sInfoPostFix":   "",
+			        "sSearch":        "Buscar:",
+			        "sUrl":           "",
+			        "sInfoThousands":  ",",
+			        "sLoadingRecords": "Cargando...",
+			        "oPaginate": {
+			            "sFirst":    "Primero",
+			            "sLast":    "Último",
+			            "sNext":    "Siguiente",
+			            "sPrevious": "Anterior"
+			        },
+			        "oAria": {
+			            "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+			        }
+			    }
+		});
+	});
+
+	$("#agregarTaller").click(function(e){
+		e.preventDefault();
+		$("#tallerModal").modal({backdrop: 'static', keyboard: false})
+		$("#tallerModal").modal("show");
+	});
+	
+	$("#btnAddTallerArticulo").click(function(e){
+		e.preventDefault();
+		
+		var nombre = $("#nombreProducto").val();
+		var cantidad = $("#cantidadProducto").val();
+		var costo = $("#costoProducto").val();
+		var precio = $("#precioProducto").val();
+		
+		var error = 0;
+		
+		if(!nombre){
+			Swal.fire({
+				title : 'Advertencia!',
+				text : 'El nombre es requerido',
+				position : 'top',
+				icon : 'warning',
+				confirmButtonText : 'Cool'
+			})
+			error++;
+		}
+		
+		if(error==0){
+			 $.post("/tallerArticulos/ajax/addTallerArticulo/", $("#tallerArticulo").serialize(),
+				function(data, status){
+					$('#responseAddRecepcion').replaceWith(data);
+						if($('#responseAddRecepcion').val()==1){
+						 	Swal.fire({
+							title : 'Muy bien!',
+							text : 'Registro guardado',
+							position : 'top',
+							icon : 'success',
+							confirmButtonText : 'Cool'
+						})
+						setTimeout(function() {
+							 location.reload();		 
+						}, 2000);
+					}else{
+						Swal.fire({
+						title : 'Advertencia!',
+						text : 'El registro no pudo ser guardado',
+						position : 'top',
+						icon : 'warning',
+						confirmButtonText : 'Cool'
+					})
+				}
+			});
+		}
+	});
+	
+	</script>
+	 <span th:insert="fragments/footer :: footer"></span>  
+</body>
+</html>

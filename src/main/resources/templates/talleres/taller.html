@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <title>Sistema Celulares</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" sizes="64x64" th:href="@{/img/icon.png}">
+    <!-- Font-icon css-->
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap" rel="stylesheet">
+ 	<link rel="stylesheet" type="text/css" th:href="@{/css/Minimal-tabs.css}">
+ 	<link rel="stylesheet" type="text/css" th:href="@{/css/dashboard.css}">
+ 	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+ 	
+ 	<style type="text/css">
+ 	        .dual-list .list-group {
+            margin-top: 8px;
+        }
+
+        .list-left li, .list-right li {
+            cursor: pointer;
+        }
+
+        .list-arrows {
+            padding-top: 100px;
+        }
+
+        .list-arrows button {
+                margin-bottom: 20px;
+        }
+        .list-group-item.active, .list-group-item.active:focus, .list-group-item.active:hover {
+		    z-index: 2;
+		    background-color: #17a2b8;
+		    border-color: #17a2b8;
+		    color:#fff;
+		}
+		.btn-standar {
+		    color: #fff;
+		    background-color: #17a2b8;
+		    border-color: #17a2b8;
+		}
+		.list-group-item:hover{
+			 background-color:#17a2b882;
+			 border-color: #17a2b882;
+		}
+		.table {
+		    background-color: #fff;
+		    color: black;
+		}
+		tr:hover {
+			 color: #fff;
+		}
+		.table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th {
+		    border-top: 1px solid #68c5ca;
+		}
+ 	</style>
+ 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+ 	<style>
+	  	.table-primary, .table-primary>th, .table-primary>td {
+	   		 background-color: #25396d;
+	   		 color:#ffff;
+		}
+		.table-primary th, .table-primary td, .table-primary thead th, .table-primary tbody+tbody {
+		    border-color: #25396d;
+		}
+		.table-hover tbody tr:hover td, .table-hover tbody tr:hover th {
+		  background-color: #085865;
+		}
+		
+		.personalized > input{
+		    border: 0px;
+		    -webkit-box-shadow: none;
+		    -moz-box-shadow: none;
+		    box-shadow: none;
+			background: transparent;
+			border: none;
+    		border-bottom: solid 1px #fff;
+    		border-radius: 0px;
+    		color: #fff;
+		}
+  </style>
+  <link rel="stylesheet" type="text/css" th:href="@{/css/swal.css}">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" rel="stylesheet"/>
+  </head>
+  <body>
+     <br>
+	<div class="container">
+		<div class="panel panel-default">
+		<div class="panel-heading all" style="border-bottom: 0px;">
+
+		 <form class="form-inline" action="#" id="formTop" th:object="${facturaTemp}">
+			  <div class="form-group">
+			    <label style="color: #fff;font-size: 25px;">Taller de Reparaci&oacute;n | &nbsp;&nbsp;</label>
+			  </div>
+			  <input type="hidden" id="responseAddDetail" th:value="${responseAddDetail}">
+			  <input type="hidden" id="responseDeleteDetail" th:value="${responseDeleteDetail}">
+			  <input type="hidden" id="responseLiberado" th:value="${responseLiberado}">
+
+			  <button class="btn btn-success pull-right" id="btnRegresar">Guardar Reparacion</button>
+			  <button class="btn btn-danger" id="btnLiberarEquipo">Liberar Equipo</button>
+			  <button class="btn btn-primary" id="btnAddDiagnosticoModal">Nuevo Diagnostico</button>
+		</form>
+		
+		<br>
+		
+		<div class="panel panel-default">
+		  <div class="panel-body">
+		    <div class="row">
+		    	<div class="col-md-4"> 
+		    		<form><input type="hidden" id="idTaller" th:value="${taller.id}"></form>
+		    		<span style="font-weight: bold;">Fecha: </span><span th:text="${#dates.format(taller.fecha, 'dd-MM-yyyy')}"></span><br>
+		    		<span style="font-weight: bold;">Nombre: </span><span th:text="${taller.nombre}"></span><br>
+		    		<span style="font-weight: bold;">Cedula: </span><span th:text="${taller.cedula}"></span><br>
+		    		<span style="font-weight: bold;">Telefono: </span><span th:text="${taller.telefono}"></span><br>
+		    	</div>
+		    	<div class="col-md-4"> 
+		    		<span style="font-weight: bold;">Tipo: </span><span th:text="${taller.tipoEquipo.nombre}"></span><br>
+		    		<span style="font-weight: bold;">Marca: </span><span th:text="${taller.marca}"></span><br>
+		    		<span style="font-weight: bold;">Modelo: </span><span th:text="${taller.modelo}"></span><br>
+		    		<span style="font-weight: bold;">Serial: </span><span th:text="${taller.serial}"></span><br>
+		    	</div>
+		    	<div class="col-md-4"> 
+		    		<span style="font-weight: bold;">Tipo Reparacion: </span><span th:text="${taller.tipo_reparacion}"></span><br>
+		    		<span style="font-weight: bold;">Problema: </span><span th:text="${taller.problema}"></span><br>
+		    		<span style="font-weight: bold;">Estado: </span>
+		    	 	<select id="estadoTaller" th:field="${taller.estado}">
+		    	 		<option value="Abierto">Abierto</option>
+		    	 		<option value="Proceso">Proceso</option>
+		    	 		<option value="Reparado">Reparado</option>
+		    	 		<option value="No Reparado">No Reparado</option>
+		    	 		<option value="Devolver">Devolver a Cliente</option>
+		    		</select><br>
+		    		<span style="font-weight: bold;">Avance: </span><span th:text="${taller.avance}"></span><br>
+		    	</div>
+		    </div>
+		  </div>
+		</div>
+		 
+		</div>
+		  <div class="panel-body all">
+		     <form  method="post" action="#" id="formCreateInvoice">            
+              <div class="row">
+                <div class="col-md-6"> 
+                  <div class="form-group">
+                    <label for="nombre">Lista de Articulos</label>
+					<select class="form-control" id="articulos" style="width: 100%;">
+						<option value="">Seleccionar articulo</option>
+						<option th:each="item:${listaArticulos}"
+								th:value="${item.id}"
+								th:text="${item.nombre}" />
+                    </select>
+                  </div>
+                </div>
+                <div id="infoSelection">
+                	<input type="hidden" id="disponible" th:value="${disponible}">
+                	<input type="hidden" id="precioArticulo" th:value="${precioArticulo}">
+                	<input type="hidden" id="costoArticulo" th:value="${costoArticulo}">
+                	<input type="hidden" id="idArticulo" th:value="${idArticulo}">
+                </div>
+                <div class="col-md-2">
+            	    <label for="nombre">Cantidad</label>
+                	<input type="number" min="1" class="form-control" name="cantidad" id="cantidad" placeholder="cantidad" required="required">
+                </div>
+                <div class="col-md-2">
+            	    <label for="nombre">Precio</label>
+                	<input type="number" min="1" class="form-control" name="precio" id="precio" placeholder="Precio" required="required">
+                </div>
+                <div class="col-md-1"> 
+                	<br>
+               		 <button id="agregarItem" class="btn btn-primary pull-right" style="margin-top: 5px;"> Agregar </button>
+                </div>
+              </div>                                                  
+            </form>
+
+				<div class="col-lg-12 col-md-12 col-sm-12">
+					<div class="table-responsive">
+						<div id="cuerpoTaller">
+							
+						</div>
+					</div>
+				</div>
+
+			</div> <!--  Fin del panel body -->
+		</div>
+		
+<!-- Modal de agregar diagnostico -->
+<div id="diagnosticoModal" class="modal fade" role="dialog" data-backdrop="static">
+  <div class="modal-dialog">
+    <!-- Modal content-->
+    <div class="modal-content all">
+      <div class="modal-header bg-primary">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h3 class="modal-title">Diagnostico</h3>
+      </div>
+      <div class="modal-body">
+		<form>
+			<div class="row">
+				<div class="col col-md-12">
+					<div class="form-group">
+						 <label>Nombre</label>
+						 <input class="form-control" id="nombreDiagnostico" type="text" placeholder="Nombre del diagnostico">
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col col-md-6">
+					<div class="form-group">
+						<label>Costo</label>
+	               		<input id="costoDiagnostico" min="1" class="form-control" type="number">
+					</div>
+				</div>
+				<div class="col col-md-6">
+					<div class="form-group">
+						 <label>Precio</label>
+	                   	 <input id="precioDiagnostico" min="1" class="form-control" type="number">
+					</div>
+				</div>
+			</div>
+       	 </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-warning" data-dismiss="modal">Regresar</button>
+        <button type="button" class="btn btn-standar" id="btnAddDiagnostico">Agregar</button>
+      </div>
+    </div>
+  </div>
+</div>		
+
+</div>
+	<script th:src="@{/js/jquery.min.js}"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
+	<span th:if="${msg != null}" class="alert alert-success" role="alert">
+		<script type="text/javascript">
+		Swal.fire({
+			  title: 'Muy bien!',
+			  text: 'Registro Creado',
+			  icon: 'success',
+			  confirmButtonText: 'Cool'
+			})
+		</script>
+	</span>
+	<span th:if="${msg2 != null}" class="alert alert-success" role="alert">
+		<script type="text/javascript">
+		Swal.fire({
+			  title: 'Muy bien!',
+			  text: 'Registro Modificado',
+			  icon: 'success',
+			  confirmButtonText: 'Cool'
+			})
+		</script>	
+	</span>
+	<script th:src="@{/js/taller.js}"></script>
+	<script th:src="@{/js/jquery.hotkeys.js}"></script>
+	<span th:insert="fragments/footer :: footer"></span>  
+</body>
+</html>

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
+<head>
+</head>
+
+<body>
+	<div th:fragment="cuerpoTaller">
+		<table class="table table-hover">
+			<thead>
+				<tr style="background-color: #17a2b8;color:#fff">
+					<th class="text-center">Item</th>
+					<th>Cantidad</th>
+					<th class="text-center">Costo</th>
+					<th class="text-right">Precio</th>
+					<th class="text-right"></th>
+				</tr>
+			</thead>
+			<tbody class="items">
+				<tr th:each="detalle : ${listaDetalles}">
+					<td th:text="${detalle.item}" class="text-center">Nombre del item</td>
+					<td th:text="${detalle.cantidad}">Cantidad</td>
+					<td th:text="${detalle.costo}" class="text-center">Costo</td>
+					<td class="text-right" th:text="${detalle.precio}">Precio</td>
+					<td class='text-right'><a href="#" th:onclick="'eliminarItem(\'' + ${detalle.id} + '\');'"> <i class="icono fa fa-trash text-danger"></i> </a></td>			
+				</tr>
+				<tr>
+					<td colspan="4" class="text-right"><b><em><span style="font-size: 16px;">TOTAL</span></em></b></td>
+					<th th:text="${total}" class="text-right" id="precioTotal">precio total</th>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</body>
+</html>

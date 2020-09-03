@@ -305,7 +305,7 @@
 				                   <td th:text="${taller.asignado.nombre}"></td>
 				                  <td>
 <!-- 				                    <a href="#" th:onclick="'modalModificarIngreso(\'' + ${taller.id} + '\');'" class="btn btn-primary btn-sm" data-toggle="tooltip" data-placement="top" role="button" title="Modificar"><i class="fa fa-edit" aria-hidden="true"></i></a> -->
-				                    <a th:if="${taller.asignado.nombre != null}" href="#" th:onclick="'modalModificarIngreso(\'' + ${taller.id} + '\');'" class="btn btn-info btn-sm" data-toggle="tooltip" data-placement="top" role="button" title="Procesar"><i class="fa fa-share" aria-hidden="true"></i></a>
+				                    <a th:if="${taller.asignado.nombre != null}" th:href="@{/talleres/procesar/{id} (id = ${taller.id})}" class="btn btn-info btn-sm" data-toggle="tooltip" data-placement="top" role="button" title="Procesar"><i class="fa fa-share" aria-hidden="true"></i></a>
 				                 	<a th:unless="${taller.asignado.nombre != null}" href="#" th:onclick="'modalAsignarTecnico(\'' + ${taller.id} + '\');'" class="btn btn-info btn-sm" data-toggle="tooltip" data-placement="top" role="button" title="Asignar Tecnico"><i class="fa fa-share" aria-hidden="true"></i></a>
 <!-- 				                 	<a href="#" onclick="return confirm('¿Estas seguro de eliminar el registro?')" data-toggle="tooltip" data-placement="top" class="btn btn-danger btn-sm" role="button" title="Eliminar el registro"><i class="fa fa-trash" aria-hidden="true"></i></a> -->
 				                  </td>
