@@ -42,6 +42,8 @@ public class TallerDetalle {
 	private Integer cantidad = 0;
 	private Double costo = 0.0;
 	private Double precio = 0.0;
+
+	private Double subtotal = 0.0;
 	
 	public Integer getId() {
 		return id;
@@ -109,10 +111,17 @@ public class TallerDetalle {
 	public void setTallerArticulo(TallerArticulo tallerArticulo) {
 		this.tallerArticulo = tallerArticulo;
 	}
+	public Double getSubtotal() {
+		return subtotal;
+	}
+	public void setSubtotal(Double subtotal) {
+		this.subtotal = subtotal;
+	}
 	@Override
 	public String toString() {
 		return "TallerDetalle [id=" + id + ", fecha=" + fecha + ", hora=" + hora + ", articulo=" + articulo
 				+ ", tallerArticulo=" + tallerArticulo + ", taller=" + taller + ", usuario=" + usuario + ", item="
-				+ item + ", cantidad=" + cantidad + ", costo=" + costo + ", precio=" + precio + "]";
+				+ item + ", cantidad=" + cantidad + ", costo=" + costo + ", precio=" + precio + ", subtotal=" + subtotal
+				+ "]";
 	}
 }

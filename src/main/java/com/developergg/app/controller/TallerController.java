@@ -106,6 +106,16 @@ public class TallerController {
 			}else if(taller.getTipo_reparacion().equals("3")) {
 				taller.setTipo_reparacion("Desbloqueo");
 			}
+			List<TallerDetalle> listaDetalles = serviceTalleresDetalle.buscarPorTaller(taller);
+			if(!listaDetalles.isEmpty()) {
+				Double total = 0.0;
+				//Recalculamos el total del taller
+				for (TallerDetalle tallerDetalle : listaDetalles) {
+					total+=tallerDetalle.getSubtotal();
+				}
+				taller.setTotal(total);
+				serviceTalleres.guardar(taller);
+			}
 		}
 		model.addAttribute("taller", taller);
 		return "talleres/taller";
@@ -162,16 +172,10 @@ public class TallerController {
 	@GetMapping("/ajax/loadCuerpoTaller/{idTaller}")
 	public String getCuerpoFacturaTemp(Model model, HttpSession session, @PathVariable("idTaller") Integer idTaller) {
 		Taller taller = serviceTalleres.buscarPorId(idTaller);
-		Double total = 0.0;
 		//Cargamos los detalles
 		List<TallerDetalle> listaDetalles = serviceTalleresDetalle.buscarPorTaller(taller);
-		if(!listaDetalles.isEmpty()) {
-			for (TallerDetalle tallerDetalle : listaDetalles) {
-				total += tallerDetalle.getPrecio();
-			}
-		}
 		model.addAttribute("listaDetalles", listaDetalles);
-		model.addAttribute("total", total);
+		model.addAttribute("total", taller.getTotal());
 		return "talleres/cuerpoTaller :: cuerpoTaller";
 	}
 	
@@ -193,6 +197,7 @@ public class TallerController {
 		detalle.setPrecio(precio);
 		detalle.setTaller(taller);
 		detalle.setUsuario(usuario);
+		detalle.setSubtotal(cantidad*precio);
 		
 		if(idArticulo>0) {
 			Articulo articulo = serviceArticulos.buscarPorId(idArticulo);
@@ -211,18 +216,42 @@ public class TallerController {
 		}
 		
 		serviceTalleresDetalle.guardar(detalle);
+		
+		List<TallerDetalle> listaDetalles = serviceTalleresDetalle.buscarPorTaller(taller);
+		if(!listaDetalles.isEmpty()) {
+			Double total = 0.0;
+			//Recalculamos el total del taller
+			for (TallerDetalle tallerDetalle : listaDetalles) {
+				total+=tallerDetalle.getSubtotal();
+			}
+			taller.setTotal(total);
+			serviceTalleres.guardar(taller);
+		}
+		
 		return "talleres/taller :: #responseAddDetail";
 	}
 	
 	@PostMapping("/ajax/deleteDetail/")
 	public String deleteDetail(Model model, HttpSession session, @RequestParam("idDetalle") Integer idDetalle) {
 		TallerDetalle item = serviceTalleresDetalle.buscarPorId(idDetalle);
+		Taller taller = item.getTaller();
 		if(item!=null) {
 			//Verificamos si tinee registro en los articulos del taller
 			if(item.getTallerArticulo()!=null) {
 				TallerArticulo tallerArticulo = item.getTallerArticulo();
 				tallerArticulo.setCantidad(tallerArticulo.getCantidad()+item.getCantidad());
 				serviceTalleresArticulos.guardar(tallerArticulo);
+			}
+			List<TallerDetalle> listaDetalles = serviceTalleresDetalle.buscarPorTaller(taller);
+			if(!listaDetalles.isEmpty()) {
+				Double total = 0.0;
+				//Recalculamos el total del taller
+				for (TallerDetalle tallerDetalle : listaDetalles) {
+					total+=tallerDetalle.getSubtotal();
+				}
+				total-=item.getSubtotal();
+				taller.setTotal(total);
+				serviceTalleres.guardar(taller);
 			}
 			serviceTalleresDetalle.eliminar(item);
 		}

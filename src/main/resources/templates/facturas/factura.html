@@ -118,6 +118,7 @@
 			  <button class="btn btn-primary pull-right" id="btnServiceModal">Servicio</button>
 			  <button class="btn btn-success pull-right" id="btnClienteModal">Clientes</button>
 			  <button class="btn btn-info pull-right" id="btnTallerModal">Taller</button>
+			  <button class="btn btn-standar pull-right" id="btnVerTaleres">Ver Talleres</button>
 			  <button class="btn btn-danger" onclick="javascript:location.href='/facturas/cancelarFactura'">Cancelar</button>
 			  <button class="btn btn-warning" onclick="javascript:location.href='/facturas/'">Regresar</button>
 		</form>
@@ -255,6 +256,58 @@
       <div class="modal-footer">
         <button type="button" class="btn btn-warning" data-dismiss="modal">Regresar</button>
         <button type="button" class="btn btn-standar" id="guardarSerialesDelProducto">Guardar</button>
+      </div>
+    </div>
+
+  </div>
+</div>	
+
+<!-- Modal Add Seriales-->
+<div id="verTalleresModal" class="modal fade" role="dialog" data-backdrop="static">
+  <div class="modal-dialog modal-lg">
+
+    <!-- Modal content-->
+    <div class="modal-content all">
+      <div class="modal-header">
+        <h4 class="modal-title">Equipos en el Taller</h4>
+      </div>
+      <div class="modal-body">
+		<div class="row">
+			<div class="col col-md-12">
+				<div class="table-responsive">
+					<table class="table table-hover">
+						<thead>
+							<tr style="background-color: #17a2b8; color: #fff">
+								<th class="text-center">Cliente</th>
+								<th>Telefono</th>
+								<th>Equipo</th>
+								<th>Serial</th>
+								<th>Estado</th>
+								<th>Avance</th>
+								<th>Total</th>
+								<th>Accion</th>
+							</tr>
+						</thead>
+						<tbody class="items">
+							<tr th:each="taller: ${listaTalleres}">
+								<td th:text="${taller.nombre}" class="text-center">Cliente</td>
+								<td th:text="${taller.telefono}" class="text-center">Telefono</td>
+								<td th:text="${taller.marca} + ${taller.modelo}" class="text-center">Equipo</td>
+								<td th:text="${taller.serial}" class="text-center">Serial</td>
+								<td th:text="${taller.estado}" class="text-center">Estado</td>
+								<td th:text="${taller.avance}" class="text-center">Avance</td>
+								<td th:text="${taller.total - taller.avance}" class="text-center">Total</td>
+								<td th:if="${taller.estado == 'Reparado'}"><a href="#" class="btn btn-primary" th:onclick="'agregarAFactura(\'' + ${taller.id} + '\');'"><i class="fa fa-check" style="font-size: 15px;"></i></a></td>			
+								<td th:unless="${taller.estado == 'Reparado'}"> &nbsp; </td>			
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-warning" data-dismiss="modal">Regresar</button>
       </div>
     </div>
 

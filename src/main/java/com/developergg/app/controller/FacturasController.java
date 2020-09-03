@@ -77,6 +77,8 @@ import com.developergg.app.service.IFacturasService;
 import com.developergg.app.service.IFacturasServiciosTempService;
 import com.developergg.app.service.IFacturasTempService;
 import com.developergg.app.service.IFormasPagoService;
+import com.developergg.app.service.ITalleresDetallesService;
+import com.developergg.app.service.ITalleresService;
 import com.developergg.app.service.ITiposEquipoService;
 import com.developergg.app.service.IVendedoresService;
 
@@ -157,6 +159,12 @@ public class FacturasController {
 	
 	@Autowired
 	private IAbonosCxCDetallesService serviceAbonosDetalles;
+	
+	@Autowired
+	private ITalleresService serviceTalleres;
+	
+	@Autowired
+	private ITalleresDetallesService serviceTalleresDetalles;
 	
 	@Autowired
 	private DataSource dataSource;
@@ -254,7 +262,11 @@ public class FacturasController {
 				}
 			}
 		}
-
+		
+		//Verificamos el listado en taller
+		List<Taller> listaTalleres = serviceTalleres.buscarPorAlmacen(usuario.getAlmacen());
+		
+		model.addAttribute("listaTalleres", listaTalleres);
 		model.addAttribute("listaArticulos", listaDefinitive);
 		model.addAttribute("vendedores", listaVendedores);
 		model.addAttribute("condicionesPago", condicionesPago);

@@ -1087,6 +1087,14 @@ function guardarFacturaCredito(){
 		}
 }
 
+$("#btnVerTaleres").click(function(e){
+	e.preventDefault();
+	$("#verTalleresModal").modal("show");
+});
+
+function agregarAFactura(idTaller){
+	
+}
 
 
 

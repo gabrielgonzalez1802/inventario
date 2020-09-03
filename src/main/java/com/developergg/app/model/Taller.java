@@ -10,6 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 @Entity
 @Table(name = "taller")
@@ -48,6 +49,8 @@ public class Taller {
 	private String problema;
 	private Integer entregado = 0;
 	private Double avance = 0.0;
+	
+	private Double total = 0.0; 
 	
 	@OneToOne
 	@JoinColumn(name = "asignado")
@@ -195,14 +198,20 @@ public class Taller {
 	public void setAsignado(Usuario asignado) {
 		this.asignado = asignado;
 	}
+	public Double getTotal() {
+		return total;
+	}
+	public void setTotal(Double total) {
+		this.total = total;
+	}
 	@Override
 	public String toString() {
 		return "Taller [id=" + id + ", codigo=" + codigo + ", fecha=" + fecha + ", hora=" + hora + ", nombre=" + nombre
 				+ ", cedula=" + cedula + ", telefono=" + telefono + ", celular=" + celular + ", marca=" + marca
 				+ ", tipoEquipo=" + tipoEquipo + ", modelo=" + modelo + ", serial=" + serial + ", tipo_reparacion="
 				+ tipo_reparacion + ", estado=" + estado + ", almacen=" + almacen + ", usuario=" + usuario
-				+ ", problema=" + problema + ", entregado=" + entregado + ", avance=" + avance + ", asignado="
-				+ asignado + ", motivo=" + motivo + ", entregado_por=" + entregado_por + ", fecha_entrega="
-				+ fecha_entrega + "]";
+				+ ", problema=" + problema + ", entregado=" + entregado + ", avance=" + avance + ", total=" + total
+				+ ", asignado=" + asignado + ", motivo=" + motivo + ", entregado_por=" + entregado_por
+				+ ", fecha_entrega=" + fecha_entrega + "]";
 	}
 }

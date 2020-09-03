@@ -32,7 +32,7 @@ $("#btnAddDiagnostico").click(function(e){
 			 'costo' : costo,
 			 'cantidad' : 1,
 			 'precio' : precio,
-			 'idArticulo' : idArticulo,
+			 'idArticulo' : 0,
 			 'tallerArticuloId' : 0
 		 },function(data){
 			taller_detalle_items();
