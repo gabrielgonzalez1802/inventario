@@ -10,52 +10,45 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "temp_facturas_talleres")
-public class FacturaTallerTemp {
+@Table(name = "facturas_detalle_talleres")
+public class FacturaDetalleTaller {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "id_factura_taller_temp")
+	@Column(name = "id_factura_detalle_taller")
 	private Integer id;
 	
 	private String descripcion;
-	private Double costo = 0.0;
-	private Integer cantidad = 0;
-	private Double precio = 0.0;
-	private Double itbis = 0.0;
-	private Double subtotal = 0.0;
+	private Double costo;
+	private Integer cantidad;
+	private Double precio;
+	
+	@OneToOne
+	@JoinColumn(name = "id_almacen")
+	private Almacen almacen;
+	
+	private Double itbis;
+	private Double subtotal;
 	
 	@OneToOne
 	@JoinColumn(name = "id_usuario")
 	private Usuario usuario;
 	
 	@OneToOne
-	@JoinColumn(name = "id_taller")
-	private Taller taller;
-	
-	@OneToOne
-	@JoinColumn(name = "id_taller_detalle")
-	private TallerDetalle tallerDetalle;
-
-	@OneToOne
 	@JoinColumn(name = "id_comprobanteFiscal")
 	private ComprobanteFiscal comprobanteFiscal;
 	
 	@OneToOne
-	@JoinColumn(name = "id_taller_articulo")
-	private TallerArticulo tallerArticulo;
+	@JoinColumn(name = "id_factura")
+	private Factura factura;
 	
 	@OneToOne
 	@JoinColumn(name = "id_articulo")
 	private Articulo articulo;
 	
 	@OneToOne
-	@JoinColumn(name = "id_almacen")
-	private Almacen almacen;
-	
-	@OneToOne
-	@JoinColumn(name = "id_factura_temp")
-	private FacturaTemp facturaTemp;
+	@JoinColumn(name = "id_taller_articulo")
+	private TallerArticulo tallerArticulo;
 
 	public Integer getId() {
 		return id;
@@ -97,6 +90,14 @@ public class FacturaTallerTemp {
 		this.precio = precio;
 	}
 
+	public Almacen getAlmacen() {
+		return almacen;
+	}
+
+	public void setAlmacen(Almacen almacen) {
+		this.almacen = almacen;
+	}
+
 	public Double getItbis() {
 		return itbis;
 	}
@@ -129,36 +130,12 @@ public class FacturaTallerTemp {
 		this.comprobanteFiscal = comprobanteFiscal;
 	}
 
-	public TallerDetalle getTallerDetalle() {
-		return tallerDetalle;
+	public Factura getFactura() {
+		return factura;
 	}
 
-	public void setTallerDetalle(TallerDetalle tallerDetalle) {
-		this.tallerDetalle = tallerDetalle;
-	}
-
-	public Taller getTaller() {
-		return taller;
-	}
-
-	public void setTaller(Taller taller) {
-		this.taller = taller;
-	}
-
-	public Almacen getAlmacen() {
-		return almacen;
-	}
-
-	public void setAlmacen(Almacen almacen) {
-		this.almacen = almacen;
-	}
-
-	public FacturaTemp getFacturaTemp() {
-		return facturaTemp;
-	}
-
-	public void setFacturaTemp(FacturaTemp facturaTemp) {
-		this.facturaTemp = facturaTemp;
+	public void setFactura(Factura factura) {
+		this.factura = factura;
 	}
 
 	public Articulo getArticulo() {
@@ -179,10 +156,9 @@ public class FacturaTallerTemp {
 
 	@Override
 	public String toString() {
-		return "FacturaTallerTemp [id=" + id + ", descripcion=" + descripcion + ", costo=" + costo + ", cantidad="
-				+ cantidad + ", precio=" + precio + ", itbis=" + itbis + ", subtotal=" + subtotal + ", usuario="
-				+ usuario + ", taller=" + taller + ", tallerDetalle=" + tallerDetalle + ", comprobanteFiscal="
-				+ comprobanteFiscal + ", tallerArticulo=" + tallerArticulo + ", articulo=" + articulo + ", almacen="
-				+ almacen + ", facturaTemp=" + facturaTemp + "]";
+		return "FacturaDetalleTaller [id=" + id + ", descripcion=" + descripcion + ", costo=" + costo + ", cantidad="
+				+ cantidad + ", precio=" + precio + ", almacen=" + almacen + ", itbis=" + itbis + ", subtotal="
+				+ subtotal + ", usuario=" + usuario + ", comprobanteFiscal=" + comprobanteFiscal + ", factura="
+				+ factura + ", articulo=" + articulo + ", tallerArticulo=" + tallerArticulo + "]";
 	}
 }

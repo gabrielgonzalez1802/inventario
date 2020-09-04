@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.developergg.app.model.Almacen;
 import com.developergg.app.model.Articulo;
+import com.developergg.app.model.FacturaTemp;
 import com.developergg.app.model.Taller;
 import com.developergg.app.model.TallerArticulo;
 import com.developergg.app.repository.TalleresArticulosRepository;
@@ -54,6 +55,11 @@ public class TalleresArticulosServiceJpa implements ITalleresArticulosService{
 		if(optional.isPresent()){
 			repo.delete(optional.get());
 		}
+	}
+
+	@Override
+	public List<TallerArticulo> buscarPorFacturaTemp(FacturaTemp facturaTemp) {
+		return repo.findByFacturaTemp(facturaTemp);
 	}
 
 }

@@ -66,10 +66,6 @@ public class Factura {
 	private Integer cuotas;
 	
 	@OneToOne
-	@JoinColumn(name = "id_taller")
-	private Taller taller;
-	
-	@OneToOne
 	@JoinColumn(name = "forma_pago")
 	private FormaPago formaPago;
 	
@@ -248,14 +244,6 @@ public class Factura {
 		this.cuotas = cuotas;
 	}
 
-	public Taller getTaller() {
-		return taller;
-	}
-
-	public void setTaller(Taller taller) {
-		this.taller = taller;
-	}
-
 	public FormaPago getFormaPago() {
 		return formaPago;
 	}
@@ -312,8 +300,7 @@ public class Factura {
 				+ total_venta + ", nombre_cliente=" + nombre_cliente + ", telefono_cliente=" + telefono_cliente
 				+ ", rnc_cliente=" + rnc_cliente + ", nota_factura=" + nota_factura + ", total_itbis=" + total_itbis
 				+ ", usuario=" + usuario + ", vendedor=" + vendedor + ", almacen=" + almacen + ", abono=" + abono
-				+ ", credito=" + credito + ", cuotas=" + cuotas + ", taller=" + taller + ", formaPago=" + formaPago
-				+ ", avance_taller=" + avance_taller + ", comision=" + comision + ", id_comision=" + id_comision
-				+ ", paga=" + paga + "]";
+				+ ", credito=" + credito + ", cuotas=" + cuotas + ", formaPago=" + formaPago + ", avance_taller="
+				+ avance_taller + ", comision=" + comision + ", id_comision=" + id_comision + ", paga=" + paga + "]";
 	}
 }

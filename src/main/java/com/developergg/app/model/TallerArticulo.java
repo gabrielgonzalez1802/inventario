@@ -29,11 +29,15 @@ public class TallerArticulo {
 	private Articulo articulo; //Se utilizara solo para los articulos que modifiquen inventario 
 	
 	@OneToOne
+	@JoinColumn(name = "id_factura_temp")
+	private FacturaTemp facturaTemp;
+	
+	@OneToOne
 	@JoinColumn(name = "id_almacen")
 	private Almacen almacen;
 	
-	private Double costo;
-	private Double precio;
+	private Double costo = 0.0;
+	private Double precio = 0.0;
 	private Integer cantidad;
 	private Date fecha;
 	private String hora;
@@ -131,10 +135,19 @@ public class TallerArticulo {
 		this.almacen = almacen;
 	}
 
+	public FacturaTemp getFacturaTemp() {
+		return facturaTemp;
+	}
+
+	public void setFacturaTemp(FacturaTemp facturaTemp) {
+		this.facturaTemp = facturaTemp;
+	}
+
 	@Override
 	public String toString() {
-		return "TallerArticulo [id=" + id + ", taller=" + taller + ", articulo=" + articulo + ", almacen=" + almacen
-				+ ", costo=" + costo + ", precio=" + precio + ", cantidad=" + cantidad + ", fecha=" + fecha + ", hora="
-				+ hora + ", nombre=" + nombre + ", usuario=" + usuario + "]";
+		return "TallerArticulo [id=" + id + ", taller=" + taller + ", articulo=" + articulo + ", facturaTemp="
+				+ facturaTemp + ", almacen=" + almacen + ", costo=" + costo + ", precio=" + precio + ", cantidad="
+				+ cantidad + ", fecha=" + fecha + ", hora=" + hora + ", nombre=" + nombre + ", usuario=" + usuario
+				+ "]";
 	}
 }

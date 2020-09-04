@@ -47,14 +47,18 @@ import com.developergg.app.model.Factura;
 import com.developergg.app.model.FacturaDetalle;
 import com.developergg.app.model.FacturaDetallePagoTemp;
 import com.developergg.app.model.FacturaDetalleServicio;
+import com.developergg.app.model.FacturaDetalleTaller;
 import com.developergg.app.model.FacturaDetalleTemp;
 import com.developergg.app.model.FacturaPago;
 import com.developergg.app.model.FacturaPagoTemp;
 import com.developergg.app.model.FacturaSerialTemp;
 import com.developergg.app.model.FacturaServicioTemp;
+import com.developergg.app.model.FacturaTallerTemp;
 import com.developergg.app.model.FacturaTemp;
 import com.developergg.app.model.FormaPago;
 import com.developergg.app.model.Taller;
+import com.developergg.app.model.TallerArticulo;
+import com.developergg.app.model.TallerDetalle;
 import com.developergg.app.model.TipoEquipo;
 import com.developergg.app.model.Usuario;
 import com.developergg.app.model.Vendedor;
@@ -69,14 +73,17 @@ import com.developergg.app.service.ICondicionesPagoService;
 import com.developergg.app.service.IFacturasDetallesPagoTempService;
 import com.developergg.app.service.IFacturasDetallesService;
 import com.developergg.app.service.IFacturasDetallesServiciosService;
+import com.developergg.app.service.IFacturasDetallesTallerService;
 import com.developergg.app.service.IFacturasDetallesTempService;
 import com.developergg.app.service.IFacturasPagoService;
 import com.developergg.app.service.IFacturasPagoTempService;
 import com.developergg.app.service.IFacturasSerialesTempService;
 import com.developergg.app.service.IFacturasService;
 import com.developergg.app.service.IFacturasServiciosTempService;
+import com.developergg.app.service.IFacturasTalleresTempService;
 import com.developergg.app.service.IFacturasTempService;
 import com.developergg.app.service.IFormasPagoService;
+import com.developergg.app.service.ITalleresArticulosService;
 import com.developergg.app.service.ITalleresDetallesService;
 import com.developergg.app.service.ITalleresService;
 import com.developergg.app.service.ITiposEquipoService;
@@ -165,6 +172,15 @@ public class FacturasController {
 	
 	@Autowired
 	private ITalleresDetallesService serviceTalleresDetalles;
+	
+	@Autowired
+	private IFacturasTalleresTempService serviceFacturasTalleresTemp;
+	
+	@Autowired
+	private ITalleresArticulosService serviceTalleresArticulos;
+	
+	@Autowired
+	private IFacturasDetallesTallerService serviceFacturasDetallesTaller;
 	
 	@Autowired
 	private DataSource dataSource;
@@ -389,11 +405,6 @@ public class FacturasController {
 			}
 		}
 
-		//TODO:GGONZALEZ logica del taller
-		//if($id_taller_factura>0)
-		 // $sql="UPDATE taller SET entregado=1,entregado_por ='$id_usuario',fecha_entrega='$fecha' WHERE id_reparacion = $id_taller_factura limit 1";
-		 // mysql_query($sql);
-
 		//detalles de la factura
 		for (FacturaDetalleTemp facturaDetalleTemp : facturaDetallesTemp) {
 			FacturaDetalle facturaDetalle = new FacturaDetalle();
@@ -469,6 +480,45 @@ public class FacturasController {
 			facturasDetallesServiciosService.guardar(facturaDetalleServicio);
 		}
 		
+		//talleres
+		List<FacturaTallerTemp> facturasTalleresTemp = serviceFacturasTalleresTemp.buscarPorFacturaTemp(facturaTemp);
+		for (FacturaTallerTemp facturaTallerTemp : facturasTalleresTemp) {
+			FacturaDetalleTaller facturaTaller = new FacturaDetalleTaller();
+			facturaTaller.setAlmacen(usuario.getAlmacen());
+			
+			if(facturaTallerTemp.getArticulo()!=null) {
+				facturaTaller.setArticulo(facturaTallerTemp.getArticulo());
+				//genera la salida del articulo en el taller
+				List<ArticuloAjuste> lista = serviceArticulosAjuste.buscarPorArticuloYAlmacen(facturaTallerTemp.getArticulo(), usuario.getAlmacen());
+				ArticuloAjuste newArticuloAjuste = lista.get(lista.size()-1);
+				ArticuloAjuste newArticuloAjusteDefinitive = new ArticuloAjuste();
+				newArticuloAjusteDefinitive.setAlmacen(usuario.getAlmacen());
+				newArticuloAjusteDefinitive.setArticulo(facturaTallerTemp.getArticulo());
+				newArticuloAjusteDefinitive.setAlmacen(usuario.getAlmacen());
+				newArticuloAjusteDefinitive.setFecha(new Date());
+				newArticuloAjusteDefinitive.setUsuario(usuario);
+				newArticuloAjusteDefinitive.setTipoMovimiento("salida");
+				newArticuloAjusteDefinitive.setCantidad(facturaTallerTemp.getCantidad());
+				newArticuloAjusteDefinitive.setCosto(facturaTallerTemp.getCosto());
+				newArticuloAjusteDefinitive.setExistencia(newArticuloAjuste.getDisponible());
+				newArticuloAjusteDefinitive.setNo_factura(String.valueOf(factura.getCodigo()));
+				newArticuloAjusteDefinitive.setDisponible(newArticuloAjusteDefinitive.getExistencia());
+				serviceArticulosAjuste.guardar(newArticuloAjusteDefinitive);
+			}
+			
+			facturaTaller.setCantidad(facturaTallerTemp.getCantidad());
+			facturaTaller.setComprobanteFiscal(facturaTallerTemp.getComprobanteFiscal());
+			facturaTaller.setCosto(facturaTallerTemp.getCosto());
+			facturaTaller.setDescripcion(facturaTallerTemp.getDescripcion());
+			facturaTaller.setFactura(factura);
+			facturaTaller.setItbis(facturaTallerTemp.getItbis());
+			facturaTaller.setPrecio(facturaTallerTemp.getPrecio());
+			facturaTaller.setSubtotal(facturaTallerTemp.getSubtotal());
+			facturaTaller.setTallerArticulo(facturaTallerTemp.getTallerArticulo());
+			facturaTaller.setUsuario(usuario);
+			serviceFacturasDetallesTaller.guardar(facturaTaller);
+		}
+		
 		//obtenemos los seriales temporales de la factura
 		List<FacturaSerialTemp> listaSerialesTemp = serviceFacturasSerialesTemp.buscarPorFacturaTemp(facturaTemp);
 		//borramos registros temporales
@@ -488,6 +538,14 @@ public class FacturasController {
 			//borramos los pagos
 			serviceFacturaDetallesPagosTemp.eliminarListaPagos(detallesPagosTemp);
 		}
+		if(!facturasTalleresTemp.isEmpty()) {
+			//borramos lostalleres
+			serviceFacturasTalleresTemp.elminar(facturasTalleresTemp);
+		}
+		
+		if(facturaTemp.getTaller()!=null) {
+			serviceTalleres.eliminar(facturaTemp.getTaller());
+		}
 		
 		//Borramos la factura temporal
 		serviceFacturasTemp.eliminar(facturaTemp); 
@@ -500,15 +558,8 @@ public class FacturasController {
 	public void descargarFactura(@PathVariable("id") Integer idFactura,
 			HttpServletRequest request, 
             HttpServletResponse response
-           // @RequestHeader String referer
             ) throws JRException, SQLException {
-		
-		//Check the renderer
-//        if(referer != null && !referer.isEmpty()) {
-//            //do nothing
-//            //or send error
-//        }
-        
+
 		Factura factura = serviceFacturas.buscarPorId(idFactura);
 		
 		if(factura!=null) {
@@ -622,7 +673,6 @@ public class FacturasController {
 			for (FacturaDetalleServicio facturaDetalleServicio : detalleServicios) {
 				DetalleFactura detalleFacturaServicio = new DetalleFactura();
 				detalleFacturaServicio.setId(facturaDetalleServicio.getId());
-				detalleFacturaServicio.setOriginalTable("");
 				detalleFacturaServicio.setOriginalTable("factura_detalle_servicio");
 				detalleFacturaServicio.setCantidad(facturaDetalleServicio.getCantidad());
 				detalleFacturaServicio.setDescripcion(facturaDetalleServicio.getDescripcion());
@@ -630,6 +680,20 @@ public class FacturasController {
 				detalleFacturaServicio.setPrecio(facturaDetalleServicio.getPrecio());
 				detalleFacturaServicio.setSubtotal(facturaDetalleServicio.getSubtotal());
 				listaDetalle.add(detalleFacturaServicio);
+			}
+			
+			//verificamos si tiene taller
+			List<FacturaDetalleTaller> detallesTaller = serviceFacturasDetallesTaller.buscarPorFactura(factura);
+			for (FacturaDetalleTaller detalleTaller : detallesTaller) {
+				DetalleFactura detalleFacturaTaller = new DetalleFactura();
+				detalleFacturaTaller.setId(detalleTaller.getId());
+				detalleFacturaTaller.setOriginalTable("facturas_detalle_talleres");
+				detalleFacturaTaller.setCantidad(detalleTaller.getCantidad());
+				detalleFacturaTaller.setDescripcion(detalleTaller.getDescripcion());
+				detalleFacturaTaller.setItbis(detalleTaller.getItbis());
+				detalleFacturaTaller.setPrecio(detalleTaller.getPrecio());
+				detalleFacturaTaller.setSubtotal(detalleTaller.getSubtotal());
+				listaDetalle.add(detalleFacturaTaller);
 			}
 			
 			JasperReport jasperReport = JasperCompileManager.compileReport(rutaJreport);
@@ -682,6 +746,7 @@ public class FacturasController {
 		List<FacturaDetallePagoTemp> detallesPagosTemp = serviceFacturaDetallesPagosTemp.buscarPorFacturaTemp(facturaTemp); 
 		List<FacturaServicioTemp> facturasServicioTemp = facturasServiciosTempService.buscarPorUsuarioAlmacen(usuario, usuario.getAlmacen());
 		List<FacturaSerialTemp> listaSerialesTemp = serviceFacturasSerialesTemp.buscarPorFacturaTemp(facturaTemp);
+		List<FacturaTallerTemp> facturasTallersTemp = serviceFacturasTalleresTemp.buscarPorFacturaTemp(facturaTemp);
 		
 		//borramos registros temporales
 		if(!listaSerialesTemp.isEmpty()) {
@@ -699,6 +764,40 @@ public class FacturasController {
 		if(!detallesPagosTemp.isEmpty()) {
 			//borramos los pagos
 			serviceFacturaDetallesPagosTemp.eliminarListaPagos(detallesPagosTemp);
+		}
+		if(!facturasTallersTemp.isEmpty()) {
+			Taller taller = facturasTallersTemp.get(0).getTaller();
+			//Los items volveran al taller
+			for (FacturaTallerTemp facturaTallerTemp : facturasTallersTemp) {
+				TallerDetalle detalle = facturaTallerTemp.getTallerDetalle();
+				TallerArticulo tallerArticulo = detalle.getTallerArticulo();
+				if(tallerArticulo.getArticulo()!=null) {
+					//verificamos si el articulo viene de inventario
+					if(tallerArticulo.getArticulo()!=null) {
+						tallerArticulo.setCantidad(tallerArticulo.getCantidad()+detalle.getCantidad()); 
+						serviceTalleresArticulos.guardar(tallerArticulo);
+						taller.setTotal(taller.getTotal()-detalle.getSubtotal());
+						serviceTalleresDetalles.eliminar(detalle);
+					}
+				}else {
+					tallerArticulo.setCantidad(tallerArticulo.getCantidad()+detalle.getCantidad()); 
+					serviceTalleresArticulos.guardar(tallerArticulo);
+					taller.setTotal(taller.getTotal()-detalle.getSubtotal());
+					serviceTalleresDetalles.eliminar(detalle);
+				}
+			}
+			taller.setEstado("Abierto");
+			taller.setFacturaTemp(null);
+			serviceTalleres.guardar(taller);
+			serviceFacturasTalleresTemp.elminar(facturasTallersTemp);
+		}
+		//Verificamos si existe registros en taller que usen la factura temporal
+		List<Taller> listaTaller = serviceTalleres.buscarPorFacturaTemp(facturaTemp);
+		if(!listaTaller.isEmpty()) {
+			for (Taller taller : listaTaller) {
+				taller.setFacturaTemp(null);
+				serviceTalleres.guardar(taller);
+			}
 		}
 		//Borramos la factura temporal
 		serviceFacturasTemp.eliminar(facturaTemp); 	

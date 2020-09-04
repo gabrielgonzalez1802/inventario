@@ -660,6 +660,7 @@ function factura_detalle_items(incluyeItbis){
 			$('#divButtonSaveFact').hide();
 		}else{
 			$('#divButtonSaveFact').show();
+			$("#btnVerTaleres").hide();
 		}
 	});
 }
@@ -1099,6 +1100,8 @@ function agregarAFactura(idTaller){
 		  'idTaller': idTaller
 		},
 		function(data, status){
+			$("#btnTallerModal").modal("hide");
+			$("#verTalleresModal").modal("hide");
 			factura_detalle_items(incluyeItbis);
 			focusSelectArticuloNew();
 		});

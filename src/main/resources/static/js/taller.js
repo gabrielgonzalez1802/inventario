@@ -152,12 +152,23 @@ $("#agregarItem").click(function(e){
 			 'idArticulo' : idArticulo,
 			 'tallerArticuloId' : tallerArticuloId
 		 },function(data){
-			//recargar la lista de articulos
-			$('#articulos').load("/talleres/ajax/getListaArticulos/"+idTaller,function(){});
-			$("#cantidad").val("");
-			$("#precio").val("");
-			focusSelectArticuloNew();
-			taller_detalle_items();
+			 $('#responseAddDetail').replaceWith(data);
+			 if( $('#responseAddDetail').val()==0){
+					//recargar la lista de articulos
+					$('#articulos').load("/talleres/ajax/getListaArticulos/"+idTaller,function(){});
+					$("#cantidad").val("");
+					$("#precio").val("");
+					focusSelectArticuloNew();
+					taller_detalle_items();
+			 }else{
+				 Swal.fire({
+						title : 'Advertencia!',
+						text : 'El precio del articulo no puede ser menor al precio x mayor',
+						position : 'top',
+						icon : 'warning',
+						confirmButtonText : 'Cool'
+					})
+			 }
 		 });
 	}
 });

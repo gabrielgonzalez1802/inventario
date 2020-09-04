@@ -119,9 +119,7 @@
 				                   <td th:text="${item.cantidad}"></td> 
 				                   <td th:text="${item.precio}"></td> 
 				                  <td>
-				                    <a th:if="${item.articulo.nombre != null}" th:href="@{/talleres/procesar/{id} (id = ${item.id})}" class="btn btn-info btn-sm" data-toggle="tooltip" data-placement="top" role="button" title="Procesar"><i class="fa fa-share" aria-hidden="true"></i></a>
-				                 	<a th:unless="${item.articulo.nombre != null}" href="#" th:onclick="'modalAsignarTecnico(\'' + ${item.id} + '\');'" class="btn btn-info btn-sm" data-toggle="tooltip" data-placement="top" role="button" title="Asignar Tecnico"><i class="fa fa-share" aria-hidden="true"></i></a>
-<!-- 				                 	<a href="#" onclick="return confirm('¿Estas seguro de eliminar el registro?')" data-toggle="tooltip" data-placement="top" class="btn btn-danger btn-sm" role="button" title="Eliminar el registro"><i class="fa fa-trash" aria-hidden="true"></i></a> -->
+				                 	<a th:href="@{/tallerArticulos/delete/{id} (id=${item.id})}" onclick="return confirm('¿Estas seguro de eliminar el registro?')" data-toggle="tooltip" data-placement="top" class="btn btn-danger btn-sm" role="button" title="Eliminar el registro"><i class="fa fa-trash" aria-hidden="true"></i></a>
 				                  </td>
 				                </tr>
 							</tbody>
@@ -133,6 +131,18 @@
 	<script th:src="@{/js/jquery.min.js}"></script>
     <script th:src="@{/bootstrap/js/bootstrap.min.js}"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+	
+	<span th:if="${msgError != null}" class="alert alert-success" role="alert">
+		<script type="text/javascript">
+		Swal.fire({
+			  title: 'Error!',
+			  text: 'No se puede borrar el registro, tiene una facturacion pendiente, debera cancelar la misma para luego borrar',
+			  icon: 'error',
+			  confirmButtonText: 'Cool'
+			})
+		</script>
+	</span>
+	
 	<script type="text/javascript">
 	$(document).ready(function() {
 		$('#tabla').DataTable({

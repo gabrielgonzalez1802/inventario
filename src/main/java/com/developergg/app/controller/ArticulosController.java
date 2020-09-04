@@ -1,10 +1,13 @@
 package com.developergg.app.controller;
 
 import java.text.DecimalFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpSession;
@@ -40,6 +43,7 @@ import com.developergg.app.model.Propietario;
 import com.developergg.app.model.SerialTemporal;
 import com.developergg.app.model.Suplidor;
 import com.developergg.app.model.Taller;
+import com.developergg.app.model.TallerArticulo;
 import com.developergg.app.model.Usuario;
 import com.developergg.app.service.IArticulosAjustesService;
 import com.developergg.app.service.IArticulosSeriales;
@@ -54,6 +58,7 @@ import com.developergg.app.service.IFacturasServiciosTempService;
 import com.developergg.app.service.IFacturasTalleresTempService;
 import com.developergg.app.service.IFacturasTempService;
 import com.developergg.app.service.ISuplidoresService;
+import com.developergg.app.service.ITalleresArticulosService;
 import com.developergg.app.service.ITalleresService;
 import com.developergg.app.util.Utileria;
 
@@ -102,6 +107,9 @@ public class ArticulosController {
 	
 	@Autowired
 	private ITalleresService serviceTalleres;
+	
+	@Autowired
+	private ITalleresArticulosService serviceTalleresArticulos;
 	
 	@Value("${inventario.ruta.imagenes}")
 	private String ruta;
@@ -258,20 +266,53 @@ public class ArticulosController {
 		// verificar si el registro tiene inventario
 		List<ArticuloAjuste> lista = serviceArticulosAjustes.buscarPorArticuloYAlmacen(articulo, usuario.getAlmacen());
 		//Caso para entradas y salidas
-		if(articuloAjuste.getTipoMovimiento().equalsIgnoreCase("entrada") || (articuloAjuste.getTipoMovimiento().equalsIgnoreCase("salida"))) {
+		if(articuloAjuste.getTipoMovimiento().equalsIgnoreCase("entrada") || (articuloAjuste.getTipoMovimiento().equalsIgnoreCase("salida"))
+				|| (articuloAjuste.getTipoMovimiento().equalsIgnoreCase("enviarTaller"))) {
 			// Si no tiene registros se crea uno nuevo, de lo contrario, 
 			//utilizamos los valores del inventario de articulo como referencia para el nuevo registro
 			if(lista.isEmpty()) {
-				articuloAjuste.setExistencia(articuloAjuste.getCantidad());
-				articuloAjuste.setDisponible(articuloAjuste.getCantidad());
-				articuloAjuste.setFecha(new Date());
-				articuloAjuste.setAlmacen(usuario.getAlmacen());
-				articuloAjuste.setUsuario(usuario);
-				serviceArticulosAjustes.guardar(articuloAjuste);
-				if(articuloAjuste.getId()!=null) {
-					attributes.addFlashAttribute("msg", "Registro creado");
+				if(!articuloAjuste.getTipoMovimiento().equalsIgnoreCase("enviarTaller")) {
+					articuloAjuste.setExistencia(articuloAjuste.getCantidad());
+					articuloAjuste.setDisponible(articuloAjuste.getCantidad());
+					articuloAjuste.setFecha(new Date());
+					articuloAjuste.setAlmacen(usuario.getAlmacen());
+					articuloAjuste.setUsuario(usuario);
+					serviceArticulosAjustes.guardar(articuloAjuste);
+					if(articuloAjuste.getId()!=null) {
+						attributes.addFlashAttribute("msg", "Registro creado");
+					}else {
+						attributes.addFlashAttribute("msg3", "Registro no creado");
+					}
 				}else {
-					attributes.addFlashAttribute("msg3", "Registro no creado");
+					//Enviar al taller
+					DateTimeFormatter formatter = DateTimeFormatter.ofPattern("KK:mm:ss a", Locale.ENGLISH);
+				    String now = LocalDateTime.now().format(formatter);
+				    TallerArticulo tallerArticulo = new TallerArticulo();
+				    tallerArticulo.setCantidad(articuloAjuste.getCantidad());
+				    tallerArticulo.setArticulo(articuloAjuste.getArticulo());
+					tallerArticulo.setFecha(new Date());
+					tallerArticulo.setPrecio(articuloAjuste.getArticulo().getPrecio_mayor());
+					tallerArticulo.setNombre(articulo.getNombre());
+					tallerArticulo.setHora(now);
+					tallerArticulo.setUsuario(usuario);
+					tallerArticulo.setAlmacen(usuario.getAlmacen());
+					tallerArticulo.setCosto(articuloAjuste.getCosto());
+					serviceTalleresArticulos.guardar(tallerArticulo);
+					if(tallerArticulo.getId()!=null) {
+						articuloAjuste.setExistencia(0);
+						articuloAjuste.setDisponible(0);
+						articuloAjuste.setCantidad(articuloAjuste.getCantidad());
+						articuloAjuste.setTipoMovimiento(articuloAjuste.getTipoMovimiento());
+						articuloAjuste.setFecha(new Date());
+						articuloAjuste.setAlmacen(usuario.getAlmacen());
+						articuloAjuste.setUsuario(usuario);
+						serviceArticulosAjustes.guardar(articuloAjuste);
+						if(articuloAjuste.getId()!=null) {
+							attributes.addFlashAttribute("msg", "Registro creado");
+						}else {
+							attributes.addFlashAttribute("msg3", "Registro no creado");
+						}
+					}
 				}
 			}else {
 				//ordenamos el ultimo elemento de la lista
@@ -297,9 +338,24 @@ public class ArticulosController {
 						attributes.addFlashAttribute("msg4", "Registro no creado");
 						return "redirect:/articulos/";
 					}
-				}else {
+				}else if (newArticuloAjusteDefinitive.getTipoMovimiento().equalsIgnoreCase("entrada")) {
 					//entradas con registros anteriores
 					newArticuloAjusteDefinitive.setDisponible(newArticuloAjusteDefinitive.getExistencia()+newArticuloAjusteDefinitive.getCantidad());	
+				}else {
+					//Enviar al taller
+					newArticuloAjusteDefinitive.setDisponible(newArticuloAjusteDefinitive.getExistencia());
+					DateTimeFormatter formatter = DateTimeFormatter.ofPattern("KK:mm:ss a", Locale.ENGLISH);
+				    String now = LocalDateTime.now().format(formatter);
+				    TallerArticulo tallerArticulo = new TallerArticulo();
+				    tallerArticulo.setCantidad(articuloAjuste.getCantidad());
+				    tallerArticulo.setArticulo(newArticuloAjusteDefinitive.getArticulo());
+					tallerArticulo.setFecha(new Date());
+					tallerArticulo.setPrecio(newArticuloAjusteDefinitive.getArticulo().getPrecio_mayor());
+					tallerArticulo.setNombre(newArticuloAjusteDefinitive.getArticulo().getNombre());
+					tallerArticulo.setHora(now);
+					tallerArticulo.setUsuario(usuario);
+					tallerArticulo.setAlmacen(usuario.getAlmacen());
+					serviceTalleresArticulos.guardar(tallerArticulo);
 				}
 				serviceArticulosAjustes.guardar(newArticuloAjusteDefinitive);
 				if(newArticuloAjusteDefinitive.getId()!=null) {
@@ -1168,7 +1224,6 @@ public class ArticulosController {
 			subTotalItbis+=facturaServicioTemp.getItbis();
 		}
 		
-		//Validaciones para talleres //FIXME: GGONZALEZ REVISAR
 		for (FacturaTallerTemp facturaTallerTemp : facturaTalleresTemp) {
 			//Verificamos si el comprobante fiscal paga itbis
 			if(facturaTemp.getComprobanteFiscal().getPaga_itbis() == 1) {
@@ -1176,27 +1231,28 @@ public class ArticulosController {
 				if(facturaTemp.getComprobanteFiscal().getIncluye_itbis() == 1) {
 					//realizamos las conversiones
 					String tempSv = "1."+facturaTemp.getComprobanteFiscal().getValor_itbis().intValue();
-					Double precioTempSv = facturaTallerTemp.getPrecio() / Double.parseDouble(tempSv);
-					Double itBisTempSv = (facturaTallerTemp.getCantidad() * precioTempSv) * (facturaTemp.getComprobanteFiscal().getValor_itbis()/100.00);
-					facturaTallerTemp.setPrecio(Double.parseDouble(df2.format(precioTempSv).replace(",", ".")));
-					facturaTallerTemp.setItbis(Double.parseDouble(df2.format(itBisTempSv).replace(",", ".")));
-					facturaTallerTemp.setSubtotal(Double.parseDouble(df2.format((facturaTallerTemp.getCantidad()*facturaTallerTemp.getPrecio())+facturaTallerTemp.getItbis()).replace(",", ".")));
+					facturaTallerTemp.setSubtotal(Double.parseDouble(df2.format((facturaTallerTemp.getCantidad()*facturaTallerTemp.getTallerDetalle().getPrecio())).replace(",", ".")));
+					Double precioTempSv = facturaTallerTemp.getSubtotal()/Double.parseDouble(tempSv);
+					Double itBisTempSv = facturaTallerTemp.getSubtotal()- precioTempSv;
+					precioTempSv = precioTempSv/facturaTallerTemp.getCantidad();
+					facturaTallerTemp.setPrecio(Double.parseDouble(df2.format((precioTempSv)).replace(",", ".")));
+					facturaTallerTemp.setItbis(Double.parseDouble(df2.format((itBisTempSv)).replace(",", ".")));
 					total+=facturaTallerTemp.getSubtotal();
 				}else {
 					//realizamos las conversiones
-					Double itBisTempServ = (facturaTallerTemp.getCantidad() * facturaTallerTemp.getPrecio()) * (facturaTemp.getComprobanteFiscal().getValor_itbis()/100.00);
-					facturaTallerTemp.setPrecio(Double.parseDouble(df2.format(facturaTallerTemp.getPrecio()).replace(",", ".")));
+					Double itBisTempServ = (facturaTallerTemp.getTallerDetalle().getCantidad() * facturaTallerTemp.getTallerDetalle().getPrecio()) * (facturaTemp.getComprobanteFiscal().getValor_itbis()/100.00);
+					facturaTallerTemp.setPrecio(Double.parseDouble(df2.format(facturaTallerTemp.getTallerDetalle().getPrecio()).replace(",", ".")));
 					facturaTallerTemp.setItbis(Double.parseDouble(df2.format(itBisTempServ).replace(",", ".")));
-					facturaTallerTemp.setSubtotal(Double.parseDouble(df2.format((facturaTallerTemp.getCantidad()*facturaTallerTemp.getPrecio())+facturaTallerTemp.getItbis()).replace(",", ".")));
+					facturaTallerTemp.setSubtotal(Double.parseDouble(df2.format((facturaTallerTemp.getTallerDetalle().getCantidad()*facturaTallerTemp.getTallerDetalle().getPrecio())+facturaTallerTemp.getItbis()).replace(",", ".")));
 					total+=facturaTallerTemp.getSubtotal();
 				}
 			}else {
 				//verificamos si el valor inicial del comprobante fiscal en la factura incluye itbis
 				if(facturaTallerTemp.getComprobanteFiscal().getIncluye_itbis()==1) {
 					//realizamos las conversiones
-					facturaTallerTemp.setPrecio(Double.parseDouble(df2.format((facturaTallerTemp.getSubtotal()/facturaTallerTemp.getCantidad())).replace(",", ".")));
-					facturaTallerTemp.setItbis(Double.parseDouble(df2.format((facturaTallerTemp.getCantidad()*facturaTallerTemp.getPrecio())*(facturaTemp.getComprobanteFiscal().getValor_itbis()/100.00)).replace(",", ".")));
-					facturaTallerTemp.setSubtotal(Double.parseDouble(df2.format((facturaTallerTemp.getCantidad()*facturaTallerTemp.getPrecio())+facturaTallerTemp.getItbis()).replace(",", ".")));
+					facturaTallerTemp.setPrecio(Double.parseDouble(df2.format((facturaTallerTemp.getTallerDetalle().getSubtotal()/facturaTallerTemp.getTallerDetalle().getCantidad())).replace(",", ".")));
+					facturaTallerTemp.setItbis(Double.parseDouble(df2.format((facturaTallerTemp.getTallerDetalle().getCantidad()*facturaTallerTemp.getTallerDetalle().getPrecio())*(facturaTemp.getComprobanteFiscal().getValor_itbis()/100.00)).replace(",", ".")));
+					facturaTallerTemp.setSubtotal(Double.parseDouble(df2.format((facturaTallerTemp.getTallerDetalle().getCantidad()*facturaTallerTemp.getTallerDetalle().getPrecio())+facturaTallerTemp.getItbis()).replace(",", ".")));
 					total+=facturaTallerTemp.getSubtotal();
 				}else {
 					total+=facturaTallerTemp.getSubtotal();

@@ -36,6 +36,10 @@ public class FacturaTemp {
 	@OneToOne
 	@JoinColumn(name = "id_vendedor")
 	private Vendedor vendedor;
+	
+	@OneToOne
+	@JoinColumn(name = "id_reparacion")
+	private Taller taller;
 
 	public Integer getId() {
 		return id;
@@ -85,9 +89,18 @@ public class FacturaTemp {
 		this.vendedor = vendedor;
 	}
 
+	public Taller getTaller() {
+		return taller;
+	}
+
+	public void setTaller(Taller taller) {
+		this.taller = taller;
+	}
+
 	@Override
 	public String toString() {
 		return "FacturaTemp [id=" + id + ", cliente=" + cliente + ", comprobanteFiscal=" + comprobanteFiscal
-				+ ", usuario=" + usuario + ", condicionPago=" + condicionPago + ", vendedor=" + vendedor + "]";
+				+ ", usuario=" + usuario + ", condicionPago=" + condicionPago + ", vendedor=" + vendedor + ", taller="
+				+ taller + "]";
 	}
 }

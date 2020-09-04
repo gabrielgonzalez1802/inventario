@@ -188,6 +188,8 @@ public class TallerController {
 		Taller taller = serviceTalleres.buscarPorId(idTaller);
 	    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("KK:mm:ss a", Locale.ENGLISH);
 	    String now = LocalDateTime.now().format(formatter);
+	    
+	    int error = 0;
 		TallerDetalle detalle = new TallerDetalle();
 		detalle.setCantidad(cantidad);
 		detalle.setCosto(costo);
@@ -203,31 +205,36 @@ public class TallerController {
 			Articulo articulo = serviceArticulos.buscarPorId(idArticulo);
 			if(articulo!=null) {
 				detalle.setArticulo(articulo);
+				if(detalle.getPrecio()<articulo.getPrecio_mayor()) {
+					error++;
+				}
 			}
 		}
 		
-		if(tallerArticuloId>0) {
-			TallerArticulo tallerArticulo = serviceTalleresArticulos.buscarPorId(tallerArticuloId);
-			if(tallerArticulo!=null) {
-				detalle.setTallerArticulo(tallerArticulo);
-				tallerArticulo.setCantidad(tallerArticulo.getCantidad()-cantidad);
-				serviceTalleresArticulos.guardar(tallerArticulo);
+		if(error == 0) {
+			if(tallerArticuloId>0) {
+				TallerArticulo tallerArticulo = serviceTalleresArticulos.buscarPorId(tallerArticuloId);
+				if(tallerArticulo!=null) {
+					detalle.setTallerArticulo(tallerArticulo);
+					tallerArticulo.setCantidad(tallerArticulo.getCantidad()-cantidad);
+					serviceTalleresArticulos.guardar(tallerArticulo);
+				}
+			}
+			
+			serviceTalleresDetalle.guardar(detalle);
+			
+			List<TallerDetalle> listaDetalles = serviceTalleresDetalle.buscarPorTaller(taller);
+			if(!listaDetalles.isEmpty()) {
+				Double total = 0.0;
+				//Recalculamos el total del taller
+				for (TallerDetalle tallerDetalle : listaDetalles) {
+					total+=tallerDetalle.getSubtotal();
+				}
+				taller.setTotal(total);
+				serviceTalleres.guardar(taller);
 			}
 		}
-		
-		serviceTalleresDetalle.guardar(detalle);
-		
-		List<TallerDetalle> listaDetalles = serviceTalleresDetalle.buscarPorTaller(taller);
-		if(!listaDetalles.isEmpty()) {
-			Double total = 0.0;
-			//Recalculamos el total del taller
-			for (TallerDetalle tallerDetalle : listaDetalles) {
-				total+=tallerDetalle.getSubtotal();
-			}
-			taller.setTotal(total);
-			serviceTalleres.guardar(taller);
-		}
-		
+		model.addAttribute("responseAddDetail", error);
 		return "talleres/taller :: #responseAddDetail";
 	}
 	

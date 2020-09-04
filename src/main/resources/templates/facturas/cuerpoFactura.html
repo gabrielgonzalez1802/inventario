@@ -42,7 +42,8 @@
 				</tr>
 				<!--  Talleres  -->
 				<tr th:each="taller : ${facturaTalleres}">
-					<td></td>
+					<td th:if="${taller.articulo != null}" class="text-center" th:text="${taller.articulo.codigo}"></td>
+					<td th:unless="${taller.articulo != null}">&nbsp;</td>
 					<td th:text="${taller.descripcion}" class="text-center">Nombre del taller</td>
 					<td th:text="${taller.cantidad}">Cantidad del Servicio</td>
 					<td th:text="${taller.precio}" class="text-center">Precio del taller</td>

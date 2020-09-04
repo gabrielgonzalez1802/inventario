@@ -83,7 +83,7 @@ public class FacturasTalleresTempController {
 					subtotal = Double
 							.parseDouble(df2.format((tallerDetalle.getCantidad() * precio)
 									+ itbis).replace(",", "."));
-					total += subtotal;
+					total = subtotal;
 				}
 			}else {
 				precio = tallerDetalle.getPrecio(); //TODO: GGONZALEZ REVISAR
@@ -94,6 +94,7 @@ public class FacturasTalleresTempController {
 			
 			if(tallerDetalle.getArticulo()!=null) {
 				facturaTallerTemp.setArticulo(tallerDetalle.getArticulo());
+//				facturaTallerTemp.setTallerArticulo(tallerArticulo);
 			}
 			
 			facturaTallerTemp.setFacturaTemp(factura);
@@ -111,6 +112,8 @@ public class FacturasTalleresTempController {
 		}
 		
 		taller.setFacturaTemp(factura);
+		factura.setTaller(taller);
+		serviceFacturasTemp.guardar(factura);
 		serviceTalleres.guardar(taller);
 		return "facturas/factura :: #response";
 	}

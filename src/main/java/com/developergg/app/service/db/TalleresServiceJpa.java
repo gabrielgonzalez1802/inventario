@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.developergg.app.model.Almacen;
+import com.developergg.app.model.FacturaTemp;
 import com.developergg.app.model.Taller;
 import com.developergg.app.repository.TalleresRepository;
 import com.developergg.app.service.ITalleresService;
@@ -42,6 +43,16 @@ public class TalleresServiceJpa implements ITalleresService {
 		if(optional.isPresent()) {
 			repo.delete(optional.get());
 		}
+	}
+
+	@Override
+	public List<Taller> buscarPorFacturaTemp(FacturaTemp facturaTemp) {
+		return repo.findByFacturaTemp(facturaTemp);
+	}
+
+	@Override
+	public void eliminar(Taller taller) {
+		repo.delete(taller);
 	}
 
 }

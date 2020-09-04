@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.developergg.app.model.Taller;
+import com.developergg.app.model.TallerArticulo;
 import com.developergg.app.model.TallerDetalle;
 import com.developergg.app.repository.TalleresDetallesRepository;
 import com.developergg.app.service.ITalleresDetallesService;
@@ -47,6 +48,16 @@ public class TalleresDetallesServiceJpa implements ITalleresDetallesService{
 	@Override
 	public void eliminar(TallerDetalle tallerDetalle) {
 		repo.delete(tallerDetalle);
+	}
+
+	@Override
+	public List<TallerDetalle> buscarPorTallerArticulo(TallerArticulo tallerArticulo) {
+		return repo.findByTallerArticulo(tallerArticulo);
+	}
+
+	@Override
+	public void eliminar(List<TallerDetalle> listaTalleresDetalles) {
+		repo.deleteAll(listaTalleresDetalles);
 	}
 
 }
