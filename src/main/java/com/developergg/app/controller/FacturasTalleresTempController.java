@@ -115,7 +115,8 @@ public class FacturasTalleresTempController {
 		factura.setTaller(taller);
 		serviceFacturasTemp.guardar(factura);
 		serviceTalleres.guardar(taller);
-		return "facturas/factura :: #response";
+		model.addAttribute("infoTaller", taller);
+		return "facturas/factura :: #responseInfoClienteTaller";
 	}
 	
 }

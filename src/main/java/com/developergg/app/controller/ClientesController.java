@@ -112,4 +112,11 @@ public class ClientesController {
 		return "redirect:/clientes/";
 	}
 	
+	@GetMapping("/ajax/getInfoClienteTemp/{id}")
+	public String getInfoTemp(Model model, @PathVariable("id") Integer id) {
+		Cliente cliente = serviceClientes.buscarPorIdCliente(id);
+		model.addAttribute("infoCliente", cliente);
+		return "facturas/factura :: #responseInfoCliente";
+	}
+	
 }

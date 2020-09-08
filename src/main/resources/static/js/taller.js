@@ -88,10 +88,31 @@ $("#estadoTaller").change(function(e){
 	e.preventDefault();
 	var idTaller = $("#idTaller").val();
 	var estado = $("#estadoTaller").val();
-	$.post("/talleres/ajax/updateEstado/", {
-		 'idTaller' : idTaller,
-		 'estado' : estado
-	 },function(data){});
+	if(estado == 'Devolver'){
+		//Verificamos que no existan registros
+		var nFilas = $("#cuerpoTaller tr").length;
+	    var nColumnas = $("#cuerpoTaller tr:last td").length;
+	    if(nFilas > 2){
+	    	Swal.fire({
+				  title: 'Advertencia!',
+				  text: 'Para devolver al cliente no puede tener nada agregado!!',
+				  icon: 'warning',
+				  position: 'top',
+				  confirmButtonText: 'Cool'
+			  })
+			  $("#estadoTaller").val("Abierto");
+	    }else{
+	    	$.post("/talleres/ajax/updateEstado/", {
+	   		 'idTaller' : idTaller,
+	   		 'estado' : estado
+	   	 },function(data){});
+	    }
+	}else{
+		$.post("/talleres/ajax/updateEstado/", {
+	   		 'idTaller' : idTaller,
+	   		 'estado' : estado
+	   	 },function(data){});
+	}
 });
 
 //Carga el detalle del taller
