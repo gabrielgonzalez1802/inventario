@@ -62,9 +62,7 @@ public class TallerController {
 	@GetMapping("/")
 	public String listaTaller(Model model, HttpSession session) {
 		Usuario usuario = (Usuario) session.getAttribute("usuario");
-		//Talleres que no esten completados ni devueltos al cliente
-		List<Taller> listaTaller = serviceTalleres.buscarPorAlmacen(usuario.getAlmacen()).
-				stream().filter(t -> t.getEntregado() == 0 && t.getCompletado() == 0).collect(Collectors.toList());
+		List<Taller> listaTaller = serviceTalleres.buscarPorAlmacen(usuario.getAlmacen());
 		for (Taller taller : listaTaller) {
 			if(taller.getAsignado() == null) {
 				taller.setAsignado(new Usuario());

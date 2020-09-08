@@ -2,20 +2,6 @@
 var incluyeItbis = 0;
 var columnas = [];
 var seleccionado = $("#articulos").select2();
-if($("#idTaller").val()){
-	$("#responseInfoClienteTaller").show();
-	$("#btnClienteModal").hide();
-}else{
-	$("#responseInfoClienteTaller").hide();
-}
-
-if($("#idClienteInfo").val()){
-	$("#responseInfoCliente").show();
-	$("#btnClienteModal").show();
-}else{
-	$("#responseInfoCliente").hide();
-}
-
 //al principio tomara el foco
 focusSelectArticuloNew();
 //verificamos si la factura tiene un cliente asociado
@@ -266,20 +252,12 @@ function seleccionarCliente(){
 				$("#facturaCliente").val("");
 				$("#facturaTelefono").val("");
 				$("#facturaRnc").val("");
-				$("#responseInfoCliente").hide();
 			});
 	}else{
 		//obtenemos la informacion del cliente
 		$.get("/articulos/ajax/getInfoCliente/" + idCliente,
 				function(fragment) {
 					$('#nuevoCliente').replaceWith(fragment);
-					if($("#idCliente").val()){
-						$("#responseInfoCliente").load("/clientes/ajax/getInfoClienteTemp/"+idCliente,function(data){
-							$("#responseInfoCliente").show();
-						});
-					}else{
-						$("#responseInfoCliente").hide();
-					}
 					//Actualizamos el cliente en el formulario de pago
 					$("#facturaCliente").val($("#nombreCliente").val());
 					$("#facturaTelefono").val($("#telefonoCliente").val());
@@ -1122,19 +1100,14 @@ function agregarAFactura(idTaller){
 		  'idTaller': idTaller
 		},
 		function(data, status){
-			//infoTaller
-			$('#responseInfoClienteTaller').replaceWith(data);
-			if($("#idTaller").val()){
-				$("#btnClienteModal").hide();
-				$("#responseInfoCliente").hide();
-				$("#responseInfoClienteTaller").show();
-			}
 			$("#btnTallerModal").modal("hide");
 			$("#verTalleresModal").modal("hide");
 			factura_detalle_items(incluyeItbis);
 			focusSelectArticuloNew();
 		});
 }
+
+
 
 
 

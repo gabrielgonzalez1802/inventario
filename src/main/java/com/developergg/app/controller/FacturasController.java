@@ -283,19 +283,6 @@ public class FacturasController {
 		List<Taller> listaTalleres = serviceTalleres.buscarPorAlmacen(usuario.getAlmacen()).
 				stream().filter(t -> t.getFacturaTemp() == null).collect(Collectors.toList());
 		
-		Taller taller = facturaTemp.getTaller();
-		if(taller==null) {
-			taller = new Taller();
-		}
-		
-		Cliente cliente = facturaTemp.getCliente();
-		if(cliente!=null) {
-			model.addAttribute("infoCliente", cliente);
-		}else {
-			model.addAttribute("infoCliente", new Cliente());
-		}
-		
-		model.addAttribute("infoTaller", taller);
 		model.addAttribute("listaTalleres", listaTalleres);
 		model.addAttribute("listaArticulos", listaDefinitive);
 		model.addAttribute("vendedores", listaVendedores);
@@ -652,7 +639,14 @@ public class FacturasController {
 	public void imprimirFactura(@PathVariable("id") Integer idFactura,
 			HttpServletRequest request, 
             HttpServletResponse response
+           // @RequestHeader String referer
             ) throws JRException, SQLException {
+		
+		//Check the renderer
+//        if(referer != null && !referer.isEmpty()) {
+//            //do nothing
+//            //or send error
+//        }
         
 		Factura factura = serviceFacturas.buscarPorId(idFactura);
 		
@@ -777,21 +771,19 @@ public class FacturasController {
 			for (FacturaTallerTemp facturaTallerTemp : facturasTallersTemp) {
 				TallerDetalle detalle = facturaTallerTemp.getTallerDetalle();
 				TallerArticulo tallerArticulo = detalle.getTallerArticulo();
-				if(tallerArticulo!=null) {
+				if(tallerArticulo.getArticulo()!=null) {
+					//verificamos si el articulo viene de inventario
 					if(tallerArticulo.getArticulo()!=null) {
-						//verificamos si el articulo viene de inventario
-						if(tallerArticulo.getArticulo()!=null) {
-							tallerArticulo.setCantidad(tallerArticulo.getCantidad()+detalle.getCantidad()); 
-							serviceTalleresArticulos.guardar(tallerArticulo);
-							taller.setTotal(taller.getTotal()-detalle.getSubtotal());
-							serviceTalleresDetalles.eliminar(detalle);
-						}
-					}else {
 						tallerArticulo.setCantidad(tallerArticulo.getCantidad()+detalle.getCantidad()); 
 						serviceTalleresArticulos.guardar(tallerArticulo);
 						taller.setTotal(taller.getTotal()-detalle.getSubtotal());
 						serviceTalleresDetalles.eliminar(detalle);
 					}
+				}else {
+					tallerArticulo.setCantidad(tallerArticulo.getCantidad()+detalle.getCantidad()); 
+					serviceTalleresArticulos.guardar(tallerArticulo);
+					taller.setTotal(taller.getTotal()-detalle.getSubtotal());
+					serviceTalleresDetalles.eliminar(detalle);
 				}
 			}
 			taller.setEstado("Abierto");

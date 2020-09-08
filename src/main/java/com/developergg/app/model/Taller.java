@@ -27,7 +27,6 @@ public class Taller {
 	private String telefono;
 	private String celular;
 	private String marca;
-	private String motivo_entrega;
 	
 	@OneToOne
 	@JoinColumn(name = "id_tipo_equipo")
@@ -51,9 +50,9 @@ public class Taller {
 	private Usuario usuario;
 	
 	private String problema;
-	private Integer completado = 0;
 	private Integer entregado = 0;
 	private Double avance = 0.0;
+	
 	private Double total = 0.0; 
 	
 	@OneToOne
@@ -214,26 +213,14 @@ public class Taller {
 	public void setFacturaTemp(FacturaTemp facturaTemp) {
 		this.facturaTemp = facturaTemp;
 	}
-	public Integer getCompletado() {
-		return completado;
-	}
-	public void setCompletado(Integer completado) {
-		this.completado = completado;
-	}
-	public String getMotivo_entrega() {
-		return motivo_entrega;
-	}
-	public void setMotivo_entrega(String motivo_entrega) {
-		this.motivo_entrega = motivo_entrega;
-	}
 	@Override
 	public String toString() {
 		return "Taller [id=" + id + ", codigo=" + codigo + ", fecha=" + fecha + ", hora=" + hora + ", nombre=" + nombre
 				+ ", cedula=" + cedula + ", telefono=" + telefono + ", celular=" + celular + ", marca=" + marca
-				+ ", completado=" + completado + ", tipoEquipo=" + tipoEquipo + ", facturaTemp=" + facturaTemp
-				+ ", modelo=" + modelo + ", serial=" + serial + ", tipo_reparacion=" + tipo_reparacion + ", estado="
-				+ estado + ", almacen=" + almacen + ", usuario=" + usuario + ", problema=" + problema + ", entregado="
-				+ entregado + ", avance=" + avance + ", total=" + total + ", asignado=" + asignado + ", motivo="
-				+ motivo + ", entregado_por=" + entregado_por + ", fecha_entrega=" + fecha_entrega + "]";
+				+ ", tipoEquipo=" + tipoEquipo + ", facturaTemp=" + facturaTemp + ", modelo=" + modelo + ", serial="
+				+ serial + ", tipo_reparacion=" + tipo_reparacion + ", estado=" + estado + ", almacen=" + almacen
+				+ ", usuario=" + usuario + ", problema=" + problema + ", entregado=" + entregado + ", avance=" + avance
+				+ ", total=" + total + ", asignado=" + asignado + ", motivo=" + motivo + ", entregado_por="
+				+ entregado_por + ", fecha_entrega=" + fecha_entrega + "]";
 	}
 }
