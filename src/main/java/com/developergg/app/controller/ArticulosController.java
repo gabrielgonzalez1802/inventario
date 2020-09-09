@@ -42,7 +42,6 @@ import com.developergg.app.model.FacturaTemp;
 import com.developergg.app.model.Propietario;
 import com.developergg.app.model.SerialTemporal;
 import com.developergg.app.model.Suplidor;
-import com.developergg.app.model.Taller;
 import com.developergg.app.model.TallerArticulo;
 import com.developergg.app.model.Usuario;
 import com.developergg.app.service.IArticulosAjustesService;
@@ -59,7 +58,6 @@ import com.developergg.app.service.IFacturasTalleresTempService;
 import com.developergg.app.service.IFacturasTempService;
 import com.developergg.app.service.ISuplidoresService;
 import com.developergg.app.service.ITalleresArticulosService;
-import com.developergg.app.service.ITalleresService;
 import com.developergg.app.util.Utileria;
 
 @Controller
@@ -104,10 +102,7 @@ public class ArticulosController {
 	
 	@Autowired
 	private IFacturasTalleresTempService serviceFacturasTalleresTemp;
-	
-	@Autowired
-	private ITalleresService serviceTalleres;
-	
+
 	@Autowired
 	private ITalleresArticulosService serviceTalleresArticulos;
 	
@@ -163,14 +158,21 @@ public class ArticulosController {
 	public String crear(Model model, HttpSession session) {
 		Usuario usuario = (Usuario) session.getAttribute("usuario");
 		List<Categoria> categorias = serviceCategorias.buscarPorPropietario(usuario.getAlmacen().getPropietario());
-		Articulo articuloTemp = lista.get(lista.size()-1);
-		Integer codigo = Integer.parseInt(articuloTemp.getCodigo());
-		codigo++;
-		Articulo newArticulo = new Articulo();
-		newArticulo.setCodigo(String.valueOf(codigo));
-		model.addAttribute("categorias",categorias);
-		model.addAttribute("articulos", lista);
-		model.addAttribute("articulo", newArticulo);
+		if(lista.isEmpty()) {
+			lista = new LinkedList<>();
+			model.addAttribute("categorias",categorias);
+			model.addAttribute("articulos", lista);
+			model.addAttribute("articulo", new Articulo());
+		}else {
+			Articulo articuloTemp = lista.get(lista.size()-1);
+			Integer codigo = Integer.parseInt(articuloTemp.getCodigo());
+			codigo++;
+			Articulo newArticulo = new Articulo();
+			newArticulo.setCodigo(String.valueOf(codigo));
+			model.addAttribute("categorias",categorias);
+			model.addAttribute("articulos", lista);
+			model.addAttribute("articulo", newArticulo);
+		}
 		return "articulos/formulario";
 	}
 	

@@ -125,6 +125,47 @@
 		 
 		</div>
 		  <div class="panel-body all">
+		  
+		  <div id="responseInfoClienteTaller">
+			  <div class="container">
+			  	<div class="row">
+			  		<div class="col-md-10">
+			  			<input type="hidden" id="idTaller" th:value="${infoTaller.id}">
+				  		<div class="col-md-2">
+							<span style="color: yellow;"> Nombre Cliente: </span><span th:text="${infoTaller.nombre}"></span>
+				  		</div>
+				  		<div class="col-md-1">
+							<span style="color: yellow;"> Cedula: </span> <span th:text="${infoTaller.cedula}"></span>
+				  		</div>
+				  		<div class="col-md-1">
+							<span style="color: yellow;"> Telefono: </span> <span th:text="${infoTaller.telefono}"></span>
+				  		</div>
+			  		</div>	
+			  	</div>
+			  </div>
+		 </div>
+		 
+		 <div id="responseInfoCliente">
+			  <div class="container">
+			  	<div class="row">
+			  		<div class="col-md-10">
+			  			<input type="hidden" id="idClienteInfo" th:value="${infoCliente.id}">
+				  		<div class="col-md-2">
+							<span style="color: yellow;"> Nombre Cliente: </span><span id="nombreClienteInfo" th:text="${infoCliente.nombre}"></span>
+				  		</div>
+				  		<div class="col-md-1">
+							<span style="color: yellow;"> RNC: </span> <span id="rncClienteInfo" th:text="${infoCliente.rnc}"></span>
+				  		</div>
+				  		<div class="col-md-1">
+							<span style="color: yellow;"> Telefono: </span> <span id="telefonoClienteInfo" th:text="${infoCliente.telefono}"></span>
+				  		</div>
+			  		</div>	
+			  	</div>
+			  </div>
+		 </div>
+		  
+		  <br>
+		  
 		     <form  method="post" action="#" id="formCreateInvoice">            
               <div class="row">
                 <div class="col-md-8"> 
