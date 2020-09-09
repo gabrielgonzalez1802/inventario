@@ -60,8 +60,10 @@ public class Taller {
 	@JoinColumn(name = "asignado")
 	private Usuario asignado;
 	
-	private String motivo;
-	private Integer entregado_por;
+	@OneToOne
+	@JoinColumn(name = "entregado_por")
+	private Usuario entregado_por;
+	
 	private Date fecha_entrega;
 	
 	public Integer getId() {
@@ -178,18 +180,6 @@ public class Taller {
 	public void setAvance(Double avance) {
 		this.avance = avance;
 	}
-	public String getMotivo() {
-		return motivo;
-	}
-	public void setMotivo(String motivo) {
-		this.motivo = motivo;
-	}
-	public Integer getEntregado_por() {
-		return entregado_por;
-	}
-	public void setEntregado_por(Integer entregado_por) {
-		this.entregado_por = entregado_por;
-	}
 	public Date getFecha_entrega() {
 		return fecha_entrega;
 	}
@@ -226,14 +216,20 @@ public class Taller {
 	public void setMotivo_entrega(String motivo_entrega) {
 		this.motivo_entrega = motivo_entrega;
 	}
+	public Usuario getEntregado_por() {
+		return entregado_por;
+	}
+	public void setEntregado_por(Usuario entregado_por) {
+		this.entregado_por = entregado_por;
+	}
 	@Override
 	public String toString() {
 		return "Taller [id=" + id + ", codigo=" + codigo + ", fecha=" + fecha + ", hora=" + hora + ", nombre=" + nombre
 				+ ", cedula=" + cedula + ", telefono=" + telefono + ", celular=" + celular + ", marca=" + marca
-				+ ", completado=" + completado + ", tipoEquipo=" + tipoEquipo + ", facturaTemp=" + facturaTemp
+				+ ", motivo_entrega=" + motivo_entrega + ", tipoEquipo=" + tipoEquipo + ", facturaTemp=" + facturaTemp
 				+ ", modelo=" + modelo + ", serial=" + serial + ", tipo_reparacion=" + tipo_reparacion + ", estado="
-				+ estado + ", almacen=" + almacen + ", usuario=" + usuario + ", problema=" + problema + ", entregado="
-				+ entregado + ", avance=" + avance + ", total=" + total + ", asignado=" + asignado + ", motivo="
-				+ motivo + ", entregado_por=" + entregado_por + ", fecha_entrega=" + fecha_entrega + "]";
+				+ estado + ", almacen=" + almacen + ", usuario=" + usuario + ", problema=" + problema + ", completado="
+				+ completado + ", entregado=" + entregado + ", avance=" + avance + ", total=" + total + ", asignado="
+				+ asignado + ", entregado_por=" + entregado_por + ", fecha_entrega=" + fecha_entrega + "]";
 	}
 }

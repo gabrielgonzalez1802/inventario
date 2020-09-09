@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.developergg.app.model.Almacen;
 import com.developergg.app.model.Factura;
+import com.developergg.app.model.Taller;
 import com.developergg.app.repository.FacturasRepository;
 import com.developergg.app.service.IFacturasService;
 
@@ -42,6 +43,11 @@ public class FacturasServiceJpa implements IFacturasService {
 	@Override
 	public List<Factura> buscarPorAlmacen(Almacen almacen) {
 		return repo.findByAlmacen(almacen);
+	}
+
+	@Override
+	public Factura buscarPorTaller(Taller taller) {
+		return repo.findByTaller(taller);
 	}
 
 }

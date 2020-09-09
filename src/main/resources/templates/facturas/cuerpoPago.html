@@ -20,7 +20,9 @@
 						<tr th:each="pago:${listaPagos}">
 							<td th:text="${pago.formaPago.nombre}">Efectivo</td>
 							<td th:text="${pago.monto}">0.0</td>
-							<td><a href="#" th:onclick="'eliminarPagoFactura(\'' + ${pago.id} + '\');'"><i class="icono fa fa-trash text-danger pull-right"></i></a></td>
+							<td><a href="#" th:if="${pago.formaPago.nombre != 'Avance Taller'}" th:onclick="'eliminarPagoFactura(\'' + ${pago.id} + '\');'"><i class="icono fa fa-trash text-danger pull-right"></i></a>
+								<a href="#" th:if="${pago.formaPago.nombre == 'Avance Taller'}"></a>
+							</td>
 						</tr>
 					</tbody>
 				</table>

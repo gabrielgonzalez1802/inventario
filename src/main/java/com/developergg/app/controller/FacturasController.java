@@ -83,8 +83,6 @@ import com.developergg.app.service.IFacturasServiciosTempService;
 import com.developergg.app.service.IFacturasTalleresTempService;
 import com.developergg.app.service.IFacturasTempService;
 import com.developergg.app.service.IFormasPagoService;
-import com.developergg.app.service.ITalleresArticulosService;
-import com.developergg.app.service.ITalleresDetallesService;
 import com.developergg.app.service.ITalleresService;
 import com.developergg.app.service.ITiposEquipoService;
 import com.developergg.app.service.IVendedoresService;
@@ -171,13 +169,7 @@ public class FacturasController {
 	private ITalleresService serviceTalleres;
 	
 	@Autowired
-	private ITalleresDetallesService serviceTalleresDetalles;
-	
-	@Autowired
 	private IFacturasTalleresTempService serviceFacturasTalleresTemp;
-	
-	@Autowired
-	private ITalleresArticulosService serviceTalleresArticulos;
 	
 	@Autowired
 	private IFacturasDetallesTallerService serviceFacturasDetallesTaller;
@@ -281,7 +273,7 @@ public class FacturasController {
 		
 		//Verificamos el listado en taller
 		List<Taller> listaTalleres = serviceTalleres.buscarPorAlmacen(usuario.getAlmacen()).
-				stream().filter(t -> t.getFacturaTemp() == null).collect(Collectors.toList());
+				stream().filter(t -> t.getFacturaTemp() == null && t.getCompletado() == 0).collect(Collectors.toList());
 		
 		Taller taller = facturaTemp.getTaller();
 		if(taller==null) {
@@ -389,7 +381,10 @@ public class FacturasController {
 		//factura.setAbono(abono); //validar
 		factura.setCredito(credito); 
 		//factura.setCuotas(); //validar
-		//factura.setTaller(taller); //se agregara cuando se complete la parte del taller
+		if(facturaTemp.getTaller()!=null) {
+			factura.setTaller(facturaTemp.getTaller());
+			factura.setAvance_taller(facturaTemp.getTaller().getAvance());
+		}
 		//forma_pago,avance_taller,total_itbis
 		factura.setTotal_itbis(total_itbis);
 		
@@ -557,7 +552,9 @@ public class FacturasController {
 		}
 		
 		if(facturaTemp.getTaller()!=null) {
-			serviceTalleres.eliminar(facturaTemp.getTaller());
+			facturaTemp.getTaller().setCompletado(1);
+			facturaTemp.getTaller().setFacturaTemp(null);
+			serviceTalleres.guardar(facturaTemp.getTaller());
 		}
 		
 		//Borramos la factura temporal
@@ -781,16 +778,14 @@ public class FacturasController {
 					if(tallerArticulo.getArticulo()!=null) {
 						//verificamos si el articulo viene de inventario
 						if(tallerArticulo.getArticulo()!=null) {
-							tallerArticulo.setCantidad(tallerArticulo.getCantidad()+detalle.getCantidad()); 
-							serviceTalleresArticulos.guardar(tallerArticulo);
-							taller.setTotal(taller.getTotal()-detalle.getSubtotal());
-							serviceTalleresDetalles.eliminar(detalle);
+//							tallerArticulo.setCantidad(tallerArticulo.getCantidad()+detalle.getCantidad()); 
+//							serviceTalleresArticulos.guardar(tallerArticulo);
+//							taller.setTotal(taller.getTotal()-detalle.getSubtotal());
 						}
 					}else {
-						tallerArticulo.setCantidad(tallerArticulo.getCantidad()+detalle.getCantidad()); 
-						serviceTalleresArticulos.guardar(tallerArticulo);
-						taller.setTotal(taller.getTotal()-detalle.getSubtotal());
-						serviceTalleresDetalles.eliminar(detalle);
+//						tallerArticulo.setCantidad(tallerArticulo.getCantidad()+detalle.getCantidad()); 
+//						serviceTalleresArticulos.guardar(tallerArticulo);
+//						taller.setTotal(taller.getTotal()-detalle.getSubtotal());
 					}
 				}
 			}

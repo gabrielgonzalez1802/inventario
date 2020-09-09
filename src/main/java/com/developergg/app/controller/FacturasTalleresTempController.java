@@ -12,13 +12,17 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.developergg.app.model.FacturaDetallePagoTemp;
 import com.developergg.app.model.FacturaTallerTemp;
 import com.developergg.app.model.FacturaTemp;
+import com.developergg.app.model.FormaPago;
 import com.developergg.app.model.Taller;
 import com.developergg.app.model.TallerDetalle;
 import com.developergg.app.model.Usuario;
+import com.developergg.app.service.IFacturasDetallesPagoTempService;
 import com.developergg.app.service.IFacturasTalleresTempService;
 import com.developergg.app.service.IFacturasTempService;
+import com.developergg.app.service.IFormasPagoService;
 import com.developergg.app.service.ITalleresDetallesService;
 import com.developergg.app.service.ITalleresService;
 
@@ -37,6 +41,12 @@ public class FacturasTalleresTempController {
 	
 	@Autowired
 	private IFacturasTalleresTempService serviceFacturasTalleresTemp;
+	
+	@Autowired
+	private IFormasPagoService serviceFormasPago;
+	
+	@Autowired
+	private IFacturasDetallesPagoTempService serviceDetallePagoTemp;
 	
 	private DecimalFormat df2 = new DecimalFormat("###.##");
 	
@@ -111,6 +121,17 @@ public class FacturasTalleresTempController {
 			serviceFacturasTalleresTemp.guardar(facturaTallerTemp);
 		}
 		
+		//Verificamos si hay algun avance en el taller y si la condicion de pago es contado
+		if(taller.getAvance().doubleValue()>0 && factura.getCondicionPago().getDia() == 0) {
+			//Si tiene avance el creamos la forma de pago avance taller con el monto del avance
+			FacturaDetallePagoTemp pagoTemp = new FacturaDetallePagoTemp();
+			FormaPago formaPago = serviceFormasPago.buscarPorId(0);
+			pagoTemp.setFacturaTemp(factura);
+			pagoTemp.setFormaPago(formaPago);
+			pagoTemp.setMonto(taller.getAvance());
+			serviceDetallePagoTemp.guardar(pagoTemp);
+		}
+		
 		taller.setFacturaTemp(factura);
 		factura.setTaller(taller);
 		serviceFacturasTemp.guardar(factura);
@@ -118,5 +139,4 @@ public class FacturasTalleresTempController {
 		model.addAttribute("infoTaller", taller);
 		return "facturas/factura :: #responseInfoClienteTaller";
 	}
-	
 }

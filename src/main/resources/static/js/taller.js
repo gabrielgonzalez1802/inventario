@@ -105,13 +105,35 @@ $("#estadoTaller").change(function(e){
 	    	$.post("/talleres/ajax/updateEstado/", {
 	   		 'idTaller' : idTaller,
 	   		 'estado' : estado
-	   	 },function(data){});
+	   	 },function(data){
+	   		$('#responseUpdateEstado').replaceWith(data);
+	   		if($('#responseUpdateEstado').val()==0){
+	   			Swal.fire({
+					title : 'Advertencia!',
+					text : 'Este taller esta relacionado a una factura, no se puede cambiar el estado',
+					position : 'top',
+					icon : 'warning',
+					confirmButtonText : 'Cool'
+				})
+	   		}
+	   	 });
 	    }
 	}else{
 		$.post("/talleres/ajax/updateEstado/", {
 	   		 'idTaller' : idTaller,
 	   		 'estado' : estado
-	   	 },function(data){});
+	   	 },function(data){
+	   		$('#responseUpdateEstado').replaceWith(data);
+	   		if($('#responseUpdateEstado').val()==0){
+	   			Swal.fire({
+					title : 'Advertencia!',
+					text : 'Este taller esta relacionado a una factura, no se puede cambiar el estado',
+					position : 'top',
+					icon : 'warning',
+					confirmButtonText : 'Cool'
+				})
+	   		}
+	   	 });
 	}
 });
 
@@ -204,12 +226,23 @@ function eliminarItem(idItem){
 	$.post("/talleres/ajax/deleteDetail/", {
 		 'idDetalle' : idItem
 	 },function(data){
-		//recargar la lista de articulos
-		$('#articulos').load("/talleres/ajax/getListaArticulos/"+idTaller,function(){});
-		$("#cantidad").val("");
-		$("#precio").val("");
-		focusSelectArticuloNew();
-		taller_detalle_items();
-		focusSelectArticuloNew();
+		$('#responseDeleteDetail').replaceWith(data);
+		if($("#responseDeleteDetail").val() == 0){
+			Swal.fire({
+				title : 'Advertencia!',
+				text : 'Este taller esta relacionado a una factura, para eliminar los items debe cancelar la factura pendiente',
+				position : 'top',
+				icon : 'warning',
+				confirmButtonText : 'Cool'
+			})
+		}else{
+			//recargar la lista de articulos
+			$('#articulos').load("/talleres/ajax/getListaArticulos/"+idTaller,function(){});
+			$("#cantidad").val("");
+			$("#precio").val("");
+			focusSelectArticuloNew();
+			taller_detalle_items();
+			focusSelectArticuloNew();
+		}
 	 });
 }

@@ -96,11 +96,14 @@
 			  </div>
 			  <input type="hidden" id="responseAddDetail" th:value="${responseAddDetail}">
 			  <input type="hidden" id="responseDeleteDetail" th:value="${responseDeleteDetail}">
+			  <input type="hidden" id="responseUpdateEstado" th:value="${responseUpdateEstado}"> 
 			  <input type="hidden" id="responseLiberado" th:value="${responseLiberado}">
 
 			  <button class="btn btn-success pull-right" id="btnRegresar">Guardar Reparacion</button>
-			  <button class="btn btn-danger" id="btnLiberarEquipo">Liberar Equipo</button>
-			  <button class="btn btn-primary" id="btnAddDiagnosticoModal">Nuevo Diagnostico</button>
+			  <button class="btn btn-danger" id="btnLiberarEquipo" disabled="disabled" th:if="${taller.facturaTemp != null}">Liberar Equipo</button>
+			  <button class="btn btn-primary" id="btnAddDiagnosticoModal" disabled="disabled" th:if="${taller.facturaTemp != null}">Nuevo Diagnostico</button>
+			   <button class="btn btn-danger" id="btnLiberarEquipo" th:if="${taller.facturaTemp == null}">Liberar Equipo</button>
+			  <button class="btn btn-primary" id="btnAddDiagnosticoModal" th:if="${taller.facturaTemp == null}">Nuevo Diagnostico</button>
 		</form>
 		
 		<br>
@@ -125,7 +128,14 @@
 		    		<span style="font-weight: bold;">Tipo Reparacion: </span><span th:text="${taller.tipo_reparacion}"></span><br>
 		    		<span style="font-weight: bold;">Problema: </span><span th:text="${taller.problema}"></span><br>
 		    		<span style="font-weight: bold;">Estado: </span>
-		    	 	<select id="estadoTaller" th:field="${taller.estado}">
+		    	 	<select id="estadoTaller" th:field="${taller.estado}" th:if="${taller.facturaTemp == null}">
+		    	 		<option value="Abierto">Abierto</option>
+		    	 		<option value="Proceso">Proceso</option>
+		    	 		<option value="Reparado">Reparado</option>
+		    	 		<option value="No Reparado">No Reparado</option>
+		    	 		<option value="Devolver">Devolver a Cliente</option>
+		    		</select><br>
+		    		<select id="estadoTaller" th:field="${taller.estado}" disabled="disabled" th:if="${taller.facturaTemp != null}">
 		    	 		<option value="Abierto">Abierto</option>
 		    	 		<option value="Proceso">Proceso</option>
 		    	 		<option value="Reparado">Reparado</option>
@@ -169,7 +179,8 @@
                 </div>
                 <div class="col-md-1"> 
                 	<br>
-               		 <button id="agregarItem" class="btn btn-primary pull-right" style="margin-top: 5px;"> Agregar </button>
+               		 <button id="agregarItem" disabled="disabled" th:if="${taller.facturaTemp != null}" class="btn btn-primary pull-right" style="margin-top: 5px;"> Agregar </button>
+                	 <button id="agregarItem" th:if="${taller.facturaTemp == null}" class="btn btn-primary pull-right" style="margin-top: 5px;"> Agregar </button>
                 </div>
               </div>                                                  
             </form>

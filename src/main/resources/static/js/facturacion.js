@@ -901,6 +901,11 @@ $(document).on('keydown', null, 'f8', function(){
 		if($("#tipoCondicionPago").val().toLowerCase() != "contado"){
 			guardarFacturaCredito();
 		}else{
+			if($("#nombreClienteInfo").text()==""){
+				$("#facturaCliente").val($("#nombreClienteTallerInfo").text());
+				$("#facturaTelefono").val($("#telefonoClienteTallerInfo").text());
+				$("#facturaRnc").val($("#rncClienteTallerInfo").text());
+			}
 			//cargamos los detalles de pago en la factura
 			factura_pagos_detalle_items();
 		}
@@ -912,6 +917,11 @@ $("#guardarFactura").click(function(e) {
 	if($("#tipoCondicionPago").val().toLowerCase() != "contado"){
 		guardarFacturaCredito();
 	}else{
+		if($("#nombreClienteInfo").text()==""){
+			$("#facturaCliente").val($("#nombreClienteTallerInfo").text());
+			$("#facturaTelefono").val($("#telefonoClienteTallerInfo").text());
+			$("#facturaRnc").val($("#rncClienteTallerInfo").text());
+		}
 		//cargamos los detalles de pago en la factura
 		factura_pagos_detalle_items();
 	}
@@ -1135,6 +1145,41 @@ function agregarAFactura(idTaller){
 			focusSelectArticuloNew();
 		});
 }
+
+function devolver(idTaller){
+	Swal.fire({
+		  title: "Ingrese la razon de devolucion",
+		  input: "text",
+		  position: "top",
+		  inputAttributes: {
+		    autocapitalize: "off"
+		  },
+		  showCancelButton: true,
+		  confirmButtonText: "Confirmar",
+		  cancelButtonText: "Cancelar",
+		  showLoaderOnConfirm: true,
+		  preConfirm: (razon) => {
+			$.post("/talleres/ajax/devolverEquipo/",
+			{
+			  'idTaller': idTaller,
+			  'razon': razon
+			},
+			function(data){
+				Swal.fire({
+					title : 'Muy bien!',
+					text : 'El equipo se ha entregado!!',
+					position : 'top',
+					icon : 'success',
+					confirmButtonText : 'Cool'
+				})
+				setTimeout(function() {
+					location.reload();
+				}, 1000);
+			});
+		  }
+		});
+}
+
 
 
 

@@ -245,24 +245,30 @@ public class TallerController {
 		TallerDetalle item = serviceTalleresDetalle.buscarPorId(idDetalle);
 		Taller taller = item.getTaller();
 		if(item!=null) {
-			//Verificamos si tinee registro en los articulos del taller
-			if(item.getTallerArticulo()!=null) {
-				TallerArticulo tallerArticulo = item.getTallerArticulo();
-				tallerArticulo.setCantidad(tallerArticulo.getCantidad()+item.getCantidad());
-				serviceTalleresArticulos.guardar(tallerArticulo);
-			}
-			List<TallerDetalle> listaDetalles = serviceTalleresDetalle.buscarPorTaller(taller);
-			if(!listaDetalles.isEmpty()) {
-				Double total = 0.0;
-				//Recalculamos el total del taller
-				for (TallerDetalle tallerDetalle : listaDetalles) {
-					total+=tallerDetalle.getSubtotal();
+			//Verificamos si tiene una factura temporal asociada
+			if(taller.getFacturaTemp()!=null) {
+				model.addAttribute("responseDeleteDetail", 0);
+			}else {
+				//Verificamos si tinee registro en los articulos del taller
+				if(item.getTallerArticulo()!=null) {
+					TallerArticulo tallerArticulo = item.getTallerArticulo();
+					tallerArticulo.setCantidad(tallerArticulo.getCantidad()+item.getCantidad());
+					serviceTalleresArticulos.guardar(tallerArticulo);
 				}
-				total-=item.getSubtotal();
-				taller.setTotal(total);
-				serviceTalleres.guardar(taller);
+				List<TallerDetalle> listaDetalles = serviceTalleresDetalle.buscarPorTaller(taller);
+				if(!listaDetalles.isEmpty()) {
+					Double total = 0.0;
+					//Recalculamos el total del taller
+					for (TallerDetalle tallerDetalle : listaDetalles) {
+						total+=tallerDetalle.getSubtotal();
+					}
+					total-=item.getSubtotal();
+					taller.setTotal(total);
+					serviceTalleres.guardar(taller);
+				}
+				serviceTalleresDetalle.eliminar(item);
+				model.addAttribute("responseDeleteDetail", 1);
 			}
-			serviceTalleresDetalle.eliminar(item);
 		}
 		return "talleres/taller :: #responseDeleteDetail";
 	}
@@ -272,10 +278,15 @@ public class TallerController {
 			 @RequestParam("estado") String estado) {
 		Taller taller = serviceTalleres.buscarPorId(idTaller);
 		if(taller!=null) {
-			taller.setEstado(estado); 
-			serviceTalleres.guardar(taller);
+			if(taller.getFacturaTemp()!=null) {
+				model.addAttribute("responseUpdateEstado", 0);
+			}else {
+				taller.setEstado(estado); 
+				serviceTalleres.guardar(taller);
+				model.addAttribute("responseUpdateEstado", 1);
+			}
 		}
-		return "talleres/listaTaller :: #responseAddDetail";
+		return "talleres/taller :: #responseUpdateEstado";
 	}
 	
 	@PostMapping("/ajax/liberarEquipo/")
@@ -302,5 +313,20 @@ public class TallerController {
 		serviceTalleres.guardar(taller);
 		model.addAttribute("responseAddRecepcion", taller.getId()!=null?1:0);
 		return "facturas/factura :: #responseAddRecepcion";
+	}
+	
+	@PostMapping("/ajax/devolverEquipo")
+	public String devolverEquipo(Model model, HttpSession session,
+			@RequestParam(name = "idTaller") Integer idTaller, @RequestParam(name = "razon") String razon) {
+		Usuario usuario = (Usuario) session.getAttribute("usuario");
+		Taller taller = serviceTalleres.buscarPorId(idTaller);
+		taller.setEntregado(1);
+		taller.setEntregado_por(usuario);
+		taller.setMotivo_entrega(razon);
+		taller.setCompletado(1);
+		taller.setAsignado(null);
+		taller.setFacturaTemp(null);
+		serviceTalleres.guardar(taller);
+		return "facturas/factura :: #responseEntregado";
 	}
 }
