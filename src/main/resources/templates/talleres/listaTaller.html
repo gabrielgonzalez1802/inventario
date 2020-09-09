@@ -62,8 +62,8 @@
 					<input type="hidden" id="responseAddRecepcion" th:value="${responseAddRecepcion}">
 						<div class="col col-md-6">
 							<div class="form-group">
-								 <label>Celular</label>
-								 <input th:field="*{celular}" class="form-control" id="celularTaller" type="text" placeholder="Celular" autocomplete="off">
+								 <label>Telefono Cliente</label>
+								 <input th:field="*{celular}" class="form-control" id="celularTaller" type="text" placeholder="Telefono Cliente" autocomplete="off">
 							</div>
 						</div>
 						<div class="col col-md-6">
@@ -82,8 +82,8 @@
 						</div>
 						<div class="col col-md-6">
 							<div class="form-group">
-								<label>Telefono</label>
-	                       		<input th:field="*{telefono}" class="form-control" id="telefonoTaller" type="text" placeholder="Telefono" autocomplete="off">
+								<label>Direccion</label>
+	                       		<input th:field="*{direccionCliente}" class="form-control" id="direccionClienteTaller" type="text" placeholder="Direccion" autocomplete="off">
 							</div>
 						</div>
 					</div>
@@ -91,13 +91,13 @@
 						<div class="col col-md-6">
 							<div class="form-group">
 								<label>Serial</label>
-	                       		<input th:field="*{serial}" class="form-control" id="serialTaller" type="text" placeholder="Serial" autocomplete="off">
+	                       		<input th:field="*{serial}" class="form-control" id="serialTaller" type="text" placeholder="Serial/IMEI Equipo" autocomplete="off">
 							</div>
 						</div>
 						<div class="col col-md-6">
 							<div class="form-group">
 								<label>Marca</label>
-	                       		<input th:field="*{marca}" class="form-control" id="marcaTaller" type="text" placeholder="Marca" autocomplete="off">
+	                       		<input th:field="*{marca}" class="form-control" id="marcaTaller" type="text" placeholder="Marca Equipo" autocomplete="off">
 							</div>
 						</div>
 					</div>
@@ -105,7 +105,7 @@
 						<div class="col col-md-6">
 							<div class="form-group">
 								<label>Modelo</label>
-	                       		<input th:field="*{modelo}" class="form-control" id="modeloTaller" type="text" placeholder="Modelo" autocomplete="off">
+	                       		<input th:field="*{modelo}" class="form-control" id="modeloTaller" type="text" placeholder="Modelo Equipo" autocomplete="off">
 							</div>
 						</div>
 						<div class="col col-md-6">
@@ -173,8 +173,8 @@
 						<input type="hidden" th:value="${infoTaller.id}" id="tallerId">
 						<div class="col col-md-5">
 							<div class="form-group">+
-								<label>Celular</label>
-								<input th:value="${infoTaller.celular}" id="tallerCelular" disabled="disabled" class="form-control" type="text" placeholder="Celular">
+								<label>Telefono Cliente</label>
+								<input th:value="${infoTaller.celular}" id="tallerCelular" disabled="disabled" class="form-control" type="text" placeholder="Telefono Cliente">
 							</div>
 						</div>
 						<div class="col col-md-7">
@@ -195,8 +195,8 @@
 						</div>
 						<div class="col col-md-6">
 							<div class="form-group">
-								<label>Telefono</label>
-	                       		<input th:value="${infoTaller.telefono}" id="tallerTelefono" class="form-control" type="text" disabled="disabled" placeholder="Telefono">
+								<label>direccion</label>
+	                       		<input th:value="${infoTaller.direccionCliente}" id="direccionCliente" class="form-control" type="text" disabled="disabled" placeholder="Direccion">
 							</div>
 						</div>
 					</div>
@@ -205,13 +205,13 @@
 						<div class="col col-md-6">
 							<div class="form-group">
 								<label>Serial</label>
-	                       		<input th:value="${infoTaller.serial}" id="tallerSerial" class="form-control" type="text" disabled="disabled" placeholder="Serial">
+	                       		<input th:value="${infoTaller.serial}" id="tallerSerial" class="form-control" type="text" disabled="disabled" placeholder="Serial/IMEI Equipo">
 							</div>
 						</div>
 						<div class="col col-md-6">
 							<div class="form-group">
 								<label>Marca</label>
-	                       		<input th:value="${infoTaller.marca}" id="tallerMarca" class="form-control" type="text" disabled="disabled" placeholder="Marca">
+	                       		<input th:value="${infoTaller.marca}" id="tallerMarca" class="form-control" type="text" disabled="disabled" placeholder="Marca Equipo">
 							</div>
 						</div>
 					</div>
@@ -220,7 +220,7 @@
 						<div class="col col-md-6">
 							<div class="form-group">
 								<label>Modelo</label>
-	                       		<input th:value="${infoTaller.modelo}" id="tallerModelo" class="form-control" type="text" disabled="disabled" placeholder="Modelo">
+	                       		<input th:value="${infoTaller.modelo}" id="tallerModelo" class="form-control" type="text" disabled="disabled" placeholder="Modelo Equipo">
 							</div>
 						</div>
 						<div class="col col-md-6">
@@ -297,7 +297,7 @@
 								 <tr th:each="taller:${listaTaller}">
 				                  <td th:text="${#dates.format(taller.fecha, 'dd-MM-yyyy')}"></td>
 				                  <td th:text="${taller.nombre}"></td> 
-				                   <td th:text="${taller.telefono}"></td> 
+				                   <td th:text="${taller.celular}"></td> 
 				                   <td th:text="${taller.tipoEquipo.nombre}"></td> 
 				                   <td th:text="${taller.serial}"></td>
 				                   <td th:text="${taller.estado}"></td>
@@ -360,7 +360,7 @@
 		
 		var nombre = $("#nombreTaller").val();
 		var cedula = $("#cedulaTaller").val();
-		var telefono = $("#telefonoTaller").val();
+		var telefono = $("#celularTaller").val();
 		var problema = $("#problemaTaller").val();
 		
 		var error = 0;

@@ -1069,56 +1069,92 @@ function focusSelectArticuloNew(){
 }
 
 function guardarFacturaCredito(){
-	//verificamos que la factura tenga los pagos completos para proceder a guardarla
-		//validacion, debe incluir cliente
-		if($("#facturaCliente").val()==""){
-			Swal.fire({
-				title : 'Advertencia!',
-				text : 'El cliente no puede estar vacio',
-				position : 'top',
-				icon : 'warning',
-				confirmButtonText : 'Cool'
-			})
-		}else{
-			//debe incluir RNC
-			if($("#facturaRnc").val()==""){
+		var deTaller = 0;
+		if($("#nombreClienteTallerInfo").text() != ""){
+			deTaller = 1;
+		}
+	
+		if(deTaller == 0){
+			//debe incluir cliente
+			if($("#facturaCliente").val()==""){
 				Swal.fire({
 					title : 'Advertencia!',
-					text : 'El RNC es necesario para guardar la factura',
+					text : 'El cliente no puede estar vacio',
 					position : 'top',
 					icon : 'warning',
 					confirmButtonText : 'Cool'
 				})
 			}else{
-				var total_venta = $("#precioTotal").text();
-				var total_itbis = $("#subTotalItbis").text();
-				var nombreCliente = $("#facturaCliente").val();
-				var telefonoCliente = $("#facturaTelefono").val();
-				var rncCliente = $("#facturaRnc").val();
-				//proceso de guardado de la factura
-				 $.post("/facturas/ajax/guardarFactura/",
-						{
-					 		'total_venta':total_venta,
-					 		'nombreCliente':nombreCliente,
-					 		'telefonoCliente':telefonoCliente,
-					 		'rncCliente':rncCliente,
-					 		'total_itbis':total_itbis
-						},function(response){
-					$('#responseGeneratedInvoice').replaceWith(response);
-					var invoiceId = $('#responseGeneratedInvoice').val();
-					if(invoiceId>0){
-						factura_detalle_items(incluyeItbis);
-						$("#pagoModal").modal("hide");
-						var a = document.createElement('a');
-						  a.target="_blank";
-						  a.href='/facturas/print/'+invoiceId;
-						  a.click();
-						setTimeout(function() {
-							location.href = '/facturas/';
-						}, 1000);
-					}
-			 	});
+				//debe incluir RNC
+				if($("#facturaRnc").val()==""){
+					Swal.fire({
+						title : 'Advertencia!',
+						text : 'El RNC es necesario para guardar la factura',
+						position : 'top',
+						icon : 'warning',
+						confirmButtonText : 'Cool'
+					})
+				}else{
+					var total_venta = $("#precioTotal").text();
+					var total_itbis = $("#subTotalItbis").text();
+					var nombreCliente = $("#facturaCliente").val();
+					var telefonoCliente = $("#facturaTelefono").val();
+					var rncCliente = $("#facturaRnc").val();
+					//proceso de guardado de la factura
+					 $.post("/facturas/ajax/guardarFactura/",
+							{
+						 		'total_venta':total_venta,
+						 		'nombreCliente':nombreCliente,
+						 		'telefonoCliente':telefonoCliente,
+						 		'rncCliente':rncCliente,
+						 		'total_itbis':total_itbis
+							},function(response){
+						$('#responseGeneratedInvoice').replaceWith(response);
+						var invoiceId = $('#responseGeneratedInvoice').val();
+						if(invoiceId>0){
+							factura_detalle_items(incluyeItbis);
+							$("#pagoModal").modal("hide");
+							var a = document.createElement('a');
+							  a.target="_blank";
+							  a.href='/facturas/print/'+invoiceId;
+							  a.click();
+							setTimeout(function() {
+								location.href = '/facturas/';
+							}, 1000);
+						}
+				 	});
+				}
 			}
+		}else{
+			//Viene de taller
+			var total_venta = $("#precioTotal").text();
+			var total_itbis = $("#subTotalItbis").text();
+			var nombreCliente = $("#nombreClienteTallerInfo").text();
+			var telefonoCliente = $("#telefonoClienteTallerInfo").text();
+			var rncCliente = $("#rncClienteTallerInfo").text();
+			//proceso de guardado de la factura
+			 $.post("/facturas/ajax/guardarFactura/",
+					{
+				 		'total_venta':total_venta,
+				 		'nombreCliente':nombreCliente,
+				 		'telefonoCliente':telefonoCliente,
+				 		'rncCliente':rncCliente,
+				 		'total_itbis':total_itbis
+					},function(response){
+				$('#responseGeneratedInvoice').replaceWith(response);
+				var invoiceId = $('#responseGeneratedInvoice').val();
+				if(invoiceId>0){
+					factura_detalle_items(incluyeItbis);
+					$("#pagoModal").modal("hide");
+					var a = document.createElement('a');
+					  a.target="_blank";
+					  a.href='/facturas/print/'+invoiceId;
+					  a.click();
+					setTimeout(function() {
+						location.href = '/facturas/';
+					}, 1000);
+				}
+		 	});
 		}
 }
 

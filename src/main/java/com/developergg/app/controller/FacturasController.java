@@ -175,6 +175,12 @@ public class FacturasController {
 	private IFacturasDetallesTallerService serviceFacturasDetallesTaller;
 	
 	@Autowired
+	private IAbonosCxCService serviceAbonosCxC;
+	
+	@Autowired
+	private IAbonosCxCDetallesService serviceDetallesAbonosCxC;
+	
+	@Autowired
 	private DataSource dataSource;
 	
 	@Value("${inventario.ruta.imagenes}")
@@ -398,6 +404,39 @@ public class FacturasController {
 		}
 		
 		serviceFacturas.guardar(factura);
+		
+		//Logica para facturas con taller y abono
+		if(credito == 1 && factura.getTaller()!=null && factura.getAvance_taller().doubleValue()>0) {
+			AbonoCxC abono = new AbonoCxC();
+			abono.setAlmacen(usuario.getAlmacen());
+			abono.setCliente(factura.getCliente());
+			abono.setFactura(factura);
+			abono.setUsuario(usuario);
+			abono.setCodigo(factura.getCodigo());
+			serviceAbonosCxC.guardar(abono);
+			
+			Double restante = formato2d(factura.getTotal_venta()-factura.getAvance_taller());
+			
+			AbonoCxCDetalle detalle = new AbonoCxCDetalle();
+			FormaPago formaPago = serviceFormasPagos.buscarPorId(0);
+			detalle.setFormaPago(formaPago);
+			detalle.setIngreso(abono);
+			detalle.setAbono(factura.getAvance_taller());
+			detalle.setFecha(new Date());
+			detalle.setHora(now);
+			Double abonado =detalle.getAbono();
+			serviceDetallesAbonosCxC.guardar(detalle);
+			
+			abono.setTotalAbono(abonado);
+			abono.setTotalRestante(restante<0?0:restante);
+			abono.setTotalPagado(abonado);
+			if(restante<0) {
+				abono.setTotalDevuelto(restante*-1);
+			}
+			serviceAbonosCxC.guardar(abono);
+			factura.setAbono(factura.getAbono()+abono.getTotalAbono());
+			serviceFacturas.guardar(factura);
+		}
 		
 		//detalles del pago
 		List<FacturaDetallePagoTemp> detallesPagosTemp = serviceFacturaDetallesPagosTemp.buscarPorFacturaTemp(facturaTemp); 
@@ -863,7 +902,7 @@ public class FacturasController {
 				}
 			}
 			
-			model.addAttribute("nombreCliente",factura.getCliente().getNombre());
+			model.addAttribute("nombreCliente",factura.getNombre_cliente());
 			model.addAttribute("numFactura", factura.getCodigo());
 			model.addAttribute("detalles", abonoDetalles);
 			model.addAttribute("mostrarCambio", mostrarCambio);
@@ -873,6 +912,12 @@ public class FacturasController {
 			model.addAttribute("totalCambioPagos", df2.format(totalCambioPagos));
 		}
 		return "facturas/cuerpoPagoXC :: cuerpoPago";
+	}
+	
+	public double formato2d(double number) {
+		number = Math.round(number * 100);
+		number = number/100;
+		return number;
 	}
 
 }

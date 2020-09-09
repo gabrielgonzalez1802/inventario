@@ -24,7 +24,10 @@ public class Taller {
 	private String hora;
 	private String nombre;
 	private String cedula;
-	private String telefono;
+	
+	@Column(name = "direccion")
+	private String direccionCliente;
+	
 	private String celular;
 	private String marca;
 	private String motivo_entrega;
@@ -101,12 +104,6 @@ public class Taller {
 	}
 	public void setCedula(String cedula) {
 		this.cedula = cedula;
-	}
-	public String getTelefono() {
-		return telefono;
-	}
-	public void setTelefono(String telefono) {
-		this.telefono = telefono;
 	}
 	public String getCelular() {
 		return celular;
@@ -222,14 +219,21 @@ public class Taller {
 	public void setEntregado_por(Usuario entregado_por) {
 		this.entregado_por = entregado_por;
 	}
+	public String getDireccionCliente() {
+		return direccionCliente;
+	}
+	public void setDireccionCliente(String direccionCliente) {
+		this.direccionCliente = direccionCliente;
+	}
 	@Override
 	public String toString() {
 		return "Taller [id=" + id + ", codigo=" + codigo + ", fecha=" + fecha + ", hora=" + hora + ", nombre=" + nombre
-				+ ", cedula=" + cedula + ", telefono=" + telefono + ", celular=" + celular + ", marca=" + marca
-				+ ", motivo_entrega=" + motivo_entrega + ", tipoEquipo=" + tipoEquipo + ", facturaTemp=" + facturaTemp
-				+ ", modelo=" + modelo + ", serial=" + serial + ", tipo_reparacion=" + tipo_reparacion + ", estado="
-				+ estado + ", almacen=" + almacen + ", usuario=" + usuario + ", problema=" + problema + ", completado="
-				+ completado + ", entregado=" + entregado + ", avance=" + avance + ", total=" + total + ", asignado="
-				+ asignado + ", entregado_por=" + entregado_por + ", fecha_entrega=" + fecha_entrega + "]";
+				+ ", cedula=" + cedula + ", direccionCliente=" + direccionCliente + ", celular=" + celular + ", marca="
+				+ marca + ", motivo_entrega=" + motivo_entrega + ", tipoEquipo=" + tipoEquipo + ", facturaTemp="
+				+ facturaTemp + ", modelo=" + modelo + ", serial=" + serial + ", tipo_reparacion=" + tipo_reparacion
+				+ ", estado=" + estado + ", almacen=" + almacen + ", usuario=" + usuario + ", problema=" + problema
+				+ ", completado=" + completado + ", entregado=" + entregado + ", avance=" + avance + ", total=" + total
+				+ ", asignado=" + asignado + ", entregado_por=" + entregado_por + ", fecha_entrega=" + fecha_entrega
+				+ "]";
 	}
 }

@@ -127,41 +127,27 @@
 		  <div class="panel-body all">
 		  
 		  <div id="responseInfoClienteTaller">
-			  <div class="container">
-			  	<div class="row">
-			  		<div class="col-md-10">
-			  			<input type="hidden" id="idTaller" th:value="${infoTaller.id}">
-				  		<div class="col-md-2">
-							<span style="color: yellow;"> Nombre Cliente: </span><span th:text="${infoTaller.nombre}" id="nombreClienteTallerInfo"></span>
-				  		</div>
-				  		<div class="col-md-1">
-							<span style="color: yellow;"> Cedula: </span> <span th:text="${infoTaller.cedula}" id="telefonoClienteTallerInfo"></span>
-				  		</div>
-				  		<div class="col-md-1">
-							<span style="color: yellow;"> Telefono: </span> <span th:text="${infoTaller.telefono}" id="rncClienteTallerInfo"></span>
-				  		</div>
+			  	<div class="row pull-right">
+			  		<div class="col-md-12">
+			  				<input type="hidden" id="idTaller" th:value="${infoTaller.id}">
+							<span style="color: yellow;"> Nom. </span><span th:text="${infoTaller.nombre}" id="nombreClienteTallerInfo"></span>&nbsp;&nbsp;&nbsp;
+							<span style="color: yellow;"> Ced / RNC. </span><span th:text="${infoTaller.cedula}" id="rncClienteTallerInfo"></span>&nbsp;&nbsp;&nbsp;
+							<span style="color: yellow;"> Tlf. </span><span th:text="${infoTaller.celular}" id="telefonoClienteTallerInfo"></span>&nbsp;&nbsp;&nbsp;
+							<span style="color: yellow;"> Dir. </span> <span th:text="${infoTaller.direccionCliente}" id="direccionClienteTallerInfo"></span>
 			  		</div>	
 			  	</div>
-			  </div>
 		 </div>
 		 
 		 <div id="responseInfoCliente">
-			  <div class="container">
-			  	<div class="row">
-			  		<div class="col-md-10">
+			  	<div class="row pull-right">
+			  		<div class="col-md-12">
 			  			<input type="hidden" id="idClienteInfo" th:value="${infoCliente.id}">
-				  		<div class="col-md-2">
-							<span style="color: yellow;"> Nombre Cliente: </span><span id="nombreClienteInfo" th:text="${infoCliente.nombre}"></span>
-				  		</div>
-				  		<div class="col-md-1">
-							<span style="color: yellow;"> RNC: </span> <span id="rncClienteInfo" th:text="${infoCliente.rnc}"></span>
-				  		</div>
-				  		<div class="col-md-1">
-							<span style="color: yellow;"> Telefono: </span> <span id="telefonoClienteInfo" th:text="${infoCliente.telefono}"></span>
-				  		</div>
+						<span style="color: yellow;"> Nom. </span><span id="nombreClienteInfo" th:text="${infoCliente.nombre}"></span>
+						<span style="color: yellow;"> Ced / RNC. </span> <span id="rncClienteInfo" th:text="${infoCliente.rnc}"></span>
+						<span style="color: yellow;"> Tlf. </span> <span id="telefonoClienteInfo" th:text="${infoCliente.telefono}"></span>
+			  			<span style="color: yellow;"> Dir. </span> <span id="direccionClienteInfo" th:text="${infoCliente.direccion}"></span>
 			  		</div>	
 			  	</div>
-			  </div>
 		 </div>
 		  
 		  <br>
@@ -184,7 +170,7 @@
                     <input type="hidden" id="responseEntregado">
                     <label for="nombre">Lista de Productos</label>
                     <input type="hidden" class="form-control" name="artuculo" id="articulo" placeholder="Buscar por Imei, Art&iacute;culo y C&oacute;digo">
-					<select class="form-control" id="articulos">
+					<select class="form-control" id="articulos" style="width: 100%;">
 						<option value="">Busqueda por art&iacute;culo, c&oacute;digo y serial</option>
                    		 <option
                    		 th:each="art : ${listaArticulos}" 
@@ -333,7 +319,7 @@
 						<tbody class="items">
 							<tr th:each="taller: ${listaTalleres}">
 								<td th:text="${taller.nombre}" class="text-center">Cliente</td>
-								<td th:text="${taller.telefono}" class="text-center">Telefono</td>
+								<td th:text="${taller.celular}" class="text-center">Telefono</td>
 								<td th:text="${taller.marca} + ${taller.modelo}" class="text-center">Equipo</td>
 								<td th:text="${taller.serial}" class="text-center">Serial</td>
 								<td th:text="${taller.estado}" class="text-center">Estado</td>
@@ -683,8 +669,8 @@
 					<input type="hidden" id="responseAddRecepcion" th:value="${responseAddRecepcion}">
 						<div class="col col-md-6">
 							<div class="form-group">
-								 <label>Celular</label>
-								 <input th:field="*{celular}" class="form-control" id="celularTaller" type="text" placeholder="Celular" autocomplete="off">
+								 <label>Telefono Cliente</label>
+								 <input th:field="*{celular}" class="form-control" id="celularTaller" type="text" placeholder="Telefono Cliente" autocomplete="off">
 							</div>
 						</div>
 						<div class="col col-md-6">
@@ -703,8 +689,8 @@
 						</div>
 						<div class="col col-md-6">
 							<div class="form-group">
-								<label>Telefono</label>
-	                       		<input th:field="*{telefono}" class="form-control" id="telefonoTaller" type="text" placeholder="Telefono" autocomplete="off">
+								<label>Direccion</label>
+	                       		<input th:field="*{direccionCliente}" class="form-control" id="direccionClienteTaller" type="text" placeholder="Direccion" autocomplete="off">
 							</div>
 						</div>
 					</div>
@@ -712,13 +698,13 @@
 						<div class="col col-md-6">
 							<div class="form-group">
 								<label>Serial</label>
-	                       		<input th:field="*{serial}" class="form-control" id="serialTaller" type="text" placeholder="Serial" autocomplete="off">
+	                       		<input th:field="*{serial}" class="form-control" id="serialTaller" type="text" placeholder="Serial/IMEI Equipo" autocomplete="off">
 							</div>
 						</div>
 						<div class="col col-md-6">
 							<div class="form-group">
 								<label>Marca</label>
-	                       		<input th:field="*{marca}" class="form-control" id="marcaTaller" type="text" placeholder="Marca" autocomplete="off">
+	                       		<input th:field="*{marca}" class="form-control" id="marcaTaller" type="text" placeholder="Marca Equipo" autocomplete="off">
 							</div>
 						</div>
 					</div>
@@ -726,7 +712,7 @@
 						<div class="col col-md-6">
 							<div class="form-group">
 								<label>Modelo</label>
-	                       		<input th:field="*{modelo}" class="form-control" id="modeloTaller" type="text" placeholder="Modelo" autocomplete="off">
+	                       		<input th:field="*{modelo}" class="form-control" id="modeloTaller" type="text" placeholder="Modelo Equipo" autocomplete="off">
 							</div>
 						</div>
 						<div class="col col-md-6">
