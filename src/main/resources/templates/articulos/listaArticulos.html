@@ -160,11 +160,21 @@
 			})
 		</script>
 	</span>
-		<span th:if="${msg6!= null}" class="alert alert-success" role="alert">
+	<span th:if="${msg6!= null}" class="alert alert-success" role="alert">
 		<script type="text/javascript">
 		Swal.fire({
 			  title: 'Alerta!',
 			  text: 'El registro no se puede eliminar',
+			  icon: 'warning',
+			  confirmButtonText: 'Cool'
+			})
+		</script>
+	</span>	
+	<span th:if="${msg7!= null}" class="alert alert-success" role="alert">
+		<script type="text/javascript">
+		Swal.fire({
+			  title: 'Alerta!',
+			  text: 'El registro no se puede eliminar, ya que posee inventario en otro almacen',
 			  icon: 'warning',
 			  confirmButtonText: 'Cool'
 			})

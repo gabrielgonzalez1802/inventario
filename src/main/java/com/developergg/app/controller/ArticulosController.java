@@ -10,6 +10,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.collections4.ListUtils;
@@ -44,6 +47,7 @@ import com.developergg.app.model.SerialTemporal;
 import com.developergg.app.model.Suplidor;
 import com.developergg.app.model.TallerArticulo;
 import com.developergg.app.model.Usuario;
+import com.developergg.app.service.IAlmacenesService;
 import com.developergg.app.service.IArticulosAjustesService;
 import com.developergg.app.service.IArticulosSeriales;
 import com.developergg.app.service.IArticulosService;
@@ -105,6 +109,12 @@ public class ArticulosController {
 
 	@Autowired
 	private ITalleresArticulosService serviceTalleresArticulos;
+	
+	@Autowired
+	private IAlmacenesService serviceAlmacenes;
+	
+	@PersistenceContext
+	private EntityManager em;
 	
 	@Value("${inventario.ruta.imagenes}")
 	private String ruta;
@@ -387,9 +397,63 @@ public class ArticulosController {
 		return "articulos/formularioEdit";
 	}
 	
+	@SuppressWarnings("unused")
 	@GetMapping("/delete/{id}")
 	public String delete(@PathVariable(name = "id") Integer idArticulo, Model model, HttpSession session, RedirectAttributes attributes) {
 		Articulo articulo = serviceArticulos.buscarPorId(idArticulo);
+		Usuario usuario = (Usuario) session.getAttribute("usuario");
+		//Buscamos los almacenes asociados al articulo
+		Query nativeQuery = em.createNativeQuery("SELECT id_almacen FROM articulos_ajuste a " + 
+				"WHERE a.id_articulo =" + articulo.getId() + 
+				" GROUP BY id_almacen");
+		@SuppressWarnings("unchecked")
+		List<Integer> results = nativeQuery.getResultList();
+		
+		int cant = 0;
+		
+		if(!results.isEmpty()) {
+			for (Integer objects : results) {
+				Almacen almacen = serviceAlmacenes.buscarPorId(objects);
+				//si tiene no tiene serial
+				if(articulo.getImei().equalsIgnoreCase("0") || articulo.getImei().equalsIgnoreCase("NO")) {
+					List<ArticuloAjuste> articulosAjustes = serviceArticulosAjustes.buscarPorArticuloYAlmacen(articulo, almacen);
+					if(articulosAjustes.isEmpty()) {
+						cant = 0;
+					}else {
+						ArticuloAjuste newArticuloAjuste = articulosAjustes.get(articulosAjustes.size()-1);
+//						articulo.setCantidad(newArticuloAjuste.getDisponible());
+						cant = newArticuloAjuste.getDisponible();
+						if(cant>0) {
+							break;
+						}
+					}
+				}else {
+					//Validacion para articulos con serial
+					List<ArticuloSerial> articuloSerials = serviceArticulosSeriales
+							.buscarPorArticuloAlmacen(articulo, almacen).stream()
+							.filter(s -> s.getEstado().equalsIgnoreCase("Disponible"))
+							.collect(Collectors.toList());
+					if(!articuloSerials.isEmpty()) {
+						cant++;
+						break;
+					}
+					for (ArticuloSerial articuloSerial : articuloSerials) {
+						//buscamos el articulo
+						if(articuloSerial.getArticulo().getId() == articulo.getId()) {
+							articulo.setPrecio_maximo(articuloSerial.getPrecio_maximo());
+							articulo.setPrecio_mayor(articuloSerial.getPrecio_mayor());
+							articulo.setPrecio_minimo(articuloSerial.getPrecio_minimo());
+						}
+					}
+				}
+			}
+		}
+		
+		if(cant>0) {
+			attributes.addFlashAttribute("msg7", "No se puede eliminar");
+			return "redirect:/articulos/";
+		}
+		
 		if(articulo == null) {
 			attributes.addFlashAttribute("msg3", "No existe");
 			return "redirect:/articulos/create";

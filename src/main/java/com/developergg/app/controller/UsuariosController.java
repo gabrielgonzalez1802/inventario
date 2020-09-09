@@ -20,6 +20,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.developergg.app.model.Perfil;
 import com.developergg.app.model.Usuario;
 import com.developergg.app.service.IAlmacenesService;
+import com.developergg.app.service.IPerfilesService;
 import com.developergg.app.service.IUsuariosService;
 
 @Controller
@@ -34,6 +35,9 @@ public class UsuariosController {
 	
 	@Autowired
 	private IAlmacenesService serviceAlmacenes;
+	
+	@Autowired
+	private IPerfilesService servicePerfiles;
 	
 	@GetMapping("/")
 	public String listaUsuarios(Model model) {
@@ -53,8 +57,10 @@ public class UsuariosController {
 	@GetMapping("/create")
 	public String crear(Model model) {
 		Usuario usuario = new Usuario();
+		List<Perfil> perfiles = servicePerfiles.buscarTodos();
 		model.addAttribute("usuario", usuario);
 		model.addAttribute("almacenes", serviceAlmacenes.buscarTodos());
+		model.addAttribute("perfiles", perfiles);
 		return "usuarios/formularioCrear";
 	}
 	

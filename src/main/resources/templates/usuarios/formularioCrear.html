@@ -60,13 +60,13 @@
                     <input type="text" th:field="*{nombre}" class="form-control" id="nombre" placeholder="nombre" required="required">
                   </div>
                 </div>
-                 <div class="col-md-3"> 
+                 <div class="col-md-2"> 
                   <div class="form-group">
                     <label for="codigo">Usuario</label>
                     <input type="text" th:field="*{username}" class="form-control" id="username" placeholder="Usuario" required="required">
                   </div>
                 </div>
-                 <div class="col-md-3"> 
+                 <div class="col-md-2"> 
                   <div class="form-group">
                     <label for="codigo">Contrase&ntilde;a</label>
                     <input type="password"  th:field="*{password}" class="form-control" id="password" placeholder="Contrase&ntilde;a" required="required">
@@ -81,6 +81,18 @@
 									th:text="${almacen.nombre}">
 							</option>
 						</select>
+                  </div>
+                </div>
+                <div class="col-md-2"> 
+                  <div class="form-group">
+                   	 <label for="codigo">Rol</label>
+                   		 <select th:field="*{privilegio.id}" class="form-control" required="required">
+							<option th:each="privilegio : ${perfiles}"
+									th:value="${privilegio.id}" 
+									th:text="${privilegio.perfil}">
+							</option>
+						</select>
+
                   </div>
                 </div>
               </div>
