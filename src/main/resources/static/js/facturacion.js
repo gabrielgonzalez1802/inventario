@@ -998,7 +998,9 @@ function eliminarPagoFactura(idPago){
 $("#btnGuardarFactura").click(function(e) {
 	e.preventDefault();
 	//verificamos que la factura tenga los pagos completos para proceder a guardarla
-	if($("#totalRestaPagos").text()>0){
+	var totalRestaPagos = parseFloat($("#totalRestaPagos").text())
+
+	if(totalRestaPagos>0){
 		Swal.fire({
 			title : 'Advertencia!',
 			text : 'No se puede guardar la factura hasta completarse los pagos',
