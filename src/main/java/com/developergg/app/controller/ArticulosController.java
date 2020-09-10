@@ -643,10 +643,8 @@ public class ArticulosController {
 			@RequestParam("precio") Double precio, @RequestParam("cantidad") Integer cantidad) {
 		Usuario usuario = (Usuario) session.getAttribute("usuario");
 		FacturaTemp factura = serviceFacturasTemp.buscarPorUsuario(usuario);
-		double itbis = 0.0;
-		double subtotal = 0.0;
-		double total = 0.0;
-		double subTotalItbis = 0.0;
+		double itBis = 0.0;
+		double precioUnitario = precio;
 		FacturaServicioTemp servicioFac = new FacturaServicioTemp();
 		servicioFac.setUsuario(usuario);
 		servicioFac.setAlmacen(usuario.getAlmacen()); //redundante por el usuario. validar
@@ -659,36 +657,20 @@ public class ArticulosController {
 			// verificamos si el comprobante fiscal incluye el itbis en el precio
 			if (factura.getComprobanteFiscal().getIncluye_itbis() == 1) {
 				// realizamos las conversiones
-				String tempSv = "1." + factura.getComprobanteFiscal().getValor_itbis().intValue();
-				Double precioTempSv = precio / Double.parseDouble(tempSv);
-				Double itBisTempSv = (cantidad * precioTempSv)
-						* (factura.getComprobanteFiscal().getValor_itbis() / 100.00);
-				precio = Double.parseDouble(df2.format(precioTempSv).replace(",", "."));
-				itbis = Double.parseDouble(df2.format(itBisTempSv).replace(",", "."));
-				subtotal = Double
-						.parseDouble(df2.format((cantidad * precio)
-								+ itbis).replace(",", "."));
-				total += subtotal;
+				String temp = "1." + factura.getComprobanteFiscal().getValor_itbis().intValue();
+				precio = formato2d(precioUnitario / Double.parseDouble(temp));
+				itBis = formato2d(precioUnitario - precio);
 			} else {
-				// realizamos las conversiones
-				Double itBisTempServ = (cantidad * precio)
-						* (factura.getComprobanteFiscal().getValor_itbis() / 100.00);
-				precio = Double.parseDouble(df2.format(precio).replace(",", "."));
-				itbis = Double.parseDouble(df2.format(itBisTempServ).replace(",", "."));
-				subtotal = Double
-						.parseDouble(df2.format((cantidad * precio)
-								+ itbis).replace(",", "."));
-				total += subtotal;
+				double valorItbis = factura.getComprobanteFiscal().getValor_itbis().intValue();
+				itBis= formato2d(precioUnitario * valorItbis/100); 
 			}
 		}else {
-			total = precio;
+			itBis = 0.0;
 		}
-		
-		subTotalItbis+=itbis;
-		
+				
 		servicioFac.setPrecio(precio);
-		servicioFac.setItbis(subTotalItbis);
-		servicioFac.setSubtotal(total);
+		servicioFac.setItbis(itBis);
+		servicioFac.setSubtotal((cantidad * precio) + (cantidad * itBis));
 		servicioFac.setComprobanteFiscal(factura.getComprobanteFiscal());
 		serviceServiciosTemp.guardar(servicioFac);
 		return "facturas/factura :: #responseAddService";
@@ -702,14 +684,7 @@ public class ArticulosController {
 			@RequestParam("incluyeItbis") Integer incluyeItbis, @RequestParam("realPrice") Double realPrice) {
 		Double itBis = 0.0;
 		Usuario usuario = (Usuario) session.getAttribute("usuario");
-		
-		if(precio>0 && incluyeItbis == 0) {
-			realPrice = precio/cantidad;
-		}
-		
-		if(incluyeItbis == 1) {
-			precio = realPrice/cantidad;
-		}
+		double precioUnitario = realPrice/cantidad;
 		
 		//Buscamos el articulo
 		Articulo articulo = serviceArticulos.buscarPorId(idArticulo);
@@ -721,36 +696,29 @@ public class ArticulosController {
 		facturaTemp.setCantidad(cantidad);
 		facturaTemp.setConItbis(conItbis.equals("SI")?"1":"0");
 		incluyeItbis = factura.getComprobanteFiscal().getIncluye_itbis();
-		
-		Double subtotal = 0.0;	
-		
+				
 		//verificamos si el articulo tiene itbis
 		if(articulo.getItbis().equalsIgnoreCase("SI")) {
 			if(conItbis.equals("SI")) {
 				//verificamos si incluye itbis en el precio
 				if(incluyeItbis == 1) {
-					String temp = "1."+valorItbis.intValue();
 //					//incluye itbis
-					subtotal = precio / Double.parseDouble(temp);
-					itBis = precio - subtotal;
+					String temp = "1."+valorItbis.intValue();
+					precio = formato2d(precioUnitario / Double.parseDouble(temp));
+					itBis = formato2d(precioUnitario - precio);
 				}else {
-					itBis= realPrice * valorItbis/100; 
+					itBis= formato2d(precioUnitario * valorItbis/100); 
 				}
 			}
 		}else {
 			itBis = 0.0;
-			subtotal = realPrice;
 		}
-				
-		itBis *= cantidad;
-		
-		Double newPrecio = incluyeItbis==1?subtotal:realPrice;
-		newPrecio = Double.parseDouble(df2.format(newPrecio).replace(",", "."));				
-		facturaTemp.setPrecio(newPrecio);
+			
+		facturaTemp.setPrecio(precio);
 		facturaTemp.setExistencia(disponible);
-		facturaTemp.setItbis(Double.parseDouble(df2.format(itBis).replace(",", ".")));
+		facturaTemp.setItbis(itBis);
 		facturaTemp.setPrecio_maximo(maximo);
-		facturaTemp.setSubtotal(cantidad*newPrecio+itBis);
+		facturaTemp.setSubtotal((cantidad * precio) + (cantidad * itBis));
 		facturaTemp.setComprobanteFiscal(factura.getComprobanteFiscal());
 		serviceFacturasDetallesTemp.guardar(facturaTemp);
 		return "facturas/factura :: #responseAddArticuloSinSerial";
@@ -868,40 +836,40 @@ public class ArticulosController {
 								
 				//verificamos si tienen seriales con distintos precios, esto determinara los items en el detalle
 				for (SerialTemporal listSerial : serialesTemporales) {
+					int cant = 1; //Se toma unitario
 					FacturaDetalleTemp facturaTemp = new FacturaDetalleTemp();
 					facturaTemp.setArticulo(articulo);
 					facturaTemp.setUsuario(usuario);
 					facturaTemp.setAlmacen(usuario.getAlmacen());
-					facturaTemp.setCantidad(1);
+					facturaTemp.setCantidad(cant);
 					facturaTemp.setConItbis(articulo.getItbis().equals("SI")?"1":"0");
 					facturaTemp.setImei(articulo.getImei().equals("SI")?"1":"0");
 					
 					precio = listSerial.getPrecio();
+					double precioUnitario = listSerial.getPrecio();
 					
 					//verificamos si el articulo tiene itbis
 					if(articulo.getItbis().equals("SI")) {
 						if(comprobanteFiscal.getPaga_itbis()==1) {
 							//No incluye itbis en el precio
-							if(comprobanteFiscal.getIncluye_itbis()==0) {
-								itBis= precio * (comprobanteFiscal.getValor_itbis()/100.00); 
+							if(comprobanteFiscal.getIncluye_itbis()==0) { 
+								itBis= formato2d(precio * (comprobanteFiscal.getValor_itbis()/100.00)); 
 							}else {
-								//incluye itbis
+								//incluye itbis 
 								String temp = "1."+comprobanteFiscal.getValor_itbis().intValue();
-								subTotal = precio / Double.parseDouble(temp);
-								itBis = precio - subTotal;
+								precio = formato2d(precioUnitario / Double.parseDouble(temp));
+								itBis = formato2d(precioUnitario - precio);
 							}
 						}
 					}else {
-						subTotal = precio;
+						itBis = 0.0;
 					}
 					
-					Double newPrecio = comprobanteFiscal.getIncluye_itbis()==1?subTotal:precio;
-					newPrecio = Double.parseDouble(df2.format(newPrecio).replace(",", "."));				
-					facturaTemp.setPrecio(newPrecio);
-					facturaTemp.setExistencia(articulo.getCantidad());
-					facturaTemp.setItbis(Double.parseDouble(df2.format(itBis).replace(",", ".")));
+					facturaTemp.setPrecio(precio);
+					facturaTemp.setExistencia(cant);
+					facturaTemp.setItbis(itBis);
 					facturaTemp.setPrecio_maximo(articulo.getPrecio_maximo());
-					facturaTemp.setSubtotal(Double.parseDouble(df2.format(1*newPrecio+itBis).replace(",", ".")));
+					facturaTemp.setSubtotal((cant * precio) + (cant * itBis));
 					facturaTemp.setComprobanteFiscal(factura.getComprobanteFiscal());
 					serviceFacturasDetallesTemp.guardar(facturaTemp);
 					
@@ -928,34 +896,31 @@ public class ArticulosController {
 				facturaTemp.setImei(articulo.getImei().equals("SI")?"1":"0");
 				
 				//como tienen el mismo precio sacamos el valor individual
-				precio/=cantidad;
+				double precioUnitario = precio/cantidad;
 				
 				//verificamos si el articulo tiene itbis
 				if(articulo.getItbis().equals("SI")) {
 					if(comprobanteFiscal.getPaga_itbis()==1) {
 						//No incluye itbis en el precio
 						if(comprobanteFiscal.getIncluye_itbis()==0) {
-							itBis= precio * (comprobanteFiscal.getValor_itbis()/100.00); 
+							itBis= formato2d(precioUnitario * (comprobanteFiscal.getValor_itbis()/100.00)); 
+							precio = precioUnitario;
 						}else {
 							//incluye itbis
 							String temp = "1."+comprobanteFiscal.getValor_itbis().intValue();
-							subTotal = precio / Double.parseDouble(temp);
-							itBis = precio - subTotal;
+							precio = formato2d(precioUnitario / Double.parseDouble(temp));
+							itBis = formato2d(precioUnitario - precio);
 						}
 					}
 				}else {
-					subTotal = precio;
+					itBis = 0.0;
 				}
 				
-				itBis *= cantidad;
-				
-				Double newPrecio = comprobanteFiscal.getIncluye_itbis()==1?subTotal:precio;
-				newPrecio = Double.parseDouble(df2.format(newPrecio).replace(",", "."));				
-				facturaTemp.setPrecio(newPrecio);
-				facturaTemp.setExistencia(articulo.getCantidad());
-				facturaTemp.setItbis(Double.parseDouble(df2.format(itBis).replace(",", ".")));
+				facturaTemp.setPrecio(precio);
+				facturaTemp.setExistencia(cantidad);
+				facturaTemp.setItbis(itBis);
 				facturaTemp.setPrecio_maximo(articulo.getPrecio_maximo());
-				facturaTemp.setSubtotal(cantidad*newPrecio+itBis);
+				facturaTemp.setSubtotal((cantidad * precio) + (cantidad * itBis));
 				facturaTemp.setComprobanteFiscal(factura.getComprobanteFiscal());
 				serviceFacturasDetallesTemp.guardar(facturaTemp);
 				
@@ -976,8 +941,7 @@ public class ArticulosController {
 			
 			}
 			
-		}else { //ggonzalez verificar urgente
-			Double newPrecio = 0.0;
+		}else {
 			FacturaDetalleTemp facturaTemp = new FacturaDetalleTemp();
 			facturaTemp.setArticulo(articulo);
 			facturaTemp.setUsuario(usuario);
@@ -992,28 +956,27 @@ public class ArticulosController {
 				if(comprobanteFiscal.getPaga_itbis()==1) {
 					//No incluye itbis en el precio
 					if(comprobanteFiscal.getIncluye_itbis()==0) {
-						itBis= precio * (comprobanteFiscal.getValor_itbis()/100.00); 
-						newPrecio = precio;
-						subTotal = cantidad*precio+itBis;
+						double precioUnitario = precio/cantidad;
+						itBis= formato2d(precioUnitario * (comprobanteFiscal.getValor_itbis()/100.00)); 
+						precio = precioUnitario;
 					}else {
+						
+						double precioUnitario = precio;
 						//incluye itbis
 						String temp = "1."+comprobanteFiscal.getValor_itbis().intValue();
-						newPrecio = precio / Double.parseDouble(temp);
-						itBis = newPrecio * (comprobanteFiscal.getValor_itbis().intValue()/100.00);
-						subTotal = newPrecio + itBis;
+						precio = formato2d(precioUnitario / Double.parseDouble(temp));
+						itBis = formato2d(precioUnitario - precio);
 					}
 				}
 			}else {
-				subTotal = precio;
+				itBis = 0.0;
 			}
 			
-			itBis *= cantidad;
-
-			facturaTemp.setPrecio(Double.parseDouble(df2.format(newPrecio).replace(",", ".")));
-			facturaTemp.setExistencia(articulo.getCantidad());
-			facturaTemp.setItbis(Double.parseDouble(df2.format(itBis).replace(",", ".")));
+			facturaTemp.setPrecio(precio);
+			facturaTemp.setExistencia(cantidad);
+			facturaTemp.setItbis(itBis);
 			facturaTemp.setPrecio_maximo(articulo.getPrecio_maximo());
-			facturaTemp.setSubtotal(Double.parseDouble(df2.format(subTotal).replace(",", ".")));
+			facturaTemp.setSubtotal((cantidad * precio) + (cantidad * itBis));
 			facturaTemp.setComprobanteFiscal(factura.getComprobanteFiscal());
 			serviceFacturasDetallesTemp.guardar(facturaTemp);
 			
@@ -1216,122 +1179,26 @@ public class ArticulosController {
 		Double subTotalItbis = 0.0;
 		//Calculamos el total
 		for (FacturaDetalleTemp facturaDetalleTemp : facturaDetallesTemp) {
-			//verificamos si en el detalle el articulo incluye itbis en el precio
-			if(facturaTemp.getComprobanteFiscal().getIncluye_itbis()==1) {
-				//verificamos si el valor inicial del comprobante fiscal en la factura incluye itbis
-				if(facturaDetalleTemp.getComprobanteFiscal().getIncluye_itbis()==1) {
-					//realizamos las conversiones
-					total+=facturaDetalleTemp.getSubtotal();
-				}else {
-					//realizamos las conversiones
-					String temp = "1."+facturaTemp.getComprobanteFiscal().getValor_itbis().intValue();
-					Double precioTemp = facturaDetalleTemp.getPrecio() / Double.parseDouble(temp);
-					Double itBisTemp = (facturaDetalleTemp.getCantidad() * precioTemp) * (facturaTemp.getComprobanteFiscal().getValor_itbis()/100.00);
-					facturaDetalleTemp.setPrecio(Double.parseDouble(df2.format(precioTemp).replace(",", ".")));
-					facturaDetalleTemp.setItbis(Double.parseDouble(df2.format(itBisTemp).replace(",", ".")));
-					facturaDetalleTemp.setSubtotal(Double.parseDouble(df2.format((facturaDetalleTemp.getCantidad()*facturaDetalleTemp.getPrecio())+facturaDetalleTemp.getItbis()).replace(",", ".")));
-					total+=facturaDetalleTemp.getSubtotal();
-				}
-			}else {
-				//verificamos si el valor inicial del comprobante fiscal en la factura incluye itbis
-				if(facturaDetalleTemp.getComprobanteFiscal().getIncluye_itbis()==1) {
-					//realizamos las conversiones
-					facturaDetalleTemp.setPrecio(Double.parseDouble(df2.format((facturaDetalleTemp.getSubtotal()/facturaDetalleTemp.getCantidad())).replace(",", ".")));
-					facturaDetalleTemp.setItbis(Double.parseDouble(df2.format((facturaDetalleTemp.getCantidad()*facturaDetalleTemp.getPrecio())*(facturaTemp.getComprobanteFiscal().getValor_itbis()/100.00)).replace(",", ".")));
-					facturaDetalleTemp.setSubtotal(Double.parseDouble(df2.format((facturaDetalleTemp.getCantidad()*facturaDetalleTemp.getPrecio())+facturaDetalleTemp.getItbis()).replace(",", ".")));
-					total+=facturaDetalleTemp.getSubtotal();
-				}else {
-					total+=facturaDetalleTemp.getSubtotal();
-				}
-			}
 			subTotalItbis+=facturaDetalleTemp.getItbis();
-			List<FacturaSerialTemp> facturaSerialesTemp = serviceSerialesTemp.buscarPorDetalleTemp(facturaDetalleTemp);
-			if(!facturaSerialesTemp.isEmpty()) {
-				for (FacturaSerialTemp facturaSerialTemp : facturaSerialesTemp) {
-					facturaDetalleTemp.agregar(facturaSerialTemp);
-				}
-			}
+			total+=facturaDetalleTemp.getSubtotal();
 		}
 		
 		//Validaciones para servicios
 		for (FacturaServicioTemp facturaServicioTemp : facturaServiciosTemp) {
-			//Verificamos si el comprobante fiscal paga itbis
-			if(facturaTemp.getComprobanteFiscal().getPaga_itbis() == 1) {
-				//verificamos si el comprobante fiscal incluye el itbis en el precio				
-				if(facturaTemp.getComprobanteFiscal().getIncluye_itbis() == 1) {
-					//realizamos las conversiones
-					String tempSv = "1."+facturaTemp.getComprobanteFiscal().getValor_itbis().intValue();
-					Double precioTempSv = facturaServicioTemp.getPrecio() / Double.parseDouble(tempSv);
-					Double itBisTempSv = (facturaServicioTemp.getCantidad() * precioTempSv) * (facturaTemp.getComprobanteFiscal().getValor_itbis()/100.00);
-					facturaServicioTemp.setPrecio(Double.parseDouble(df2.format(precioTempSv).replace(",", ".")));
-					facturaServicioTemp.setItbis(Double.parseDouble(df2.format(itBisTempSv).replace(",", ".")));
-					facturaServicioTemp.setSubtotal(Double.parseDouble(df2.format((facturaServicioTemp.getCantidad()*facturaServicioTemp.getPrecio())+facturaServicioTemp.getItbis()).replace(",", ".")));
-					total+=facturaServicioTemp.getSubtotal();
-				}else {
-					//realizamos las conversiones
-					Double itBisTempServ = (facturaServicioTemp.getCantidad() * facturaServicioTemp.getPrecio()) * (facturaTemp.getComprobanteFiscal().getValor_itbis()/100.00);
-					facturaServicioTemp.setPrecio(Double.parseDouble(df2.format(facturaServicioTemp.getPrecio()).replace(",", ".")));
-					facturaServicioTemp.setItbis(Double.parseDouble(df2.format(itBisTempServ).replace(",", ".")));
-					facturaServicioTemp.setSubtotal(Double.parseDouble(df2.format((facturaServicioTemp.getCantidad()*facturaServicioTemp.getPrecio())+facturaServicioTemp.getItbis()).replace(",", ".")));
-					total+=facturaServicioTemp.getSubtotal();
-				}
-			}else {
-				//verificamos si el valor inicial del comprobante fiscal en la factura incluye itbis
-				if(facturaServicioTemp.getComprobanteFiscal().getIncluye_itbis()==1) {
-					//realizamos las conversiones
-					facturaServicioTemp.setPrecio(Double.parseDouble(df2.format((facturaServicioTemp.getSubtotal()/facturaServicioTemp.getCantidad())).replace(",", ".")));
-					facturaServicioTemp.setItbis(Double.parseDouble(df2.format((facturaServicioTemp.getCantidad()*facturaServicioTemp.getPrecio())*(facturaTemp.getComprobanteFiscal().getValor_itbis()/100.00)).replace(",", ".")));
-					facturaServicioTemp.setSubtotal(Double.parseDouble(df2.format((facturaServicioTemp.getCantidad()*facturaServicioTemp.getPrecio())+facturaServicioTemp.getItbis()).replace(",", ".")));
-					total+=facturaServicioTemp.getSubtotal();
-				}else {
-					total+=facturaServicioTemp.getSubtotal();
-				}
-			}
 			subTotalItbis+=facturaServicioTemp.getItbis();
+			total+=facturaServicioTemp.getSubtotal();
 		}
 		
 		for (FacturaTallerTemp facturaTallerTemp : facturaTalleresTemp) {
-			//Verificamos si el comprobante fiscal paga itbis
-			if(facturaTemp.getComprobanteFiscal().getPaga_itbis() == 1) {
-				//verificamos si el comprobante fiscal incluye el itbis en el precio				
-				if(facturaTemp.getComprobanteFiscal().getIncluye_itbis() == 1) {
-					//realizamos las conversiones
-					String tempSv = "1."+facturaTemp.getComprobanteFiscal().getValor_itbis().intValue();
-					facturaTallerTemp.setSubtotal(Double.parseDouble(df2.format((facturaTallerTemp.getCantidad()*facturaTallerTemp.getTallerDetalle().getPrecio())).replace(",", ".")));
-					Double precioTempSv = facturaTallerTemp.getSubtotal()/Double.parseDouble(tempSv);
-					Double itBisTempSv = facturaTallerTemp.getSubtotal()- precioTempSv;
-					precioTempSv = precioTempSv/facturaTallerTemp.getCantidad();
-					facturaTallerTemp.setPrecio(Double.parseDouble(df2.format((precioTempSv)).replace(",", ".")));
-					facturaTallerTemp.setItbis(Double.parseDouble(df2.format((itBisTempSv)).replace(",", ".")));
-					total+=facturaTallerTemp.getSubtotal();
-				}else {
-					//realizamos las conversiones
-					Double itBisTempServ = (facturaTallerTemp.getTallerDetalle().getCantidad() * facturaTallerTemp.getTallerDetalle().getPrecio()) * (facturaTemp.getComprobanteFiscal().getValor_itbis()/100.00);
-					facturaTallerTemp.setPrecio(Double.parseDouble(df2.format(facturaTallerTemp.getTallerDetalle().getPrecio()).replace(",", ".")));
-					facturaTallerTemp.setItbis(Double.parseDouble(df2.format(itBisTempServ).replace(",", ".")));
-					facturaTallerTemp.setSubtotal(Double.parseDouble(df2.format((facturaTallerTemp.getTallerDetalle().getCantidad()*facturaTallerTemp.getTallerDetalle().getPrecio())+facturaTallerTemp.getItbis()).replace(",", ".")));
-					total+=facturaTallerTemp.getSubtotal();
-				}
-			}else {
-				//verificamos si el valor inicial del comprobante fiscal en la factura incluye itbis
-				if(facturaTallerTemp.getComprobanteFiscal().getIncluye_itbis()==1) {
-					//realizamos las conversiones
-					facturaTallerTemp.setPrecio(Double.parseDouble(df2.format((facturaTallerTemp.getTallerDetalle().getSubtotal()/facturaTallerTemp.getTallerDetalle().getCantidad())).replace(",", ".")));
-					facturaTallerTemp.setItbis(Double.parseDouble(df2.format((facturaTallerTemp.getTallerDetalle().getCantidad()*facturaTallerTemp.getTallerDetalle().getPrecio())*(facturaTemp.getComprobanteFiscal().getValor_itbis()/100.00)).replace(",", ".")));
-					facturaTallerTemp.setSubtotal(Double.parseDouble(df2.format((facturaTallerTemp.getTallerDetalle().getCantidad()*facturaTallerTemp.getTallerDetalle().getPrecio())+facturaTallerTemp.getItbis()).replace(",", ".")));
-					total+=facturaTallerTemp.getSubtotal();
-				}else {
-					total+=facturaTallerTemp.getSubtotal();
-				}
-			}
+			total+=facturaTallerTemp.getSubtotal();
 			subTotalItbis+=facturaTallerTemp.getItbis();
 		}
 		
 		model.addAttribute("facturaTalleres", facturaTalleresTemp);
 		model.addAttribute("facturaDetalles", facturaDetallesTemp);
 		model.addAttribute("facturaServicios", facturaServiciosTemp);
-		model.addAttribute("subTotalItbis", Double.parseDouble(df2.format(subTotalItbis).replace(",", ".")));
-		model.addAttribute("total", Double.parseDouble(df2.format(total).replace(",", ".")));
+		model.addAttribute("subTotalItbis",formato2d(subTotalItbis));
+		model.addAttribute("total", formato2d(total));
 		return "facturas/cuerpoFactura :: cuerpoFactura";
 	}
 	
@@ -1598,6 +1465,12 @@ public class ArticulosController {
 		model.addAttribute("incluyeItbis", comprobanteFiscal.getIncluye_itbis());
 		model.addAttribute("valorItbis", comprobanteFiscal.getValor_itbis());
 		return "facturas/factura :: #comprobanteFiscalInfo";
+	}
+	
+	public double formato2d(double number) {
+		number = Math.round(number * 100);
+		number = number/100;
+		return number;
 	}
 		
 	@ModelAttribute

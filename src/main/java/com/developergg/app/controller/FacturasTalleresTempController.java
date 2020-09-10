@@ -1,6 +1,5 @@
 package com.developergg.app.controller;
 
-import java.text.DecimalFormat;
 import java.util.List;
 
 import javax.servlet.http.HttpSession;
@@ -47,18 +46,13 @@ public class FacturasTalleresTempController {
 	
 	@Autowired
 	private IFacturasDetallesPagoTempService serviceDetallePagoTemp;
-	
-	private DecimalFormat df2 = new DecimalFormat("###.##");
-	
+		
 	@PostMapping("/ajax/addDetailsTaller")
 	public String agregarDetallesTallerInvoice(Model model, HttpSession session,
 			@RequestParam(name = "idTaller") Integer idTaller) {
 		Usuario usuario = (Usuario) session.getAttribute("usuario");
 		FacturaTemp factura = serviceFacturasTemp.buscarPorUsuario(usuario);
-		double itbis = 0.0;
-		double subtotal = 0.0;
-		double total = 0.0;
-		double subTotalItbis = 0.0;
+		double itBis = 0.0;
 		double precio =0.0;
 		
 		Taller taller = serviceTalleres.buscarPorId(idTaller);
@@ -73,45 +67,30 @@ public class FacturasTalleresTempController {
 				// verificamos si el comprobante fiscal incluye el itbis en el precio
 				if (factura.getComprobanteFiscal().getIncluye_itbis() == 1) {
 					// realizamos las conversiones
-					String tempSv = "1." + factura.getComprobanteFiscal().getValor_itbis().intValue();
-					Double precioTempSv = tallerDetalle.getSubtotal() / Double.parseDouble(tempSv);
-					Double itBisTempSv = (tallerDetalle.getCantidad() * precioTempSv)
-							* (factura.getComprobanteFiscal().getValor_itbis() / 100.00);
-					precio = Double.parseDouble(df2.format(precioTempSv).replace(",", "."));
-					itbis = Double.parseDouble(df2.format(itBisTempSv).replace(",", "."));
-					subtotal = Double
-							.parseDouble(df2.format((tallerDetalle.getCantidad() * precio)
-									+ itbis).replace(",", "."));
-					total += subtotal;
+					String temp = "1." + factura.getComprobanteFiscal().getValor_itbis().intValue();
+					precio = formato2d(tallerDetalle.getSubtotal() / Double.parseDouble(temp));
+					itBis = formato2d(tallerDetalle.getSubtotal() - precio);
 				} else {
 					// realizamos las conversiones
 					precio = tallerDetalle.getSubtotal();
-					Double itBisTempServ = (tallerDetalle.getCantidad() * precio)
-							* (factura.getComprobanteFiscal().getValor_itbis() / 100.00);
-					precio = Double.parseDouble(df2.format(precio).replace(",", "."));
-					itbis = Double.parseDouble(df2.format(itBisTempServ).replace(",", "."));
-					subtotal = Double
-							.parseDouble(df2.format((tallerDetalle.getCantidad() * precio)
-									+ itbis).replace(",", "."));
-					total = subtotal;
+					itBis= formato2d(precio * (factura.getComprobanteFiscal().getValor_itbis()/100.00)); 
 				}
 			}else {
-				precio = tallerDetalle.getPrecio(); //TODO: GGONZALEZ REVISAR
-				total = tallerDetalle.getSubtotal();
+				precio = tallerDetalle.getPrecio();
+				itBis = 0.0;
 			}
-			
-			subTotalItbis+=itbis;
-			
+						
 			if(tallerDetalle.getArticulo()!=null) {
 				facturaTallerTemp.setArticulo(tallerDetalle.getArticulo());
-//				facturaTallerTemp.setTallerArticulo(tallerArticulo);
 			}
 			
+			int cant = tallerDetalle.getCantidad();
+			
 			facturaTallerTemp.setFacturaTemp(factura);
-			facturaTallerTemp.setCantidad(tallerDetalle.getCantidad());
+			facturaTallerTemp.setCantidad(cant);
 			facturaTallerTemp.setPrecio(precio);
-			facturaTallerTemp.setItbis(subTotalItbis);
-			facturaTallerTemp.setSubtotal(total);
+			facturaTallerTemp.setItbis(itBis);
+			facturaTallerTemp.setSubtotal((cant * precio) + (cant * itBis));
 			facturaTallerTemp.setComprobanteFiscal(factura.getComprobanteFiscal());
 			facturaTallerTemp.setDescripcion(tallerDetalle.getItem());
 			facturaTallerTemp.setTaller(taller);
@@ -138,5 +117,11 @@ public class FacturasTalleresTempController {
 		serviceTalleres.guardar(taller);
 		model.addAttribute("infoTaller", taller);
 		return "facturas/factura :: #responseInfoClienteTaller";
+	}
+	
+	public double formato2d(double number) {
+		number = Math.round(number * 100);
+		number = number/100;
+		return number;
 	}
 }

@@ -52,7 +52,12 @@ $("#selectComprobanteFiscal").change(function(){
 	var comprobanteFiscalID = $("#selectComprobanteFiscal").val();
 	$("#comprobanteFiscalInfo").load("/articulos/ajax/getComprobanteFiscal/"+comprobanteFiscalID,function(){
 		incluyeItbis = $("#incluyeItbis").val();
-		factura_detalle_items(incluyeItbis);
+		//Calculos del comprobante fiscal
+		$.post("/facturas/ajax/conversionDetalle/", {
+			 'comprobanteFiscalID' : comprobanteFiscalID
+		 },function(data){
+				factura_detalle_items(incluyeItbis);
+		 });
 	});
 });
 
@@ -398,8 +403,8 @@ function agregarArticuloSinSerial(){
 		var disponible = $("#disponibleModal").val();
 		var maximo =  $("#precioMaximo").val();
 		maximo = parseFloat(maximo);
-		var precio = $("#totalPrecioSinSerial").val();
-		precio = parseFloat(precio);
+		var precio = parseFloat($("#precioSinSerial").val());
+		var realPrice = parseFloat($("#totalPrecioSinSerial").val());
 		var error = 0;
 		
 		// validaciones del precio del articulo si tiene cliente seleccionado
@@ -483,16 +488,9 @@ function agregarArticuloSinSerial(){
 		// si no hay errores agregamos el registro
 		if(error==0){
 			  // verificamos si el comprobante fiscal paga itbis
-			 if(pagaItbis==1){
-				 conItbis = "SI";
-				 // verificamos si el comprobante incluye itbis en el precio
-				 var realPrice = precio;
-				 if(incluyeItbis==1){
-					 precio = precio - (precio * (valorItbis/100));
-				 }
-			 }else{
+			 if(pagaItbis==0){
 				 valorItbis=0;
-				 var realPrice = 0;
+				 realPrice = 0;
 			 }
 			  $.post("/articulos/ajax/addArticuloSinSerial/",
 						{

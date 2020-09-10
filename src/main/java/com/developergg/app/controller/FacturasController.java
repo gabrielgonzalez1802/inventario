@@ -130,7 +130,7 @@ public class FacturasController {
 	private IFacturasPagoTempService serviceFacturasPagoTemp;
 	
 	@Autowired
-	private IFacturasDetallesTempService facturasDetallesTempService;
+	private IFacturasDetallesTempService serviceFacturasDetallesTemp;
 	
 	@Autowired
 	private IFacturasDetallesService facturasDetallesService;
@@ -139,7 +139,7 @@ public class FacturasController {
 	private IFacturasDetallesServiciosService facturasDetallesServiciosService;
 	
 	@Autowired
-	private IFacturasServiciosTempService facturasServiciosTempService;
+	private IFacturasServiciosTempService serviceFacturasServiciosTemp;
 	
 	@Autowired
 	private IArticulosSeriales serviceArticulosSeriales;
@@ -338,7 +338,7 @@ public class FacturasController {
 			@RequestParam("total_itbis") Double total_itbis) {
 		Usuario usuario = (Usuario) session.getAttribute("usuario");
 		FacturaTemp facturaTemp = serviceFacturasTemp.buscarPorUsuario(usuario);
-		List<FacturaDetalleTemp> facturaDetallesTemp = facturasDetallesTempService.buscarPorUsuarioAlmacen(usuario, usuario.getAlmacen());
+		List<FacturaDetalleTemp> facturaDetallesTemp = serviceFacturasDetallesTemp.buscarPorUsuarioAlmacen(usuario, usuario.getAlmacen());
 		
 		int tempCode = 1;
 		int credito = 0;
@@ -514,7 +514,7 @@ public class FacturasController {
 		}
 		
 		//servicios
-		List<FacturaServicioTemp> facturasServicioTemp = facturasServiciosTempService.buscarPorUsuarioAlmacen(usuario, usuario.getAlmacen());
+		List<FacturaServicioTemp> facturasServicioTemp = serviceFacturasServiciosTemp.buscarPorUsuarioAlmacen(usuario, usuario.getAlmacen());
 		for (FacturaServicioTemp facturaServicioTemp : facturasServicioTemp) {
 			FacturaDetalleServicio facturaDetalleServicio = new FacturaDetalleServicio();
 			facturaDetalleServicio.setCantidad(facturaServicioTemp.getCantidad());
@@ -575,11 +575,11 @@ public class FacturasController {
 		}
 		if(!facturaDetallesTemp.isEmpty()) {
 			//borramos detalles de articulos
-			facturasDetallesTempService.eliminarListadoDetalles(facturaDetallesTemp);
+			serviceFacturasDetallesTemp.eliminarListadoDetalles(facturaDetallesTemp);
 		}
 		if(!facturasServicioTemp.isEmpty()) {
 			//borramos los servicios
-			facturasServiciosTempService.eliminarListaServicios(facturasServicioTemp);
+			serviceFacturasServiciosTemp.eliminarListaServicios(facturasServicioTemp);
 		}
 		if(!detallesPagosTemp.isEmpty()) {
 			//borramos los pagos
@@ -784,9 +784,9 @@ public class FacturasController {
 	public String cancelarFactura(HttpSession session) {
 		Usuario usuario = (Usuario) session.getAttribute("usuario");
 		FacturaTemp facturaTemp = serviceFacturasTemp.buscarPorUsuario(usuario);
-		List<FacturaDetalleTemp> facturaDetallesTemp = facturasDetallesTempService.buscarPorUsuarioAlmacen(usuario, usuario.getAlmacen());
+		List<FacturaDetalleTemp> facturaDetallesTemp = serviceFacturasDetallesTemp.buscarPorUsuarioAlmacen(usuario, usuario.getAlmacen());
 		List<FacturaDetallePagoTemp> detallesPagosTemp = serviceFacturaDetallesPagosTemp.buscarPorFacturaTemp(facturaTemp); 
-		List<FacturaServicioTemp> facturasServicioTemp = facturasServiciosTempService.buscarPorUsuarioAlmacen(usuario, usuario.getAlmacen());
+		List<FacturaServicioTemp> facturasServicioTemp = serviceFacturasServiciosTemp.buscarPorUsuarioAlmacen(usuario, usuario.getAlmacen());
 		List<FacturaSerialTemp> listaSerialesTemp = serviceFacturasSerialesTemp.buscarPorFacturaTemp(facturaTemp);
 		List<FacturaTallerTemp> facturasTallersTemp = serviceFacturasTalleresTemp.buscarPorFacturaTemp(facturaTemp);
 		
@@ -797,11 +797,11 @@ public class FacturasController {
 		}
 		if(!facturaDetallesTemp.isEmpty()) {
 			//borramos detalles de articulos
-			facturasDetallesTempService.eliminarListadoDetalles(facturaDetallesTemp);
+			serviceFacturasDetallesTemp.eliminarListadoDetalles(facturaDetallesTemp);
 		}
 		if(!facturasServicioTemp.isEmpty()) {
 			//borramos los servicios
-			facturasServiciosTempService.eliminarListaServicios(facturasServicioTemp);
+			serviceFacturasServiciosTemp.eliminarListaServicios(facturasServicioTemp);
 		}
 		if(!detallesPagosTemp.isEmpty()) {
 			//borramos los pagos
@@ -912,6 +912,118 @@ public class FacturasController {
 			model.addAttribute("totalCambioPagos", df2.format(totalCambioPagos));
 		}
 		return "facturas/cuerpoPagoXC :: cuerpoPago";
+	}
+	
+	@PostMapping("/ajax/conversionDetalle")
+	public String conversionDetalle(Model model, HttpSession session,
+			@RequestParam("comprobanteFiscalID") Integer comprobanteFiscalID) {
+		Usuario usuario = (Usuario) session.getAttribute("usuario");
+		
+		ComprobanteFiscal comprobanteFiscal = serviceComprobantesFiscales.buscarPorId(comprobanteFiscalID);
+		
+		//Buscamos los detalles en la factura
+		List<FacturaDetalleTemp> facturaDetallesTemp = serviceFacturasDetallesTemp.buscarPorUsuarioAlmacen(usuario, usuario.getAlmacen());
+		FacturaTemp facturaTemp = serviceFacturasTemp.buscarPorUsuario(usuario);
+		//Buscamos los servicios en la factura
+		List<FacturaServicioTemp> facturaServiciosTemp = serviceFacturasServiciosTemp.buscarPorUsuarioAlmacen(usuario, usuario.getAlmacen());
+
+		//Buscamos los talleres en la factura
+		List<FacturaTallerTemp> facturaTalleresTemp = serviceFacturasTalleresTemp.buscarPorFacturaTemp(facturaTemp);
+		
+		Double total = 0.0;
+		Double subTotalItbis = 0.0;
+		double precio = 0.0;
+		double itBis = 0.0;
+		double valorItbis = 0.0;
+		//Calculamos el total
+		for (FacturaDetalleTemp facturaDetalleTemp : facturaDetallesTemp) {
+			//Verificamos si el comprobante fiscal paga itbis
+			if (comprobanteFiscal.getPaga_itbis() == 1) {
+				// verificamos si el comprobante fiscal incluye el itbis en el precio
+				if (comprobanteFiscal.getIncluye_itbis() == 1) {
+					// realizamos las conversiones
+					String temp = "1." + comprobanteFiscal.getValor_itbis().intValue();
+					precio = formato2d(facturaDetalleTemp.getPrecio() / Double.parseDouble(temp));
+					itBis = formato2d(facturaDetalleTemp.getPrecio() - precio);
+				} else {
+					precio = facturaDetalleTemp.getSubtotal()/facturaDetalleTemp.getCantidad();
+					valorItbis = comprobanteFiscal.getValor_itbis().intValue();
+					itBis= formato2d(precio * valorItbis/100); 
+				}
+			}else {
+				itBis = 0.0;
+				precio = facturaDetalleTemp.getPrecio();
+			}
+			int cant = facturaDetalleTemp.getCantidad();
+			subTotalItbis+=facturaDetalleTemp.getItbis();
+			total+=facturaDetalleTemp.getSubtotal();
+			facturaDetalleTemp.setPrecio(precio);
+			facturaDetalleTemp.setItbis(itBis);
+			facturaDetalleTemp.setSubtotal((cant * precio) + (cant * itBis));
+			serviceFacturasDetallesTemp.guardar(facturaDetalleTemp);
+		}
+		
+		//Validaciones para servicios
+		for (FacturaServicioTemp facturaServicioTemp : facturaServiciosTemp) {
+			//Verificamos si el comprobante fiscal paga itbis
+			if (comprobanteFiscal.getPaga_itbis() == 1) {
+				// verificamos si el comprobante fiscal incluye el itbis en el precio
+				if (comprobanteFiscal.getIncluye_itbis() == 1) {
+					// realizamos las conversiones
+					String temp = "1." + comprobanteFiscal.getValor_itbis().intValue();
+					precio = formato2d(facturaServicioTemp.getPrecio() / Double.parseDouble(temp));
+					itBis = formato2d(facturaServicioTemp.getPrecio() - precio);
+				} else {
+					precio = facturaServicioTemp.getSubtotal()/facturaServicioTemp.getCantidad();
+					valorItbis = comprobanteFiscal.getValor_itbis().intValue();
+					itBis= formato2d(precio * valorItbis/100); 
+				}
+			}else {
+				itBis = 0.0;
+				precio = facturaServicioTemp.getPrecio();
+			}
+			int cant = facturaServicioTemp.getCantidad();
+			subTotalItbis+=facturaServicioTemp.getItbis();
+			total+=facturaServicioTemp.getSubtotal();
+			facturaServicioTemp.setPrecio(precio);
+			facturaServicioTemp.setItbis(itBis);
+			facturaServicioTemp.setSubtotal((cant * precio) + (cant * itBis));
+			serviceFacturasServiciosTemp.guardar(facturaServicioTemp);
+		}
+		
+		for (FacturaTallerTemp facturaTallerTemp : facturaTalleresTemp) {
+			//Verificamos si el comprobante fiscal paga itbis
+			if (comprobanteFiscal.getPaga_itbis() == 1) {
+				// verificamos si el comprobante fiscal incluye el itbis en el precio
+				if (comprobanteFiscal.getIncluye_itbis() == 1) {
+					// realizamos las conversiones
+					String temp = "1." + comprobanteFiscal.getValor_itbis().intValue();
+					precio = formato2d(facturaTallerTemp.getPrecio() / Double.parseDouble(temp));
+					itBis = formato2d(facturaTallerTemp.getPrecio() - precio);
+				} else {
+					precio = facturaTallerTemp.getSubtotal()/facturaTallerTemp.getCantidad();
+					valorItbis = comprobanteFiscal.getValor_itbis().intValue();
+					itBis= formato2d(precio * valorItbis/100); 
+				}
+			}else {
+				itBis = 0.0;
+				precio = facturaTallerTemp.getPrecio();
+			}
+			int cant = facturaTallerTemp.getCantidad();
+			total+=facturaTallerTemp.getSubtotal();
+			subTotalItbis+=facturaTallerTemp.getItbis();
+			facturaTallerTemp.setPrecio(precio);
+			facturaTallerTemp.setItbis(itBis);
+			facturaTallerTemp.setSubtotal((cant * precio) + (cant * itBis));
+			serviceFacturasTalleresTemp.guardar(facturaTallerTemp);
+		}
+		
+		model.addAttribute("facturaTalleres", facturaTalleresTemp);
+		model.addAttribute("facturaDetalles", facturaDetallesTemp);
+		model.addAttribute("facturaServicios", facturaServiciosTemp);
+		model.addAttribute("subTotalItbis",formato2d(subTotalItbis));
+		model.addAttribute("total", formato2d(total));
+		return "facturas/factura :: #responseConversion";
 	}
 	
 	public double formato2d(double number) {
