@@ -34,66 +34,30 @@
 	<div class="container">
 		<div class="card all">
 			<div class="card-body" style="margin-top: 0px;">
-			   <h4 class="card-header"><strong style="color: #fff;">Datos del Almacen</strong><a th:href="@{/almacenes/}" style="float: right;" class="btn btn-md btn-primary">Regresar</a></h4>              
+			   <h4 class="card-header"><strong style="color: #fff;">Pie de P&aacute;gina</strong><a th:href="@{/almacenes/}" style="float: right;" class="btn btn-md btn-primary">Regresar</a></h4>              
 				<br>
 
-		<form method="post" th:object="${almacen}" th:action="@{/almacenes/save}" id="formCreateAlmacen"  enctype="multipart/form-data">       
+		<form method="post" th:object="${almacen}" th:action="@{/almacenes/PiePaginaSave}" id="formCreateAlmacen"  enctype="multipart/form-data">       
             	       
               <div class="row">
-                <div class="col-md-3"> 
+                <div class="col-md-4"> 
                   <div class="form-group">
-                    <input type="hidden" th:field="*{imagen}">
-                    <label for="nombre">Nombre</label>
-                    <input type="text" class="form-control" th:field="*{nombre}" id="nombre" placeholder="Nombre" required="required">
+                  	 <input type="hidden" th:field="*{id}">
+                     <label for="telefono">Factura</label>
+                     <textarea th:field="*{pieFactura}" rows="5" class="form-control"></textarea>
                   </div>
                 </div>
-                 <div class="col-md-3"> 
+                 <div class="col-md-4"> 
                   <div class="form-group">
-                    <label for="direccion">Direcci&oacute;n</label>
-                    <input type="text" class="form-control" th:field="*{direccion}" id="direccion" placeholder=Direcci&oacute;n required="required">
+                    <label for="telefono">Taller</label>
+                    <textarea th:field="*{pieTaller}" rows="5" class="form-control"></textarea>
                   </div>
                 </div>
-                 <div class="col-md-3"> 
+                <div class="col-md-4"> 
                   <div class="form-group">
-                    <label for="telefono">Tel&eacute;fono</label>
-                    <input type="text" class="form-control" th:field="*{telefono}" id="telefono" placeholder="Tel&eacute;fono" required="required">
+                    <label for="telefono">Recibo CxC</label>
+                     <textarea th:field="*{pieAbono}" rows="5" class="form-control"></textarea>
                   </div>
-                </div>
-                <div class="col-md-3"> 
-                  <div class="form-group">
-                    <label for="telefono">RNC</label>
-                    <input type="text" th:field="*{rnc}" class="form-control" id="rnc"  placeholder="RNC">
-                  </div>
-                </div>
-              </div>
-              
-              <div class="row">
-                <div class="col-md-3"> 
-                  <div class="form-group">
-                    <label for="propietario">Propietario</label>
-	                    <select th:field="*{propietario.id}" class="form-control">
-							<option th:each="propietario : ${propietarios}"
-									th:value="${propietario.id}" 
-									th:text="${propietario.nombre}">
-							</option>
-						</select>
-                  </div>
-                </div>
-                 <div class="col-md-3"> 
-                  <div class="form-group">
-                    <label for="direccion">Vencimiento</label>
-                      <input type="text" th:field="*{vencimiento}" class="form-control" id="fecha" placeholder="Fecha de vencimiento" required="required">
-                  </div>
-                </div>
-                <div class="col-md-3"> 
-                  <div class="form-group">
-                    <label for="imagen">Imagen</label>
-                    <input type="file" class="form-control-file" name="archivoImagen" id="imagen">
-                  </div>
-                </div>
-                <div class="col-md-3">
-                  <label for="imagen">Imagen/Logo</label>
-                  <img th:src="@{/img/no-image.png}" class="rounded mx-auto d-block" alt="Generic placeholder image" width="150" height="150">            
                 </div>
               </div>
                                                                    

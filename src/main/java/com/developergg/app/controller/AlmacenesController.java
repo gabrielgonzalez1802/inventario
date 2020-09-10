@@ -49,12 +49,27 @@ public class AlmacenesController {
 	private String ruta;
 	
 	@GetMapping("/")
+	public String listaAlmacenesOfPropietario(HttpSession session, Authentication auth, Model model) {
+		Usuario usuario = (Usuario) session.getAttribute("usuario");
+		List<Almacen> almacenes= null;
+		almacenes = serviceAlmacen.buscarPorIdTienda(usuario.getAlmacen().getPropietario().getId());
+		model.addAttribute("almacenes", almacenes);
+		return "almacenes/listaAlmacenes";
+	}
+	
+	@GetMapping("/admin")
 	public String listaAlmacenes(HttpSession session, Authentication auth, Model model) {
 		List<Almacen> almacenes= null;
-		//lista de almacenes por tienda, si es super usuario mostrar todas y Si el usuario no tiene rol asignado buscara por propietario
 		almacenes = serviceAlmacen.buscarTodos();
 		model.addAttribute("almacenes", almacenes);
 		return "almacenes/listaAlmacenes";
+	}
+	
+	@GetMapping("/piePagina")
+	public String piePagina(HttpSession session, Authentication auth, Model model) {
+		Usuario usuario = (Usuario) session.getAttribute("usuario");
+		model.addAttribute("almacen", usuario.getAlmacen());
+		return "almacenes/piePagina";
 	}
 	
 	@GetMapping("/create")
@@ -87,6 +102,18 @@ public class AlmacenesController {
 		model.addAttribute("propietarios", propietario);
 		model.addAttribute("almacen", almacen);
 		return "almacenes/formularioEdit";
+	}
+	
+	@PostMapping("/PiePaginaSave")
+	public String guardarPiePagina(Almacen almacen,HttpSession session, Model model, 
+			 RedirectAttributes attributes) throws ParseException {
+		Almacen originalAlmacen = serviceAlmacen.buscarPorId(almacen.getId());
+		originalAlmacen.setPieFactura(almacen.getPieFactura());
+		originalAlmacen.setPieTaller(almacen.getPieTaller());
+		originalAlmacen.setPieAbono(almacen.getPieAbono());
+		serviceAlmacen.guardar(originalAlmacen);
+		attributes.addFlashAttribute("msg", "Registro Guardado");
+		return "redirect:/almacenes/";
 	}
 	
 	@PostMapping("/save")

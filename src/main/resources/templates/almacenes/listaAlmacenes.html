@@ -81,6 +81,7 @@
 	<script th:src="@{/js/jquery.min.js}"></script>
     <script th:src="@{/bootstrap/js/bootstrap.min.js}"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
 	<script type="text/javascript">
 	$(document).ready(function() {
 		$('#tabla').DataTable({
@@ -111,6 +112,16 @@
 		});
 	});
 	</script>
+	<span th:if="${msg != null}" class="alert alert-success" role="alert">
+		<script type="text/javascript">
+		Swal.fire({
+			  title: 'Muy bien!',
+			  text: 'Registro guardado',
+			  icon: 'success',
+			  confirmButtonText: 'Cool'
+			})
+		</script>
+	</span>
 	 <span th:insert="fragments/footer :: footer"></span>  
 </body>
 </html>

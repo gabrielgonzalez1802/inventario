@@ -2,6 +2,7 @@ package com.developergg.app.controller;
 
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpSession;
 
@@ -57,7 +58,10 @@ public class UsuariosController {
 	@GetMapping("/create")
 	public String crear(Model model) {
 		Usuario usuario = new Usuario();
-		List<Perfil> perfiles = servicePerfiles.buscarTodos();
+		//Lista de pergiles que no sean root
+		List<Perfil> perfiles = servicePerfiles.buscarTodos().stream().
+				filter(p -> !p.getPerfil().equalsIgnoreCase("root")).
+				collect(Collectors.toList());
 		model.addAttribute("usuario", usuario);
 		model.addAttribute("almacenes", serviceAlmacenes.buscarTodos());
 		model.addAttribute("perfiles", perfiles);
