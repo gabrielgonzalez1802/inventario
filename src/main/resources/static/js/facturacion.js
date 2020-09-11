@@ -1034,7 +1034,8 @@ $("#btnGuardarFactura").click(function(e) {
 				})
 			}else{
 				var total_venta = $("#precioTotal").text();
-				var total_itbis = $("#subTotalItbis").text();
+				var total_itbis = $("#subTotalItbis2").text();
+				var total_precio = $("#subTotalItbis").text();
 				var nombreCliente = $("#facturaCliente").val();
 				var telefonoCliente = $("#facturaTelefono").val();
 				var rncCliente = $("#facturaRnc").val();
@@ -1045,7 +1046,8 @@ $("#btnGuardarFactura").click(function(e) {
 					 		'nombreCliente':nombreCliente,
 					 		'telefonoCliente':telefonoCliente,
 					 		'rncCliente':rncCliente,
-					 		'total_itbis':total_itbis
+					 		'total_itbis':total_itbis,
+					 		'total_precio':total_precio
 						},function(response){
 					$('#responseGeneratedInvoice').replaceWith(response);
 					var invoiceId = $('#responseGeneratedInvoice').val();
@@ -1100,7 +1102,8 @@ function guardarFacturaCredito(){
 					})
 				}else{
 					var total_venta = $("#precioTotal").text();
-					var total_itbis = $("#subTotalItbis").text();
+					var total_itbis = $("#subTotalItbis2").text();
+					var total_precio = $("#subTotalItbis").text();
 					var nombreCliente = $("#facturaCliente").val();
 					var telefonoCliente = $("#facturaTelefono").val();
 					var rncCliente = $("#facturaRnc").val();
@@ -1111,7 +1114,8 @@ function guardarFacturaCredito(){
 						 		'nombreCliente':nombreCliente,
 						 		'telefonoCliente':telefonoCliente,
 						 		'rncCliente':rncCliente,
-						 		'total_itbis':total_itbis
+						 		'total_itbis':total_itbis,
+						 		'total_precio': total_precio
 							},function(response){
 						$('#responseGeneratedInvoice').replaceWith(response);
 						var invoiceId = $('#responseGeneratedInvoice').val();
@@ -1132,7 +1136,8 @@ function guardarFacturaCredito(){
 		}else{
 			//Viene de taller
 			var total_venta = $("#precioTotal").text();
-			var total_itbis = $("#subTotalItbis").text();
+			var total_itbis = $("#subTotalItbis2").text();
+			var total_precio = $("#subTotalItbis").text();
 			var nombreCliente = $("#nombreClienteTallerInfo").text();
 			var telefonoCliente = $("#telefonoClienteTallerInfo").text();
 			var rncCliente = $("#rncClienteTallerInfo").text();
@@ -1143,7 +1148,8 @@ function guardarFacturaCredito(){
 				 		'nombreCliente':nombreCliente,
 				 		'telefonoCliente':telefonoCliente,
 				 		'rncCliente':rncCliente,
-				 		'total_itbis':total_itbis
+				 		'total_itbis':total_itbis,
+				 		'total_precio':total_precio
 					},function(response){
 				$('#responseGeneratedInvoice').replaceWith(response);
 				var invoiceId = $('#responseGeneratedInvoice').val();

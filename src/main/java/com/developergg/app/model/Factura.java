@@ -50,6 +50,7 @@ public class Factura {
 	private String rnc_cliente;
 	private String nota_factura;
 	
+	private Double total_precio;
 	private Double total_itbis;
 	
 	@OneToOne
@@ -303,6 +304,14 @@ public class Factura {
 	public void setTaller(Taller taller) {
 		this.taller = taller;
 	}
+	
+	public Double getTotal_precio() {
+		return total_precio;
+	}
+
+	public void setTotal_precio(Double total_precio) {
+		this.total_precio = total_precio;
+	}
 
 	@Override
 	public String toString() {
@@ -311,9 +320,9 @@ public class Factura {
 				+ ", fecha=" + fecha + ", vencimiento=" + vencimiento + ", hora=" + hora + ", condicion=" + condicion
 				+ ", total_venta=" + total_venta + ", nombre_cliente=" + nombre_cliente + ", telefono_cliente="
 				+ telefono_cliente + ", rnc_cliente=" + rnc_cliente + ", nota_factura=" + nota_factura
-				+ ", total_itbis=" + total_itbis + ", usuario=" + usuario + ", vendedor=" + vendedor + ", almacen="
-				+ almacen + ", abono=" + abono + ", credito=" + credito + ", cuotas=" + cuotas + ", formaPago="
-				+ formaPago + ", avance_taller=" + avance_taller + ", comision=" + comision + ", id_comision="
-				+ id_comision + ", paga=" + paga + "]";
+				+ ", total_precio=" + total_precio + ", total_itbis=" + total_itbis + ", usuario=" + usuario
+				+ ", vendedor=" + vendedor + ", almacen=" + almacen + ", abono=" + abono + ", credito=" + credito
+				+ ", cuotas=" + cuotas + ", formaPago=" + formaPago + ", avance_taller=" + avance_taller + ", comision="
+				+ comision + ", id_comision=" + id_comision + ", paga=" + paga + "]";
 	}
 }

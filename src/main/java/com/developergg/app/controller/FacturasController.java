@@ -335,7 +335,7 @@ public class FacturasController {
 	public String guardarFactura(Model model, HttpSession session,
 			@RequestParam(name = "total_venta") Double total_venta,@RequestParam(name = "nombreCliente") String nombreCliente,
 			@RequestParam(name = "telefonoCliente") String telefonoCliente, @RequestParam(name = "rncCliente") String rncCliente,
-			@RequestParam("total_itbis") Double total_itbis) {
+			@RequestParam("total_itbis") Double total_itbis, @RequestParam("total_precio") Double total_precio) {
 		Usuario usuario = (Usuario) session.getAttribute("usuario");
 		FacturaTemp facturaTemp = serviceFacturasTemp.buscarPorUsuario(usuario);
 		List<FacturaDetalleTemp> facturaDetallesTemp = serviceFacturasDetallesTemp.buscarPorUsuarioAlmacen(usuario, usuario.getAlmacen());
@@ -393,6 +393,7 @@ public class FacturasController {
 		}
 		//forma_pago,avance_taller,total_itbis
 		factura.setTotal_itbis(total_itbis);
+		factura.setTotal_precio(total_precio);
 		
 		if(credito==1) {
 			//default time zone
