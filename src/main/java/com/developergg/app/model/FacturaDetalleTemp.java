@@ -38,6 +38,8 @@ public class FacturaDetalleTemp {
 	private Double subtotal;
 	private Double precio_maximo;
 	
+	private Double initialPrice;
+	
 	@OneToOne
 	@JoinColumn(name = "id_comprobanteFiscal")
 	private ComprobanteFiscal comprobanteFiscal;
@@ -182,12 +184,20 @@ public class FacturaDetalleTemp {
 		this.comprobanteFiscal = comprobanteFiscal;
 	}
 
+	public Double getInitialPrice() {
+		return initialPrice;
+	}
+
+	public void setInitialPrice(Double initialPrice) {
+		this.initialPrice = initialPrice;
+	}
+
 	@Override
 	public String toString() {
 		return "FacturaDetalleTemp [id=" + id + ", articulo=" + articulo + ", cantidad=" + cantidad + ", precio="
 				+ precio + ", itbis=" + itbis + ", imei=" + imei + ", conItbis=" + conItbis + ", existencia="
-				+ existencia + ", subtotal=" + subtotal + ", precio_maximo=" + precio_maximo + ", comprobanteFiscal="
-				+ comprobanteFiscal + ", usuario=" + usuario + ", almacen=" + almacen + ", taller=" + taller
-				+ ", seriales=" + seriales + "]";
+				+ existencia + ", subtotal=" + subtotal + ", precio_maximo=" + precio_maximo + ", initialPrice="
+				+ initialPrice + ", comprobanteFiscal=" + comprobanteFiscal + ", usuario=" + usuario + ", almacen="
+				+ almacen + ", taller=" + taller + ", seriales=" + seriales + "]";
 	}
 }

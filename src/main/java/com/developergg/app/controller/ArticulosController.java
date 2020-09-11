@@ -647,10 +647,11 @@ public class ArticulosController {
 		double precioUnitario = precio;
 		FacturaServicioTemp servicioFac = new FacturaServicioTemp();
 		servicioFac.setUsuario(usuario);
-		servicioFac.setAlmacen(usuario.getAlmacen()); //redundante por el usuario. validar
+		servicioFac.setAlmacen(usuario.getAlmacen());
 		servicioFac.setDescripcion(descripcion);
 		servicioFac.setCosto(costo);
 		servicioFac.setCantidad(cantidad);
+		servicioFac.setInitialPrice(precioUnitario);
 		
 		//Verificamos si el comprobante fiscal paga itbis
 		if (factura.getComprobanteFiscal().getPaga_itbis() == 1) {
@@ -666,6 +667,7 @@ public class ArticulosController {
 			}
 		}else {
 			itBis = 0.0;
+			precio = precioUnitario;
 		}
 				
 		servicioFac.setPrecio(precio);
@@ -680,8 +682,8 @@ public class ArticulosController {
 	public String agregarArticuloSinSerial(HttpSession session, @RequestParam("idArticulo") Integer idArticulo,
 			@RequestParam("cantidad") Integer cantidad, @RequestParam("precioAcct") Double precio,
 			@RequestParam("conItbis") String conItbis, @RequestParam("disponible") Integer disponible,
-			@RequestParam("maximo") Double maximo, @RequestParam("valorItbis") Double valorItbis,
-			@RequestParam("incluyeItbis") Integer incluyeItbis, @RequestParam("realPrice") Double realPrice) {
+			@RequestParam("maximo") Double maximo, @RequestParam("valorItbis") Double valorItbis, 
+			@RequestParam("initialPrice") Double initialPrice, @RequestParam("incluyeItbis") Integer incluyeItbis, @RequestParam("realPrice") Double realPrice) {
 		Double itBis = 0.0;
 		Usuario usuario = (Usuario) session.getAttribute("usuario");
 		double precioUnitario = realPrice/cantidad;
@@ -712,6 +714,7 @@ public class ArticulosController {
 			}
 		}else {
 			itBis = 0.0;
+			precio = initialPrice;
 		}
 			
 		facturaTemp.setPrecio(precio);
@@ -720,6 +723,7 @@ public class ArticulosController {
 		facturaTemp.setPrecio_maximo(maximo);
 		facturaTemp.setSubtotal((cantidad * precio) + (cantidad * itBis));
 		facturaTemp.setComprobanteFiscal(factura.getComprobanteFiscal());
+		facturaTemp.setInitialPrice(initialPrice);
 		serviceFacturasDetallesTemp.guardar(facturaTemp);
 		return "facturas/factura :: #responseAddArticuloSinSerial";
 	}
@@ -728,7 +732,8 @@ public class ArticulosController {
 	public String agregarArticuloConSerial(HttpSession session, @RequestParam("idArticulo") Integer idArticulo,
 			@RequestParam("cantidad") Integer cantidad, @RequestParam("precio") Double precio,
 			@RequestParam("seriales") String seriales, @RequestParam("idCliente") Integer idCliente,
-			@RequestParam("comprobanteFiscalId") Integer comprobanteFiscalId, @RequestParam("realPrice") Double realPrice, String columnas) {
+			@RequestParam("comprobanteFiscalId") Integer comprobanteFiscalId, @RequestParam("initialPrice") Double initialPrice, 
+			@RequestParam("realPrice") Double realPrice, String columnas) {
 		Double itBis = 0.0;
 		Double subTotal = 0.0;
 		Usuario usuario = (Usuario) session.getAttribute("usuario");
@@ -863,6 +868,7 @@ public class ArticulosController {
 						}
 					}else {
 						itBis = 0.0;
+						precio = initialPrice;
 					}
 					
 					facturaTemp.setPrecio(precio);
@@ -871,6 +877,7 @@ public class ArticulosController {
 					facturaTemp.setPrecio_maximo(articulo.getPrecio_maximo());
 					facturaTemp.setSubtotal((cant * precio) + (cant * itBis));
 					facturaTemp.setComprobanteFiscal(factura.getComprobanteFiscal());
+					facturaTemp.setInitialPrice(initialPrice);
 					serviceFacturasDetallesTemp.guardar(facturaTemp);
 					
 					FacturaSerialTemp serialTemp = new FacturaSerialTemp();
@@ -900,6 +907,7 @@ public class ArticulosController {
 				
 				//verificamos si el articulo tiene itbis
 				if(articulo.getItbis().equals("SI")) {
+					initialPrice = initialPrice/cantidad;
 					if(comprobanteFiscal.getPaga_itbis()==1) {
 						//No incluye itbis en el precio
 						if(comprobanteFiscal.getIncluye_itbis()==0) {
@@ -914,6 +922,7 @@ public class ArticulosController {
 					}
 				}else {
 					itBis = 0.0;
+					precio = initialPrice/cantidad;
 				}
 				
 				facturaTemp.setPrecio(precio);
@@ -922,6 +931,7 @@ public class ArticulosController {
 				facturaTemp.setPrecio_maximo(articulo.getPrecio_maximo());
 				facturaTemp.setSubtotal((cantidad * precio) + (cantidad * itBis));
 				facturaTemp.setComprobanteFiscal(factura.getComprobanteFiscal());
+				facturaTemp.setInitialPrice(initialPrice);
 				serviceFacturasDetallesTemp.guardar(facturaTemp);
 				
 				if(facturaTemp.getId()!=null) {
@@ -970,6 +980,7 @@ public class ArticulosController {
 				}
 			}else {
 				itBis = 0.0;
+				precio = initialPrice;
 			}
 			
 			facturaTemp.setPrecio(precio);
@@ -978,6 +989,7 @@ public class ArticulosController {
 			facturaTemp.setPrecio_maximo(articulo.getPrecio_maximo());
 			facturaTemp.setSubtotal((cantidad * precio) + (cantidad * itBis));
 			facturaTemp.setComprobanteFiscal(factura.getComprobanteFiscal());
+			facturaTemp.setInitialPrice(initialPrice);
 			serviceFacturasDetallesTemp.guardar(facturaTemp);
 			
 			if(facturaTemp.getId()!=null) {
@@ -1176,28 +1188,33 @@ public class ArticulosController {
 		List<FacturaTallerTemp> facturaTalleresTemp = serviceFacturasTalleresTemp.buscarPorFacturaTemp(facturaTemp);
 		
 		Double total = 0.0;
-		Double subTotalItbis = 0.0;
+		Double cantXPrice = 0.0;
+		Double cantXItBis = 0.0;
 		//Calculamos el total
 		for (FacturaDetalleTemp facturaDetalleTemp : facturaDetallesTemp) {
-			subTotalItbis+=facturaDetalleTemp.getItbis();
+			cantXPrice+=facturaDetalleTemp.getCantidad()*facturaDetalleTemp.getPrecio();
+			cantXItBis+=facturaDetalleTemp.getCantidad()*facturaDetalleTemp.getItbis();
 			total+=facturaDetalleTemp.getSubtotal();
 		}
 		
 		//Validaciones para servicios
 		for (FacturaServicioTemp facturaServicioTemp : facturaServiciosTemp) {
-			subTotalItbis+=facturaServicioTemp.getItbis();
+			cantXPrice+=facturaServicioTemp.getCantidad()*facturaServicioTemp.getPrecio();
+			cantXItBis+=facturaServicioTemp.getCantidad()*facturaServicioTemp.getItbis();
 			total+=facturaServicioTemp.getSubtotal();
 		}
 		
 		for (FacturaTallerTemp facturaTallerTemp : facturaTalleresTemp) {
+			cantXPrice+=facturaTallerTemp.getCantidad()*facturaTallerTemp.getPrecio();
+			cantXItBis+=facturaTallerTemp.getCantidad()*facturaTallerTemp.getItbis();
 			total+=facturaTallerTemp.getSubtotal();
-			subTotalItbis+=facturaTallerTemp.getItbis();
 		}
 		
 		model.addAttribute("facturaTalleres", facturaTalleresTemp);
 		model.addAttribute("facturaDetalles", facturaDetallesTemp);
 		model.addAttribute("facturaServicios", facturaServiciosTemp);
-		model.addAttribute("subTotalItbis",formato2d(subTotalItbis));
+		model.addAttribute("subTotalItbis",formato2d(cantXPrice));
+		model.addAttribute("subTotal2",formato2d(cantXItBis));
 		model.addAttribute("total", formato2d(total));
 		return "facturas/cuerpoFactura :: cuerpoFactura";
 	}

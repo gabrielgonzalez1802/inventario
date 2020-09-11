@@ -25,6 +25,8 @@ public class FacturaTallerTemp {
 	private Double itbis = 0.0;
 	private Double subtotal = 0.0;
 	
+	private Double initialPrice;
+	
 	@OneToOne
 	@JoinColumn(name = "id_usuario")
 	private Usuario usuario;
@@ -177,12 +179,20 @@ public class FacturaTallerTemp {
 		this.tallerArticulo = tallerArticulo;
 	}
 
+	public Double getInitialPrice() {
+		return initialPrice;
+	}
+
+	public void setInitialPrice(Double initialPrice) {
+		this.initialPrice = initialPrice;
+	}
+
 	@Override
 	public String toString() {
 		return "FacturaTallerTemp [id=" + id + ", descripcion=" + descripcion + ", costo=" + costo + ", cantidad="
-				+ cantidad + ", precio=" + precio + ", itbis=" + itbis + ", subtotal=" + subtotal + ", usuario="
-				+ usuario + ", taller=" + taller + ", tallerDetalle=" + tallerDetalle + ", comprobanteFiscal="
-				+ comprobanteFiscal + ", tallerArticulo=" + tallerArticulo + ", articulo=" + articulo + ", almacen="
-				+ almacen + ", facturaTemp=" + facturaTemp + "]";
+				+ cantidad + ", precio=" + precio + ", itbis=" + itbis + ", subtotal=" + subtotal + ", initialPrice="
+				+ initialPrice + ", usuario=" + usuario + ", taller=" + taller + ", tallerDetalle=" + tallerDetalle
+				+ ", comprobanteFiscal=" + comprobanteFiscal + ", tallerArticulo=" + tallerArticulo + ", articulo="
+				+ articulo + ", almacen=" + almacen + ", facturaTemp=" + facturaTemp + "]";
 	}
 }

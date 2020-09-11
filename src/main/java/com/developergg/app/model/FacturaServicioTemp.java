@@ -24,6 +24,8 @@ public class FacturaServicioTemp {
 	private Double itbis;
 	private Double subtotal;
 	
+	private Double initialPrice;
+	
 	@OneToOne
 	@JoinColumn(name = "id_usuario")
 	private Usuario usuario; //usuario que creo el servicio
@@ -126,11 +128,19 @@ public class FacturaServicioTemp {
 		this.subtotal = subtotal;
 	}
 
+	public Double getInitialPrice() {
+		return initialPrice;
+	}
+
+	public void setInitialPrice(Double initialPrice) {
+		this.initialPrice = initialPrice;
+	}
+
 	@Override
 	public String toString() {
 		return "FacturaServicioTemp [id=" + id + ", descripcion=" + descripcion + ", costo=" + costo + ", cantidad="
-				+ cantidad + ", precio=" + precio + ", itbis=" + itbis + ", subtotal=" + subtotal + ", usuario="
-				+ usuario + ", almacen=" + almacen + ", comprobanteFiscal=" + comprobanteFiscal + ", taller=" + taller
-				+ "]";
+				+ cantidad + ", precio=" + precio + ", itbis=" + itbis + ", subtotal=" + subtotal + ", initialPrice="
+				+ initialPrice + ", usuario=" + usuario + ", almacen=" + almacen + ", comprobanteFiscal="
+				+ comprobanteFiscal + ", taller=" + taller + "]";
 	}
 }

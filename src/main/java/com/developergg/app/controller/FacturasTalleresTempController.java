@@ -97,6 +97,7 @@ public class FacturasTalleresTempController {
 			facturaTallerTemp.setTallerDetalle(tallerDetalle);
 			facturaTallerTemp.setUsuario(usuario);
 			facturaTallerTemp.setAlmacen(usuario.getAlmacen());
+			facturaTallerTemp.setInitialPrice(tallerDetalle.getPrecio());
 			serviceFacturasTalleresTemp.guardar(facturaTallerTemp);
 		}
 		

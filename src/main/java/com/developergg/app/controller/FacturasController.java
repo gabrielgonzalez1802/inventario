@@ -952,7 +952,7 @@ public class FacturasController {
 				}
 			}else {
 				itBis = 0.0;
-				precio = facturaDetalleTemp.getPrecio();
+				precio = facturaDetalleTemp.getInitialPrice();
 			}
 			int cant = facturaDetalleTemp.getCantidad();
 			subTotalItbis+=facturaDetalleTemp.getItbis();
@@ -980,7 +980,7 @@ public class FacturasController {
 				}
 			}else {
 				itBis = 0.0;
-				precio = facturaServicioTemp.getPrecio();
+				precio = facturaServicioTemp.getInitialPrice();
 			}
 			int cant = facturaServicioTemp.getCantidad();
 			subTotalItbis+=facturaServicioTemp.getItbis();
@@ -1007,7 +1007,7 @@ public class FacturasController {
 				}
 			}else {
 				itBis = 0.0;
-				precio = facturaTallerTemp.getPrecio();
+				precio = facturaTallerTemp.getInitialPrice();
 			}
 			int cant = facturaTallerTemp.getCantidad();
 			total+=facturaTallerTemp.getSubtotal();

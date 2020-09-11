@@ -569,13 +569,15 @@
 												<thead>
 													<tr style="background-color: #17a2b8; color: #fff">
 														<th class="text-center">Serial</th>
-														<th></th>
+<!-- 														<th></th> -->
 													</tr>
 												</thead>
 												<tbody class="items">
 													<tr th:each="serial: ${listaSeriales}">
 														<td th:text="${serial.id_serial}" class="text-center">Serial</td>
-														<td class='text-right'><a href="#" th:onclick="'eliminarSerialFactura(\'' + ${serial.id} + '\');'"> <i class="icono fa fa-trash text-danger"></i> </a></td>			
+<!-- 														<td class='text-right'> -->
+<!-- 														<a href="#" th:onclick="'eliminarSerialFactura(\'' + ${serial.id} + '\');'"> <i class="icono fa fa-trash text-danger"></i> </a> -->
+<!-- 														</td>			 -->
 													</tr>
 												</tbody>
 											</table>

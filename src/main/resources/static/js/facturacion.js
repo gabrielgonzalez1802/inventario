@@ -405,6 +405,7 @@ function agregarArticuloSinSerial(){
 		maximo = parseFloat(maximo);
 		var precio = parseFloat($("#precioSinSerial").val());
 		var realPrice = parseFloat($("#totalPrecioSinSerial").val());
+		var initialPrice = parseFloat($("#precioSinSerial").val());
 		var error = 0;
 		
 		// validaciones del precio del articulo si tiene cliente seleccionado
@@ -502,7 +503,8 @@ function agregarArticuloSinSerial(){
 						  valorItbis: valorItbis,
 						  incluyeItbis: incluyeItbis,
 						  realPrice: realPrice,
-						  maximo: maximo
+						  maximo: maximo,
+						  initialPrice: initialPrice
 						},
 						function(data, status){
 							console.log("Articulo agregado a la facturacion");
@@ -526,6 +528,9 @@ $("#guardarSerialesDelProducto").click(function(e){
 	var incluyeItbis = $("#incluyeItbis").val();
 	var valorItbis = 0;
 	var articulo = $("#nombreArticuloSerial").val();
+	
+	var initialPrice  = parseFloat($("#precioConSerial").val());
+	
 	if(incluyeItbis == 1){
 		valorItbis = $("#valorItbis").val();
 	}
@@ -589,6 +594,7 @@ $("#guardarSerialesDelProducto").click(function(e){
 										    idCliente: idCliente,
 											precio: precio,
 											realPrice: total,
+											initialPrice: initialPrice,
 											comprobanteFiscalId: comprobanteFiscalId,
 											seriales: seriales.toString(),
 											columnas: columnas.toString()
