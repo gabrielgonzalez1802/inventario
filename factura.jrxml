@@ -103,6 +103,15 @@
 		<variable name="subtotal1" class="java.lang.Double" calculation="Sum">
 			<variableExpression><![CDATA[$F{subtotal}]]></variableExpression>
 		</variable>
+		<variable name="subtotal2" class="java.lang.Double" resetType="Column" calculation="System">
+			<variableExpression><![CDATA[$F{subtotal}]]></variableExpression>
+		</variable>
+		<variable name="subtotal" class="java.lang.Double" calculation="Sum">
+			<variableExpression><![CDATA[$F{cantidad}*$F{precio}]]></variableExpression>
+		</variable>
+		<variable name="subtotalItbis" class="java.lang.Double" calculation="Sum">
+			<variableExpression><![CDATA[$F{cantidad}*$F{itbis}]]></variableExpression>
+		</variable>
 	</subDataset>
 	<parameter name="idFactura" class="java.lang.Integer"/>
 	<parameter name="detalleFactura" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
@@ -376,10 +385,10 @@ WHERE f.id_factura = $P{idFactura}]]>
 		<band/>
 	</columnHeader>
 	<detail>
-		<band height="83">
+		<band height="101">
 			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.FreeLayout"/>
 			<componentElement>
-				<reportElement style="Table 3_TH" x="0" y="0" width="210" height="80" uuid="50908676-bca4-4464-8e8b-f2c332821a22">
+				<reportElement style="Table 3_TH" x="0" y="0" width="210" height="101" uuid="50908676-bca4-4464-8e8b-f2c332821a22">
 					<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
 					<property name="com.jaspersoft.studio.table.style.table_header" value="Table_TH"/>
 					<property name="com.jaspersoft.studio.table.style.column_header" value="Table_CH"/>
@@ -401,7 +410,7 @@ WHERE f.id_factura = $P{idFactura}]]>
 								<text><![CDATA[Código]]></text>
 							</staticText>
 						</jr:columnHeader>
-						<jr:columnFooter style="Table_CH" height="20" rowSpan="1"/>
+						<jr:columnFooter style="Table_CH" height="40" rowSpan="1"/>
 						<jr:detailCell style="Table_TD" height="20">
 							<textField isBlankWhenNull="true">
 								<reportElement x="0" y="0" width="20" height="20" uuid="4ae42329-9836-4669-85e5-e58c0afba37c"/>
@@ -424,7 +433,7 @@ WHERE f.id_factura = $P{idFactura}]]>
 								<text><![CDATA[Descripción]]></text>
 							</staticText>
 						</jr:columnHeader>
-						<jr:columnFooter style="Table_CH" height="20" rowSpan="1"/>
+						<jr:columnFooter style="Table_CH" height="40" rowSpan="1"/>
 						<jr:detailCell style="Table_TD" height="20">
 							<textField textAdjust="ScaleFont">
 								<reportElement x="0" y="0" width="90" height="20" uuid="ff03c7b9-b81b-4e6d-84f4-d605fb312161"/>
@@ -447,7 +456,7 @@ WHERE f.id_factura = $P{idFactura}]]>
 								<text><![CDATA[Cantidad]]></text>
 							</staticText>
 						</jr:columnHeader>
-						<jr:columnFooter style="Table_CH" height="20" rowSpan="1"/>
+						<jr:columnFooter style="Table_CH" height="40" rowSpan="1"/>
 						<jr:detailCell style="Table_TD" height="20">
 							<textField>
 								<reportElement x="0" y="0" width="19" height="20" uuid="39f78a2b-a0f5-452b-be4f-dc764a5d4fa8"/>
@@ -470,7 +479,7 @@ WHERE f.id_factura = $P{idFactura}]]>
 								<text><![CDATA[Precio]]></text>
 							</staticText>
 						</jr:columnHeader>
-						<jr:columnFooter style="Table_CH" height="20" rowSpan="1"/>
+						<jr:columnFooter style="Table_CH" height="40" rowSpan="1"/>
 						<jr:detailCell style="Table_TD" height="20">
 							<textField>
 								<reportElement x="0" y="0" width="21" height="20" uuid="1e12008b-663f-463b-a46c-cd9a87724486"/>
@@ -501,13 +510,21 @@ WHERE f.id_factura = $P{idFactura}]]>
 								<text><![CDATA[Itbis]]></text>
 							</staticText>
 						</jr:columnHeader>
-						<jr:columnFooter style="Table_CH" height="20" rowSpan="1">
+						<jr:columnFooter style="Table_CH" height="40" rowSpan="1">
+							<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.FreeLayout"/>
 							<staticText>
 								<reportElement x="0" y="0" width="30" height="20" uuid="2ad0bf49-dcfb-4bfe-b09d-31463ce82703"/>
-								<textElement verticalAlignment="Middle">
+								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font size="6" isBold="true"/>
 								</textElement>
-								<text><![CDATA[Subtotal $ Itbis]]></text>
+								<text><![CDATA[Subtotal $]]></text>
+							</staticText>
+							<staticText>
+								<reportElement x="0" y="20" width="30" height="20" uuid="d6f3df66-9b8b-4027-8d41-cd586a0ede39"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="6" isBold="true"/>
+								</textElement>
+								<text><![CDATA[Itbis]]></text>
 							</staticText>
 						</jr:columnFooter>
 						<jr:detailCell style="Table_CH" height="20">
@@ -540,13 +557,21 @@ WHERE f.id_factura = $P{idFactura}]]>
 								<text><![CDATA[Subtotal]]></text>
 							</staticText>
 						</jr:columnHeader>
-						<jr:columnFooter style="Table_CH" height="20" rowSpan="1">
+						<jr:columnFooter style="Table_CH" height="40" rowSpan="1">
+							<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.FreeLayout"/>
 							<textField>
-								<reportElement x="0" y="0" width="31" height="20" uuid="68d4b708-be6f-4447-ae3c-c3a574f326e6"/>
+								<reportElement x="0" y="0" width="30" height="20" uuid="7fc753c0-ba15-4ee0-9f99-cf2d92514f71"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font size="6"/>
 								</textElement>
-								<textFieldExpression><![CDATA[$V{itbis2}]]></textFieldExpression>
+								<textFieldExpression><![CDATA[$V{subtotal}]]></textFieldExpression>
+							</textField>
+							<textField>
+								<reportElement x="0" y="20" width="30" height="20" uuid="fedeb210-41ea-4d9c-9bfe-fd0d1f5f448c"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="6"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{subtotalItbis}]]></textFieldExpression>
 							</textField>
 						</jr:columnFooter>
 						<jr:detailCell style="Table_CH" height="20">
