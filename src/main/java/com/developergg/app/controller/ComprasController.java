@@ -396,6 +396,7 @@ public class ComprasController {
 		//Verificamos si el articulo esta presente en el detalle
 		List<CompraDetalle> listaDetalle = serviceComprasDetalles.buscarPorCompra(compra).stream().filter(d -> d.getArticulo().getId() == idArticulo).collect(Collectors.toList());
 		CompraDetalle compraDetalle = null;
+		int distinto = 0;
 		if(listaDetalle.isEmpty()) {
 			compraDetalle = new CompraDetalle();
 			compraDetalle.setArticulo(articulo);
@@ -405,6 +406,12 @@ public class ComprasController {
 			serviceComprasDetalles.guardar(compraDetalle);
 		}else {
 			compraDetalle = listaDetalle.get(0);
+			//Verificamos que el costo sea igual
+			for (CompraDetalle detail : listaDetalle) {
+				if(detail.getCosto().doubleValue() != costo) {
+					distinto = 1;
+				}
+			}
 		}
 		
 		//Verificamos que el serial no este agregado en el detalle
@@ -413,26 +420,54 @@ public class ComprasController {
 				filter(s -> s.getSerial().equalsIgnoreCase(serial)).
 				collect(Collectors.toList());
 		
-		if(compraDetalleSeriales.isEmpty()) {
-			CompraDetalleSerial compraDetalleSerial = new CompraDetalleSerial();
-			compraDetalleSerial.setArticulo(articulo);
-			compraDetalleSerial.setCompra(compra);
-			compraDetalleSerial.setCompraDetalle(compraDetalle);
-			compraDetalleSerial.setSerial(serial);
-			compraDetalleSerial.setCosto(costo);
-			compraDetalleSerial.setPrecio_maximo(precioMaximo);
-			compraDetalleSerial.setPrecio_minimo(precioMinimo);
-			compraDetalleSerial.setPrecio_mayor(precioMayor);
-			serviceComprasDetallesSeriales.guardar(compraDetalleSerial);
-			
-			if(compraDetalleSerial.getId()!=null) {
-				compraDetalle.setCantidad(compraDetalle.getCantidad()+1);
-				compraDetalle.setSubTotal(compraDetalle.getCantidad()*compraDetalle.getCosto());
-				serviceComprasDetalles.guardar(compraDetalle);
-				response = 1;
+		if(distinto == 0) {
+			if(compraDetalleSeriales.isEmpty()) {
+				CompraDetalleSerial compraDetalleSerial = new CompraDetalleSerial();
+				compraDetalleSerial.setArticulo(articulo);
+				compraDetalleSerial.setCompra(compra);
+				compraDetalleSerial.setCompraDetalle(compraDetalle);
+				compraDetalleSerial.setSerial(serial);
+				compraDetalleSerial.setCosto(costo);
+				compraDetalleSerial.setPrecio_maximo(precioMaximo);
+				compraDetalleSerial.setPrecio_minimo(precioMinimo);
+				compraDetalleSerial.setPrecio_mayor(precioMayor);
+				serviceComprasDetallesSeriales.guardar(compraDetalleSerial);
+				
+				if(compraDetalleSerial.getId()!=null) {
+					compraDetalle.setCantidad(compraDetalle.getCantidad()+1);
+					compraDetalle.setSubTotal(compraDetalle.getCantidad()*compraDetalle.getCosto());
+					serviceComprasDetalles.guardar(compraDetalle);
+					response = 1;
+				}
+			}
+		}else {
+			if(compraDetalleSeriales.isEmpty()) {
+				CompraDetalle compraDetalle2 = new CompraDetalle();
+				compraDetalle2.setArticulo(articulo);
+				compraDetalle2.setCompra(compra);
+				compraDetalle2.setCosto(costo);
+				compraDetalle2.setCon_imei(1);
+				serviceComprasDetalles.guardar(compraDetalle2);
+				CompraDetalleSerial compraDetalleSerial = new CompraDetalleSerial();
+				compraDetalleSerial.setArticulo(articulo);
+				compraDetalleSerial.setCompra(compra);
+				compraDetalleSerial.setCompraDetalle(compraDetalle2);
+				compraDetalleSerial.setSerial(serial);
+				compraDetalleSerial.setCosto(costo);
+				compraDetalleSerial.setPrecio_maximo(precioMaximo);
+				compraDetalleSerial.setPrecio_minimo(precioMinimo);
+				compraDetalleSerial.setPrecio_mayor(precioMayor);
+				serviceComprasDetallesSeriales.guardar(compraDetalleSerial);
+				
+				if(compraDetalleSerial.getId()!=null) {
+					compraDetalle2.setCantidad(compraDetalle2.getCantidad()+1);
+					compraDetalle2.setSubTotal(compraDetalle2.getCantidad()*compraDetalle2.getCosto());
+					serviceComprasDetalles.guardar(compraDetalle2);
+					response = 1;
+				}
 			}
 		}
-
+		
 		model.addAttribute("responseAddItem", response);
 		return "compras/compra :: #responseAddItem";
 	}

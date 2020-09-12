@@ -87,10 +87,10 @@ $("#btnAddSerial").click(function(e){
 	e.preventDefault();
 	var serial = $("#serial").val();
 	var idArticulo = $("#infoIdArticulo").val();
-	var costo = $("#costoSerial").val();
-	var precioMaximo = $("#precioMaximo").val();
-	var precioMinimo = $("#precioMinimo").val();
-	var precioMayor = $("#precioMayor").val();
+	var costo = parseFloat($("#costoSerial").val());
+	var precioMaximo = parseFloat($("#precioMaximo").val());
+	var precioMinimo = parseFloat($("#precioMinimo").val());
+	var precioMayor = parseFloat($("#precioMayor").val());
 	var idCompra = $("#idCompra").val();
 	if(!serial){
 		Swal.fire({
@@ -101,32 +101,44 @@ $("#btnAddSerial").click(function(e){
 			confirmButtonText : 'Cool'
 		})
 	}else{
-		 $.post("/compras/ajax/addItemConSerial/", {
-			 'idCompra': idCompra,
-			 'idArticulo': idArticulo,
-			 'costo': costo,
-			 'precioMaximo':precioMaximo,
-			 'precioMinimo':precioMinimo,
-			 'precioMayor':precioMayor,
-			 'serial' : serial
-	   },function(response){
-			$('#responseAddItem').replaceWith(response);
-			if($("#responseAddItem").val() == 0){
-				Swal.fire({
-					title : 'Advertencia!',
-					text : 'El articulo no pudo ser agregado a la compra',
-					position : 'top',
-					icon : 'warning',
-					confirmButtonText : 'Cool'
-				})
-			}else{
-				$("#cantidad").val("");
-				$("#costo").val("");
-				$("#serial").val("");
-				focusSelectArticuloNew();
-				cargarDetalles();
-			}
-	 	});
+		
+		//el costo no puede ser mayor a ningun precio de venta
+		if(costo > precioMaximo || costo > precioMinimo || costo > precioMayor){
+			Swal.fire({
+				title : 'Advertencia!',
+				text : 'El costo no puede ser mayor a ningun precio de venta',
+				position : 'top',
+				icon : 'warning',
+				confirmButtonText : 'Cool'
+			})
+		}else{
+			 $.post("/compras/ajax/addItemConSerial/", {
+				 'idCompra': idCompra,
+				 'idArticulo': idArticulo,
+				 'costo': costo,
+				 'precioMaximo':precioMaximo,
+				 'precioMinimo':precioMinimo,
+				 'precioMayor':precioMayor,
+				 'serial' : serial
+		   },function(response){
+				$('#responseAddItem').replaceWith(response);
+				if($("#responseAddItem").val() == 0){
+					Swal.fire({
+						title : 'Advertencia!',
+						text : 'El articulo no pudo ser agregado a la compra',
+						position : 'top',
+						icon : 'warning',
+						confirmButtonText : 'Cool'
+					})
+				}else{
+					$("#cantidad").val("");
+					$("#costo").val("");
+					$("#serial").val("");
+					focusSelectArticuloNew();
+					cargarDetalles();
+				}
+		 	});
+		}
 	}
 });
 
