@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
+<head>
+</head>
+
+<body>
+	<div th:fragment="cuerpoCompra">
+		<table class="table table-hover">
+			<thead>
+				<tr style="background-color: #17a2b8;color:#fff">
+					<th class="text-center">Articulo</th>
+					<th>Cantidad</th>
+					<th class="text-center">Costo</th>
+					<th class="text-right">Subtotal</th>
+					<th class="text-right"></th>
+				</tr>
+			</thead>
+			<tbody class="items">
+				<tr th:each="detalle : ${listaDetalles}">
+					<td th:if="${detalle.con_imei == 1}" class="text-center"><a href="#" style="color: black;" th:onclick="'infoSeriales(\'' + ${detalle.id} + '\');'" th:text="${detalle.articulo.nombre}"></a></td>
+					<td th:unless="${detalle.con_imei == 1}" th:text="${detalle.articulo.nombre}" class="text-center">Nombre del item</td>
+					<td th:text="${detalle.cantidad}">Cantidad</td>
+					<td th:text="${detalle.costo}" class="text-center">Costo</td>
+					<td th:text="${detalle.cantidad} * ${detalle.costo}" class="text-right">SubTotal</td>
+					<td class='text-right'>
+						<a href="#" th:onclick="'eliminarItem(\'' + ${detalle.id} + '\');'"> 
+							<i class="icono fa fa-trash text-danger"></i> 
+						</a>
+					</td>			
+				</tr>
+				<tr>
+					<td colspan="3" class="text-right"><b><em><span style="font-size: 16px;">TOTAL</span></em></b></td>
+					<th th:text="${total}" class="text-right" id="precioTotal">precio total</th>
+					<td></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</body>
+</html>

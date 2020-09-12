@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <title>Sistema Celulares</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" sizes="64x64" th:href="@{/img/icon.png}">
+    <!-- Font-icon css-->
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap" rel="stylesheet">
+ 	<link rel="stylesheet" type="text/css" th:href="@{/css/Minimal-tabs.css}">
+ 	<link rel="stylesheet" type="text/css" th:href="@{/css/dashboard.css}">
+ 	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+ 	
+ 	<style type="text/css">
+ 	        .dual-list .list-group {
+            margin-top: 8px;
+        }
+
+        .list-left li, .list-right li {
+            cursor: pointer;
+        }
+
+        .list-arrows {
+            padding-top: 100px;
+        }
+
+        .list-arrows button {
+                margin-bottom: 20px;
+        }
+        .list-group-item.active, .list-group-item.active:focus, .list-group-item.active:hover {
+		    z-index: 2;
+		    background-color: #17a2b8;
+		    border-color: #17a2b8;
+		    color:#fff;
+		}
+		.btn-standar {
+		    color: #fff;
+		    background-color: #17a2b8;
+		    border-color: #17a2b8;
+		}
+		.list-group-item:hover{
+			 background-color:#17a2b882;
+			 border-color: #17a2b882;
+		}
+		.table {
+		    background-color: #fff;
+		    color: black;
+		}
+		tr:hover {
+			 color: #fff;
+		}
+		.table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th {
+		    border-top: 1px solid #68c5ca;
+		}
+ 	</style>
+ 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+ 	<style>
+	  	.table-primary, .table-primary>th, .table-primary>td {
+	   		 background-color: #25396d;
+	   		 color:#ffff;
+		}
+		.table-primary th, .table-primary td, .table-primary thead th, .table-primary tbody+tbody {
+		    border-color: #25396d;
+		}
+		.table-hover tbody tr:hover td, .table-hover tbody tr:hover th {
+		  background-color: #085865;
+		}
+		
+		.personalized > input{
+		    border: 0px;
+		    -webkit-box-shadow: none;
+		    -moz-box-shadow: none;
+		    box-shadow: none;
+			background: transparent;
+			border: none;
+    		border-bottom: solid 1px #fff;
+    		border-radius: 0px;
+    		color: #fff;
+		}
+  </style>
+  <link rel="stylesheet" type="text/css" th:href="@{/css/swal.css}">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" rel="stylesheet"/>
+  </head>
+  <body>
+     <br>
+	<div class="container">
+		<div class="panel panel-default">
+		<div class="panel-heading all" style="border-bottom: 0px;">
+		 <form class="form-inline" action="#" id="formTop" th:object="${facturaTemp}">
+		 	<div class="row">
+		 		<input type="hidden" id="responseAddItem" th:value="${responseAddItem}">
+		 		<input type="hidden" id="responseSave" th:value="${responseSave}">
+		 		<input type="hidden" id="responseDeleteItem">
+		 		<div class="col-md-12">
+			  		 <label style="color: #fff;font-size: 25px;">Compras | &nbsp;&nbsp;</label>
+			  		  <a class="btn btn-warning" th:href="@{/compras/}">Regresar</a>
+			  		  <button class="btn btn-success pull-right" id="btnPagar">Pagar</button>
+		 		</div>
+		 	</div>	    
+		</form>
+		<br>
+		
+		<div class="panel panel-default">
+		  <div class="panel-body">
+		    <div class="row">
+		    	<div class="col-md-12"> 
+		    		<form th:object="${compra}" id="formCompra">
+		    			<input type="hidden" id="idCompra" th:field="*{id}">
+		    			<div class="row">
+							<div class="col col-md-3">
+								<div class="form-group">			
+									 <label for="">Fecha</label> <input type="date"
+										th:value="*{#dates.format(fecha, 'yyyy-MM-dd')}" id="fechaCompra" name="fecha" class="form-control" required="required">
+								</div>
+							</div>
+							<div class="col col-md-3">
+								<div class="form-group">			
+									 <label for="">No. Factura</label> 
+									 <input type="text" th:field="*{no_factura}" id="no_factura" class="form-control" placeholder="No. Factura" required="required">
+								</div>
+							</div>
+							<div class="col col-md-3">
+								<div class="form-group">			
+									<label for="">Suplidor</label> 
+									<select id="suplidor" th:field="*{suplidor.id}" class="form-control">
+										<option th:each="suplidor : ${suplidores}"
+												th:value="${suplidor.id}" th:text="${suplidor.nombre}"></option>
+									</select>
+								</div>
+							</div>
+							<div class="col col-md-3">
+								<div class="form-group">			
+									<label for="">Condicion</label> 
+									<select id="condicionPago" th:field="*{condicion.id}" class="form-control">
+										<option th:each="condicion : ${condicionesPago}"
+												th:value="${condicion.id}" th:text="${condicion.nombre}"></option>
+									</select>
+								</div>
+							</div>
+						</div>
+						
+						<div class="row">
+							<div class="col col-md-4">
+								<div class="form-group">			
+									 <label for="">Tipo NCF</label> 
+									 <select id="tipoNCF" th:field="*{comprobanteFiscal.id}" class="form-control">
+										<option th:each="comprobanteFiscal : ${comprobantesFiscales}"
+												th:value="${comprobanteFiscal.id}" th:text="${comprobanteFiscal.nombre}"></option>
+									</select>
+								</div>	 
+							</div>
+							<div class="col col-md-4">
+								<div class="form-group">			
+									 <label for="">NCF</label> 
+									 <input type="text" th:field="*{ncf}" id="ncf" class="form-control" placeholder="NCF">
+								</div>
+							</div>
+							<div class="col col-md-4">
+								<div class="form-group">			
+									<label for="">Observacion</label> 
+									 <input type="text" th:field="*{observacion}" id="observacion" class="form-control" placeholder="Observacion">
+								</div>
+							</div>
+						</div>
+		    			
+		    		</form>
+		    	</div>
+		    </div>
+		  </div>
+		</div>
+		
+		<div id="infoArticulo">
+			<input type="hidden" th:value="${infoIdArticulo}" id="infoIdArticulo">
+			<input type="hidden" th:value="${infoCantidad}" id="infoCantidad">
+			<input type="hidden" th:value="${infoSerial}" id="infoSerial">
+			<input type="hidden" th:value="${infoNombre}" id="infoNombre">
+			<input type="hidden" th:value="${infoCosto}" id="infoCosto">
+		</div>
+		 
+		</div>
+		  <div class="panel-body all">
+		     <form  method="post" action="#" id="formCreateInvoice">            
+              <div class="row">
+                <div class="col-md-6"> 
+                  <div class="form-group">
+                    <label for="nombre">Lista de Articulos</label>
+					<select class="form-control" id="articulos" style="width: 100%;">
+						<option value="">Seleccionar articulo</option>
+						<option th:each="articulo:${articulos}"
+								th:value="${articulo.id}"
+								th:text="${articulo.nombre}" />
+                    </select>
+                  </div>
+                </div>
+                <div class="col-md-2">
+            	    <label id="lblCantidad" for="cantidad">Cantidad</label>
+                	<input type="number" min="1" class="form-control" name="cantidad" id="cantidad" placeholder="cantidad" required="required">
+                </div>
+                <div class="col-md-2">
+            	    <label for="nombre">Costo</label>
+                	<input type="number" min="1" class="form-control" name="costo" id="costo" placeholder="Costo" required="required">
+                </div>
+                <div class="col-md-1"> 
+                	<br>
+               		 <button id="agregarItem" class="btn btn-primary pull-right" style="margin-top: 5px;"> Agregar </button>
+                </div>
+              </div>                                                  
+            </form>
+
+				<div class="col-lg-12 col-md-12 col-sm-12">
+					<div class="table-responsive">
+						<div id="cuerpoCompra">
+							
+						</div>
+					</div>
+				</div>
+
+			</div> <!--  Fin del panel body -->
+		</div>
+		
+<!-- Modal de agregar serial -->
+<div id="serialModal" class="modal fade" role="dialog" data-backdrop="static">
+  <div class="modal-dialog">
+    <div class="modal-content all">
+      <div class="modal-header bg-primary">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h3 class="modal-title">Agregar Serial/IMEI Equipo</h3>
+      </div>
+      <div class="modal-body">
+		<form>
+			<div class="row">
+				<div class="col col-md-12">
+					<div class="form-group">
+						 <label>Serial</label>
+						 <input class="form-control" id="serial" type="text" placeholder="Serial/IMEI Equipo">
+					</div>
+				</div>
+			</div>
+       	 </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-warning" data-dismiss="modal">Regresar</button>
+        <button type="button" class="btn btn-standar" id="btnAddSerial">Agregar</button>
+      </div>
+    </div>
+  </div>
+</div>		
+		
+<!-- Modal info seriales -->
+		<div id="serialesAcctModal" class="modal fade" role="dialog"
+			data-backdrop="static">
+			<div class="modal-dialog">
+				<!-- Modal content-->
+				<div class="modal-content all">
+					<div class="modal-header bg-primary">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+						<h3 class="modal-title">Seriales</h3>
+					</div>
+					<div class="modal-body">
+						<div id="serialesAcct">
+							<div th:fragment="infoSeriales">
+								<div class="row">
+									<div class="col col-md-12">
+										<div class="form-group">
+											<input type="hidden" id="detalleArticuloId"
+												th:value="${idDetalleArticulo}"> <label>Nombre
+												del art&iacute;culo</label> <input th:value="${detalleArticulo}"
+												class="form-control" id="detalleArticulo" type="text"
+												placeholder="Nombre del art&iacute;culo" disabled="disabled">
+										</div>
+									</div>
+								</div>
+								<div class="row" id="rowAddSerial"></div>
+								<div class="row">
+									<div class="col col-md-12">
+										<div class="table-responsive">
+											<table class="table table-hover">
+												<thead>
+													<tr style="background-color: #17a2b8; color: #fff">
+														<th class="text-center">Serial</th>
+													</tr>
+												</thead>
+												<tbody class="items">
+													<tr th:each="serial: ${listaSeriales}">
+														<td th:text="${serial.serial}" class="text-center">Serial</td>
+													</tr>
+												</tbody>
+											</table>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-warning" data-dismiss="modal">Regresar</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+<!-- Modal de agregar pago -->
+<div id="pagoModal" class="modal fade" role="dialog" data-backdrop="static">
+  <div class="modal-dialog">
+    <!-- Modal content-->
+    <div class="modal-content all">
+      <div class="modal-header bg-primary">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h3 class="modal-title">Forma de pago</h3>
+      </div>
+      <div class="modal-body">
+			<div id="nuevoPago">
+				<form id="taller">
+					<div class="row">
+					<input type="hidden" id="responseAddRecepcion" th:value="${responseAddRecepcion}">
+						<div class="col col-md-6">
+							<div class="form-group">
+								 <label>SubTotal</label>
+								 <input class="form-control" id="subTotalPago" type="text" placeholder="SubTotal" disabled="disabled">
+							</div>
+						</div>
+						<div class="col col-md-6">
+							<div class="form-group">
+								<label>Total Neto</label>
+	                       		<input class="form-control" id="totalNetoPago" type="text" placeholder="Total Neto" disabled="disabled">
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col col-md-6">
+							<div class="form-group">
+								<label>Pago por Caja</label>
+	                       		<input class="form-control" value="0" id="cajaPago" oninput="javascript:calculoPago()" type="number" min="0" placeholder="Pago por caja" autocomplete="off">
+							</div>
+						</div>
+						<div class="col col-md-6">
+							<div class="form-group">
+								<label>Efectivo</label>
+	                       		<input class="form-control" value="0" id="efectivoPago" oninput="javascript:calculoPago()" type="number" min="0" placeholder="Efectivo" autocomplete="off">
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col col-md-6">
+							<div class="form-group">
+								<label>Deposito</label>
+	                       		<input class="form-control" value="0" id="depositoPago" oninput="javascript:calculoPago()" type="number" min="0" placeholder="Deposito" autocomplete="off">
+							</div>
+						</div>
+						<div class="col col-md-6">
+							<div class="form-group">
+								<label>Transferencia</label>
+	                       		<input class="form-control" value="0" id="transferenciaPago" oninput="javascript:calculoPago()" type="number" min="0" placeholder="Transferencia" autocomplete="off">
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col col-md-6">
+							<div class="form-group">
+								<label>Chaque</label>
+	                       		<input class="form-control" value="0" id="chequePago" oninput="javascript:calculoPago()" type="number" min="0" placeholder="Cheque" autocomplete="off">
+							</div>
+						</div>
+						<div class="col col-md-6">
+							<div class="form-group">
+								<label>TotalPagado</label>
+	                       		<input class="form-control" value="0" id="totalPago" type="number" min="0" placeholder="Total pago" autocomplete="off">
+							</div>
+						</div>
+					</div>
+           		 </form>
+		</div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-warning" data-dismiss="modal">Regresar</button>
+        <button type="button" class="btn btn-standar" id="btnAddPago">Pagar</button>
+      </div>
+    </div>
+  </div>
+</div>	
+
+	</div>
+	<script th:src="@{/js/jquery.min.js}"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
+	<span th:if="${msg != null}" class="alert alert-success" role="alert">
+		<script type="text/javascript">
+		Swal.fire({
+			  title: 'Muy bien!',
+			  text: 'Registro Creado',
+			  icon: 'success',
+			  confirmButtonText: 'Cool'
+			})
+		</script>
+	</span>
+	<span th:if="${msg2 != null}" class="alert alert-success" role="alert">
+		<script type="text/javascript">
+		Swal.fire({
+			  title: 'Muy bien!',
+			  text: 'Registro Modificado',
+			  icon: 'success',
+			  confirmButtonText: 'Cool'
+			})
+		</script>	
+	</span>
+	<script th:src="@{/js/compra.js}"></script>
+	<script th:src="@{/js/jquery.hotkeys.js}"></script>
+	<span th:insert="fragments/footer :: footer"></span>  
+</body>
+</html>
