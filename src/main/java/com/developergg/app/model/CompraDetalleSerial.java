@@ -31,6 +31,11 @@ public class CompraDetalleSerial {
 	private Articulo articulo;
 	
 	private String serial;
+	
+	private Double costo;
+	private Double precio_maximo;
+	private Double precio_minimo;
+	private Double precio_mayor;
 
 	public String getSerial() {
 		return serial;
@@ -72,9 +77,42 @@ public class CompraDetalleSerial {
 		this.articulo = articulo;
 	}
 
+	public Double getCosto() {
+		return costo;
+	}
+
+	public void setCosto(Double costo) {
+		this.costo = costo;
+	}
+
+	public Double getPrecio_maximo() {
+		return precio_maximo;
+	}
+
+	public void setPrecio_maximo(Double precio_maximo) {
+		this.precio_maximo = precio_maximo;
+	}
+
+	public Double getPrecio_minimo() {
+		return precio_minimo;
+	}
+
+	public void setPrecio_minimo(Double precio_minimo) {
+		this.precio_minimo = precio_minimo;
+	}
+
+	public Double getPrecio_mayor() {
+		return precio_mayor;
+	}
+
+	public void setPrecio_mayor(Double precio_mayor) {
+		this.precio_mayor = precio_mayor;
+	}
+
 	@Override
 	public String toString() {
 		return "CompraDetalleSerial [id=" + id + ", compra=" + compra + ", compraDetalle=" + compraDetalle
-				+ ", articulo=" + articulo + ", serial=" + serial + "]";
+				+ ", articulo=" + articulo + ", serial=" + serial + ", costo=" + costo + ", precio_maximo="
+				+ precio_maximo + ", precio_minimo=" + precio_minimo + ", precio_mayor=" + precio_mayor + "]";
 	}
 }

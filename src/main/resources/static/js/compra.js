@@ -22,17 +22,22 @@ $('#articulos').on("select2:select", function(e) {
 				$("#cantidad").val(1);
 				$("#costo").val($("#infoCosto").val());
 				if($("#infoSerial").val()==1){
-					//Con serial
-					$("#lblCantidad").hide();
-					$("#cantidad").hide();
-					$("#agregarItem").hide();
-					var costo = parseFloat($("#costo").val());
-					$("#serialModal").modal("show");
+					$('#infoArticuloSerial').load("/compras/ajax/getInfoArticuloSerial/"+idArticulo,function(data){
+						//Con serial
+						$("#lblCantidad").hide();
+						$("#costo").hide();
+						$("#lblCosto").hide();
+						$("#cantidad").hide();
+						$("#agregarItem").hide();
+						$("#serialModal").modal("show");
+					});
 				}else{
 					//Sin serial
 					$("#agregarItem").show();
 					$("#lblCantidad").show();
 					$("#cantidad").show();
+					$("#costo").show();
+					$("#lblCosto").show();
 				}
 			});
 		}
@@ -82,7 +87,10 @@ $("#btnAddSerial").click(function(e){
 	e.preventDefault();
 	var serial = $("#serial").val();
 	var idArticulo = $("#infoIdArticulo").val();
-	var costo = $("#costo").val();
+	var costo = $("#costoSerial").val();
+	var precioMaximo = $("#precioMaximo").val();
+	var precioMinimo = $("#precioMinimo").val();
+	var precioMayor = $("#precioMayor").val();
 	var idCompra = $("#idCompra").val();
 	if(!serial){
 		Swal.fire({
@@ -97,6 +105,9 @@ $("#btnAddSerial").click(function(e){
 			 'idCompra': idCompra,
 			 'idArticulo': idArticulo,
 			 'costo': costo,
+			 'precioMaximo':precioMaximo,
+			 'precioMinimo':precioMinimo,
+			 'precioMayor':precioMayor,
 			 'serial' : serial
 	   },function(response){
 			$('#responseAddItem').replaceWith(response);

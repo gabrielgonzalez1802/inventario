@@ -200,7 +200,7 @@
                 	<input type="number" min="1" class="form-control" name="cantidad" id="cantidad" placeholder="cantidad" required="required">
                 </div>
                 <div class="col-md-2">
-            	    <label for="nombre">Costo</label>
+            	    <label for="nombre" id="lblCosto">Costo</label>
                 	<input type="number" min="1" class="form-control" name="costo" id="costo" placeholder="Costo" required="required">
                 </div>
                 <div class="col-md-1"> 
@@ -236,6 +236,35 @@
 					<div class="form-group">
 						 <label>Serial</label>
 						 <input class="form-control" id="serial" type="text" placeholder="Serial/IMEI Equipo">
+					</div>
+				</div>
+			</div>
+			<div id="infoArticuloSerial">
+				<div class="row">
+					<div class="col col-md-3">
+						<input type="hidden" th:value="${idSerial}" id="idSerial">
+						<div class="form-group">
+							 <label>Costo</label>
+							 <input class="form-control" id="costoSerial" th:value="${costoSerial}" type="number" min="0" placeholder="Costo">
+						</div>
+					</div>
+					<div class="col col-md-3">
+						<div class="form-group">
+							 <label>Precio Maximo</label>
+							 <input class="form-control" id="precioMaximo" th:value="${precioMaximo}" type="number" min="0" placeholder="Precio Maximo">
+						</div>
+					</div>
+					<div class="col col-md-3">
+						<div class="form-group">
+							 <label>Precio Minimo</label>
+							 <input class="form-control" id="precioMinimo" th:value="${precioMinimo}" type="number" min="0" placeholder="Precio Minimo">
+						</div>
+					</div>
+					<div class="col col-md-3">
+						<div class="form-group">
+							 <label>Precio x Mayor</label>
+							 <input class="form-control" id="precioMayor" th:value="${precioMayor}" type="number" min="0" placeholder="Precio x Mayor">
+						</div>
 					</div>
 				</div>
 			</div>

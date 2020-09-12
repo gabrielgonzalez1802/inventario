@@ -146,7 +146,7 @@ public class ComprasController {
 			@PathVariable(name = "id") Integer idArticulo) {
 		Usuario usuario = (Usuario) session.getAttribute("usuario");
 		int conSerial = 0;
-		//si tiene no tiene serial
+		//no tiene serial
 		Articulo a = serviceArticulos.buscarPorId(idArticulo);
 		if(a.getImei().equalsIgnoreCase("0") || a.getImei().equalsIgnoreCase("NO")) {
 			List<ArticuloAjuste> articulosAjustes = serviceArticulosAjustes.buscarPorArticuloYAlmacen(a, usuario.getAlmacen());
@@ -184,6 +184,38 @@ public class ComprasController {
 		model.addAttribute("infoCosto", a.getCosto());
 		model.addAttribute("infoIdArticulo", a.getId());
 		return "compras/compra :: #infoArticulo";
+	}
+	
+	@GetMapping("/ajax/getInfoArticuloSerial/{id}")
+	public String getInfoArticuloSerial(Model model, HttpSession session, 
+			@PathVariable(name = "id") Integer idArticulo) {
+		Usuario usuario = (Usuario) session.getAttribute("usuario");
+		//si tiene no tiene serial
+		Articulo a = serviceArticulos.buscarPorId(idArticulo);
+		// Validacion para articulos con serial
+		List<ArticuloSerial> articuloSerials = serviceArticulosSeriales
+				.buscarPorArticuloAlmacen(a, usuario.getAlmacen()).stream()
+				.filter(s -> s.getEstado().equalsIgnoreCase("Disponible")).collect(Collectors.toList());
+		if (!articuloSerials.isEmpty()) {
+			a.setCantidad(articuloSerials.size());
+		} else {
+			a.setCantidad(0);
+		}
+		for (ArticuloSerial articuloSerial : articuloSerials) {
+			// buscamos el articulo
+			if (articuloSerial.getArticulo().getId() == a.getId()) {
+				a.setPrecio_maximo(articuloSerial.getPrecio_maximo());
+				a.setPrecio_mayor(articuloSerial.getPrecio_mayor());
+				a.setPrecio_minimo(articuloSerial.getPrecio_minimo());
+			}
+		}
+
+		model.addAttribute("costoSerial", a.getCosto());
+		model.addAttribute("precioMaximo", a.getPrecio_maximo());
+		model.addAttribute("precioMinimo", a.getPrecio_minimo());
+		model.addAttribute("precioMayor", a.getPrecio_mayor());
+		model.addAttribute("idSerial", a.getId());
+		return "compras/compra :: #infoArticuloSerial";
 	}
 	
 	@GetMapping("/ajax/loadCuerpo/{id}")
@@ -258,6 +290,7 @@ public class ComprasController {
 			@RequestParam(name = "idcondicionPago") Integer idcondicionPago, @RequestParam(name = "tipoNCF") Integer tipoNCF,
 			@RequestParam(name = "ncf") String ncf, @RequestParam(name = "observacion") String observacion,
 			@RequestParam(name = "precioTotal") Double precioTotal) throws ParseException {
+		Usuario usuario = (Usuario) session.getAttribute("usuario");
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 		Date date = formatter.parse(fechaCompra);
 		Compra compra = serviceCompras.buscarPorId(idCompra);
@@ -277,13 +310,85 @@ public class ComprasController {
 		compra.setNcf(ncf);
 		compra.setTotalNeto(precioTotal);
 		serviceCompras.guardar(compra);
-		return "compras/compra :: #responseDeleteItem";
+		
+		//Movimiento de inventario
+		List<CompraDetalle> compraDetalle = serviceComprasDetalles.buscarPorCompra(compra);
+		for (CompraDetalle detalle : compraDetalle) {
+			if(detalle.getCon_imei()==1) {
+				List<CompraDetalleSerial> compraDetalleSeriales = serviceComprasDetallesSeriales.buscarPorCompraDetalle(detalle);
+				//Verificamos los seriales
+				for (CompraDetalleSerial serial : compraDetalleSeriales) {
+					List<ArticuloSerial> lista = serviceArticulosSeriales
+							.buscarPorIdAlmacenDesc(usuario.getAlmacen().getId())
+							.stream().filter(s -> s.getEliminado() == 0).
+					collect(Collectors.toList());
+					//Verificamos si el serial existe
+//					if(lista.stream().
+//					filter(s -> s.getSerial().equalsIgnoreCase(serial.getSerial())).
+//					collect(Collectors.toList()).size() == 0) {
+						ArticuloSerial articuloSerial = new ArticuloSerial();
+						articuloSerial.setAlmacen(usuario.getAlmacen());
+						articuloSerial.setFecha(new Date());
+						articuloSerial.setId_usuario(usuario.getId());
+						articuloSerial.setCosto(serial.getCosto());
+						articuloSerial.setArticulo(detalle.getArticulo());
+						articuloSerial.setEstado("Disponible");
+						articuloSerial.setFecha(new Date());
+						articuloSerial.setId_compra(compra.getId());
+						articuloSerial.setId_usuario(usuario.getId());
+						articuloSerial.setSuplidor(compra.getSuplidor());
+						articuloSerial.setSerial(serial.getSerial());
+						articuloSerial.setPrecio_maximo(serial.getPrecio_maximo());
+						articuloSerial.setPrecio_minimo(serial.getPrecio_minimo());
+						articuloSerial.setPrecio_mayor(serial.getPrecio_mayor());
+						articuloSerial.setNo_factura(no_factura);
+						serviceArticulosSeriales.guardar(articuloSerial);
+						lista.add(articuloSerial);
+						//Actualizamos el articulo
+						Articulo articulo = articuloSerial.getArticulo();
+						articulo.setPrecio_maximo(serial.getPrecio_maximo());
+						articulo.setPrecio_minimo(serial.getPrecio_minimo());
+						articulo.setPrecio_mayor(serial.getPrecio_mayor());
+						articulo.setCosto(serial.getCosto());
+						serviceArticulos.guardar(articulo);
+//					}else {
+//						//serial existe
+//					}
+				}
+			}else {
+				//Articulo sin serial
+				//ordenamos el ultimo elemento de la lista
+				// verificar si el registro tiene inventario
+				List<ArticuloAjuste> lista = serviceArticulosAjustes.buscarPorArticuloYAlmacen(detalle.getArticulo(), usuario.getAlmacen());
+				ArticuloAjuste newArticuloAjuste = lista.get(lista.size()-1);
+				ArticuloAjuste newArticuloAjusteDefinitive = new ArticuloAjuste();
+				newArticuloAjusteDefinitive.setId(null);
+				newArticuloAjusteDefinitive.setAlmacen(usuario.getAlmacen());
+				newArticuloAjusteDefinitive.setFecha(new Date());
+				newArticuloAjusteDefinitive.setUsuario(usuario);
+				newArticuloAjusteDefinitive.setTipoMovimiento("Entrada");
+				newArticuloAjusteDefinitive.setCantidad(detalle.getCantidad());
+				newArticuloAjusteDefinitive.setCosto(detalle.getCosto());
+				newArticuloAjusteDefinitive.setExistencia(newArticuloAjuste.getDisponible());
+				newArticuloAjusteDefinitive.setArticulo(detalle.getArticulo());
+				newArticuloAjusteDefinitive.setSuplidor(compra.getSuplidor());
+				newArticuloAjusteDefinitive.setNo_factura(compra.getNo_factura());
+				newArticuloAjusteDefinitive.setUsuario(usuario);
+				newArticuloAjusteDefinitive.setDisponible(newArticuloAjusteDefinitive.getExistencia()+newArticuloAjusteDefinitive.getCantidad());
+				serviceArticulosAjustes.guardar(newArticuloAjusteDefinitive);
+			}
+
+		}
+		model.addAttribute("responseSave", 1);
+		return "compras/compra :: #responseSave";
 	}
 	
 	@PostMapping("/ajax/addItemConSerial/")
 	public String agregarItemConSerial(Model model, HttpSession session, 
 			@RequestParam(name = "idCompra") Integer idCompra, @RequestParam(name = "idArticulo") Integer idArticulo,
-			@RequestParam(name = "costo") Double costo, @RequestParam(name = "serial") String serial) {
+			@RequestParam(name = "costo") Double costo, @RequestParam(name = "serial") String serial,
+			@RequestParam(name = "precioMaximo") Double precioMaximo, @RequestParam(name = "precioMinimo") Double precioMinimo,
+			@RequestParam(name = "precioMayor") Double precioMayor) {
 		int response = 0;
 		Compra compra = serviceCompras.buscarPorId(idCompra);
 		Articulo articulo = serviceArticulos.buscarPorId(idArticulo);
@@ -314,6 +419,10 @@ public class ComprasController {
 			compraDetalleSerial.setCompra(compra);
 			compraDetalleSerial.setCompraDetalle(compraDetalle);
 			compraDetalleSerial.setSerial(serial);
+			compraDetalleSerial.setCosto(costo);
+			compraDetalleSerial.setPrecio_maximo(precioMaximo);
+			compraDetalleSerial.setPrecio_minimo(precioMinimo);
+			compraDetalleSerial.setPrecio_mayor(precioMayor);
 			serviceComprasDetallesSeriales.guardar(compraDetalleSerial);
 			
 			if(compraDetalleSerial.getId()!=null) {

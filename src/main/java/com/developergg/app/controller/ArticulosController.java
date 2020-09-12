@@ -735,7 +735,6 @@ public class ArticulosController {
 			@RequestParam("comprobanteFiscalId") Integer comprobanteFiscalId, @RequestParam("initialPrice") Double initialPrice, 
 			@RequestParam("realPrice") Double realPrice, String columnas) {
 		Double itBis = 0.0;
-		Double subTotal = 0.0;
 		Usuario usuario = (Usuario) session.getAttribute("usuario");
 		//Buscamos el articulo
 		Articulo articulo = serviceArticulos.buscarPorId(idArticulo);
