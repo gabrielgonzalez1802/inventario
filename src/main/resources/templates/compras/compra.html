@@ -174,17 +174,14 @@
 		
 		<div id="infoArticulo">
 			<input type="hidden" th:value="${infoIdArticulo}" id="infoIdArticulo">
-			<input type="hidden" th:value="${infoCantidad}" id="infoCantidad">
 			<input type="hidden" th:value="${infoSerial}" id="infoSerial">
-			<input type="hidden" th:value="${infoNombre}" id="infoNombre">
-			<input type="hidden" th:value="${infoCosto}" id="infoCosto">
 		</div>
 		 
 		</div>
 		  <div class="panel-body all">
 		     <form  method="post" action="#" id="formCreateInvoice">            
               <div class="row">
-                <div class="col-md-6"> 
+                <div class="col-md-8"> 
                   <div class="form-group">
                     <label for="nombre">Lista de Articulos</label>
 					<select class="form-control" id="articulos" style="width: 100%;">
@@ -194,18 +191,6 @@
 								th:text="${articulo.nombre}" />
                     </select>
                   </div>
-                </div>
-                <div class="col-md-2">
-            	    <label id="lblCantidad" for="cantidad">Cantidad</label>
-                	<input type="number" min="1" class="form-control" name="cantidad" id="cantidad" placeholder="cantidad" required="required">
-                </div>
-                <div class="col-md-2">
-            	    <label for="nombre" id="lblCosto">Costo</label>
-                	<input type="number" min="1" class="form-control" name="costo" id="costo" placeholder="Costo" required="required">
-                </div>
-                <div class="col-md-1"> 
-                	<br>
-               		 <button id="agregarItem" class="btn btn-primary pull-right" style="margin-top: 5px;"> Agregar </button>
                 </div>
               </div>                                                  
             </form>
@@ -273,6 +258,69 @@
       <div class="modal-footer">
         <button type="button" class="btn btn-warning" data-dismiss="modal">Regresar</button>
         <button type="button" class="btn btn-standar" id="btnAddSerial">Agregar</button>
+      </div>
+    </div>
+  </div>
+</div>		
+
+<!-- Modal de agregar articulo sin serial -->
+<div id="sinSerialModal" class="modal fade" role="dialog" data-backdrop="static">
+  <div class="modal-dialog">
+    <div class="modal-content all">
+      <div class="modal-header bg-primary">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h3 class="modal-title">Agregar Articulo</h3>
+      </div>
+      <div class="modal-body">
+		<form>
+			<div id="infoArticuloSinSerial">
+				<input type="hidden" id="idArticuloSinSerial" th:value="${idArticuloSinSerial}"> 
+				<div class="row">
+					<div class="col col-md-9">
+						<div class="form-group">
+							 <label>Articulo</label>
+							 <input class="form-control" id="articuloSinSerial" th:value="${articuloSinSerial}" type="text" placeholder="Articulo" disabled="disabled">
+						</div>
+					</div>
+					<div class="col col-md-3">
+						<div class="form-group">
+							 <label>Cantidad</label>
+							 <input class="form-control" id="cantidadArticuloSinSerial" min="1" value="1" type="number" placeholder="Cantidad">
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col col-md-3">
+						<div class="form-group">
+							 <label>Costo</label>
+							 <input class="form-control" id="costoSinSerial" th:value="${costoSinSerial}" type="number" min="0" placeholder="Costo">
+						</div>
+					</div>
+					<div class="col col-md-3">
+						<div class="form-group">
+							 <label>Precio Maximo</label>
+							 <input class="form-control" id="sinSerialPrecioMaximo" th:value="${sinSerialPrecioMaximo}" type="number" min="0" placeholder="Precio Maximo">
+						</div>
+					</div>
+					<div class="col col-md-3">
+						<div class="form-group">
+							 <label>Precio Minimo</label>
+							 <input class="form-control" id="sinSerialPrecioMinimo" th:value="${sinSerialPrecioMinimo}" type="number" min="0" placeholder="Precio Minimo">
+						</div>
+					</div>
+					<div class="col col-md-3">
+						<div class="form-group">
+							 <label>Precio x Mayor</label>
+							 <input class="form-control" id="sinSerialPrecioMayor" th:value="${sinSerialPrecioMayor}" type="number" min="0" placeholder="Precio x Mayor">
+						</div>
+					</div>
+				</div>
+			</div>
+       	 </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-warning" data-dismiss="modal">Regresar</button>
+        <button type="button" class="btn btn-standar" id="btnAddSinSerial">Agregar</button>
       </div>
     </div>
   </div>

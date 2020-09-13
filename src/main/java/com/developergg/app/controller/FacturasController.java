@@ -860,7 +860,7 @@ public class FacturasController {
 		model.addAttribute("facturas", facturas);
 		return "facturas/listaFacturasXC";
 	}
-	
+
 	@GetMapping("/ajax/loadCuerpoFacturaPagoCxC/{idFactura}")
 	public String getPagoTemp(Model model, HttpSession session, @PathVariable("idFactura") Integer idFactura) {
 		Factura factura = serviceFacturas.buscarPorId(idFactura);

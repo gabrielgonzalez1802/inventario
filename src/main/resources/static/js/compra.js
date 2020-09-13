@@ -19,68 +19,55 @@ $('#articulos').on("select2:select", function(e) {
 		var valor = $('#articulos :selected').text();
 		if(valor!=""){
 			$('#infoArticulo').load("/compras/ajax/getInfoArticulo/"+idArticulo,function(data){
-				$("#cantidad").val(1);
-				$("#costo").val($("#infoCosto").val());
 				if($("#infoSerial").val()==1){
 					$('#infoArticuloSerial').load("/compras/ajax/getInfoArticuloSerial/"+idArticulo,function(data){
 						//Con serial
-						$("#lblCantidad").hide();
-						$("#costo").hide();
-						$("#lblCosto").hide();
-						$("#cantidad").hide();
-						$("#agregarItem").hide();
 						$("#serialModal").modal("show");
 					});
 				}else{
 					//Sin serial
-					$("#agregarItem").show();
-					$("#lblCantidad").show();
-					$("#cantidad").show();
-					$("#costo").show();
-					$("#lblCosto").show();
+					$('#infoArticuloSinSerial').load("/compras/ajax/getInfoArticuloSinSerial/"+idArticulo,function(data){
+						//Con serial
+						$("#sinSerialModal").modal("show");
+					});
 				}
 			});
 		}
-	}else{
-		$("#cantidad").val("");
-		$("#costo").val("");
 	}
 });
 
-$("#agregarItem").click(function(e){
-	e.preventDefault();
-	var idCompra = $("#idCompra").val();
-	var idArticulo = $("#infoIdArticulo").val();
-	var costo = $("#costo").val();
-	//Verificamos el tipo de articulo
-	if($("#infoSerial").val()==1){
-		//Con serial
-	}else{
-		var cantidad = $("#cantidad").val();
-		//Sin serial
-		 $.post("/compras/ajax/addItemSinSerial/", {
-			 'idCompra': idCompra,
-			 'idArticulo': idArticulo,
-			 'cantidad': cantidad,
-			 'costo': costo
-	   },function(response){
-			$('#responseAddItem').replaceWith(response);
-			if($("#responseAddItem").val() == 0){
-				Swal.fire({
-					title : 'Advertencia!',
-					text : 'El articulo no pudo ser agregado a la compra',
-					position : 'top',
-					icon : 'warning',
-					confirmButtonText : 'Cool'
-				})
-			}else{
-				$("#cantidad").val("");
-				$("#costo").val("");
-				focusSelectArticuloNew();
-				cargarDetalles();
-			}
-	 	});
-	}
+$("#btnAddSinSerial").click(function(e){
+	 var idCompra = $("#idCompra").val();
+	 var idArticulo = $("#idArticuloSinSerial").val();
+	 var cantidad =  $("#cantidadArticuloSinSerial").val();
+	 var costo = $("#costoSinSerial").val();
+	 var precioMaximo = $("#sinSerialPrecioMaximo").val();
+	 var precioMinimo = $("#sinSerialPrecioMinimo").val();
+	 var precioMayor = $("#sinSerialPrecioMayor").val();
+	 $.post("/compras/ajax/addItemSinSerial/", {
+		 'idCompra': idCompra,
+		 'idArticulo': idArticulo,
+		 'cantidad': cantidad,
+		 'costo': costo,
+		 'precioMaximo': precioMaximo,
+		 'precioMinimo': precioMinimo,
+		 'precioMayor': precioMayor
+   },function(response){
+		$('#responseAddItem').replaceWith(response);
+		if($("#responseAddItem").val() == 0){
+			Swal.fire({
+				title : 'Advertencia!',
+				text : 'El articulo no pudo ser agregado a la compra',
+				position : 'top',
+				icon : 'warning',
+				confirmButtonText : 'Cool'
+			})
+		}else{
+			focusSelectArticuloNew();
+			cargarDetalles();
+			$("#cantidadArticuloSinSerial").val("1");
+		}
+ 	});
 });
 
 $("#btnAddSerial").click(function(e){
@@ -187,7 +174,7 @@ $("#btnPagar").click(function(e){
 					})
 					setTimeout(function() {
 						location.href = '/compras/create';
-					}, 1000);
+					}, 2000);
 		   });
 		} else{
 			Swal.fire({

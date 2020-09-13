@@ -2,8 +2,11 @@ package com.developergg.app.controller;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpSession;
@@ -20,6 +23,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.developergg.app.model.AbonoCxP;
 import com.developergg.app.model.Articulo;
 import com.developergg.app.model.ArticuloAjuste;
 import com.developergg.app.model.ArticuloSerial;
@@ -30,6 +34,7 @@ import com.developergg.app.model.ComprobanteFiscal;
 import com.developergg.app.model.CondicionPago;
 import com.developergg.app.model.Suplidor;
 import com.developergg.app.model.Usuario;
+import com.developergg.app.service.IAbonosCxPService;
 import com.developergg.app.service.IArticulosAjustesService;
 import com.developergg.app.service.IArticulosSeriales;
 import com.developergg.app.service.IArticulosService;
@@ -70,6 +75,9 @@ public class ComprasController {
 	
 	@Autowired
 	private IArticulosSeriales serviceArticulosSeriales;
+	
+	@Autowired
+	private IAbonosCxPService serviceAbonosCxP;
 
 	@GetMapping("/")
 	public String mostrarCompras(Model model, HttpSession session) {
@@ -178,10 +186,7 @@ public class ComprasController {
 			}
 		}
 		
-		model.addAttribute("infoCantidad", a.getCantidad());
 		model.addAttribute("infoSerial", conSerial);
-		model.addAttribute("infoNombre", a.getNombre());
-		model.addAttribute("infoCosto", a.getCosto());
 		model.addAttribute("infoIdArticulo", a.getId());
 		return "compras/compra :: #infoArticulo";
 	}
@@ -218,6 +223,19 @@ public class ComprasController {
 		return "compras/compra :: #infoArticuloSerial";
 	}
 	
+	@GetMapping("/ajax/getInfoArticuloSinSerial/{id}")
+	public String getInfoArticuloSinSerial(Model model, HttpSession session, 
+			@PathVariable(name = "id") Integer idArticulo) {
+		Articulo articulo = serviceArticulos.buscarPorId(idArticulo);
+		model.addAttribute("articuloSinSerial", articulo.getNombre());
+		model.addAttribute("idArticuloSinSerial", articulo.getId());
+		model.addAttribute("costoSinSerial", articulo.getCosto());
+		model.addAttribute("sinSerialPrecioMaximo", articulo.getPrecio_maximo());
+		model.addAttribute("sinSerialPrecioMinimo", articulo.getPrecio_minimo());
+		model.addAttribute("sinSerialPrecioMayor", articulo.getPrecio_mayor());
+		return "compras/compra :: #infoArticuloSinSerial";
+	}
+	
 	@GetMapping("/ajax/loadCuerpo/{id}")
 	public String cargarCuerpo(Model model, HttpSession session, 
 			@PathVariable(name = "id") Integer idCompra) {
@@ -247,7 +265,9 @@ public class ComprasController {
 	@PostMapping("/ajax/addItemSinSerial/")
 	public String agregarItemSinSerial(Model model, HttpSession session, 
 			@RequestParam(name = "idCompra") Integer idCompra, @RequestParam(name = "idArticulo") Integer idArticulo,
-			@RequestParam(name = "cantidad") Integer cantidad, @RequestParam(name = "costo") Double costo) {
+			@RequestParam(name = "cantidad") Integer cantidad, @RequestParam(name = "costo") Double costo,
+			@RequestParam(name = "precioMaximo") Double precioMaximo, @RequestParam(name = "precioMinimo") Double precioMinimo,
+			@RequestParam(name = "precioMayor") Double precioMayor) {
 		int response = 0;
 		Compra compra = serviceCompras.buscarPorId(idCompra);
 		Articulo articulo = serviceArticulos.buscarPorId(idArticulo);
@@ -256,11 +276,15 @@ public class ComprasController {
 		compraDetalle.setCompra(compra);
 		compraDetalle.setCantidad(cantidad);
 		compraDetalle.setCosto(costo);
+		compraDetalle.setPrecio_maximo(precioMaximo);
+		compraDetalle.setPrecio_minimo(precioMinimo);
+		compraDetalle.setPrecio_mayor(precioMayor);
 		compraDetalle.setSubTotal(cantidad*costo);
 		serviceComprasDetalles.guardar(compraDetalle);
 		if(compraDetalle.getId()!=null) {
 			response = 1;
 		}
+		
 		model.addAttribute("responseAddItem", response);
 		return "compras/compra :: #responseAddItem";
 	}
@@ -376,9 +400,38 @@ public class ComprasController {
 				newArticuloAjusteDefinitive.setUsuario(usuario);
 				newArticuloAjusteDefinitive.setDisponible(newArticuloAjusteDefinitive.getExistencia()+newArticuloAjusteDefinitive.getCantidad());
 				serviceArticulosAjustes.guardar(newArticuloAjusteDefinitive);
+				
+				//Actualizamos el articulo
+				Articulo articulo = detalle.getArticulo();
+				articulo.setPrecio_maximo(detalle.getPrecio_maximo());
+				articulo.setPrecio_minimo(detalle.getPrecio_minimo());
+				articulo.setPrecio_mayor(detalle.getPrecio_mayor());
+				articulo.setCosto(detalle.getCosto());
+				serviceArticulos.guardar(articulo);
 			}
 
 		}
+		
+        DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("KK:mm:ss a", Locale.ENGLISH);
+        String now = LocalDateTime.now().format(formatter2);
+		
+		//Si la condicion de pago es a credito genera una cuenta por pagar
+        CondicionPago condicionDePago = serviceCondicionesPago.buscarPorId(condicion.getId());
+		if(condicionDePago.getDia()>0) {
+			AbonoCxP cxP = new AbonoCxP();
+			cxP.setAlmacen(usuario.getAlmacen());
+			cxP.setCompra(compra);
+			cxP.setFecha(compra.getFecha());
+			cxP.setHora(now);
+			cxP.setSuplidor(suplidor);
+			cxP.setTotalAbono(0.0);
+			cxP.setTotalDevuelto(0.0);
+			cxP.setTotalPagado(0.0);
+			cxP.setTotalRestante(compra.getTotalNeto());
+			cxP.setUsuario(usuario);
+			serviceAbonosCxP.guardar(cxP);
+		}
+		
 		model.addAttribute("responseSave", 1);
 		return "compras/compra :: #responseSave";
 	}
