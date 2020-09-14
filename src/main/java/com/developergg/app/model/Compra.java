@@ -14,7 +14,6 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "compras")
 public class Compra {
-	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id_compra")
@@ -37,6 +36,8 @@ public class Compra {
 	
 	private String ncf;
 	
+	private Integer pagada = 0;
+	
 	private Integer en_proceso = 0;
 	
 	@OneToOne
@@ -52,7 +53,7 @@ public class Compra {
 	private Double itBis=0.0;
 	
 	@Column(name = "compra_total_neto")
-	private Double totalNeto;
+	private Double totalNeto=0.0;
 	
 	@OneToOne
 	@JoinColumn(name = "id_usuario")
@@ -62,12 +63,18 @@ public class Compra {
 	@JoinColumn(name = "id_almacen")
 	private Almacen almacen;
 	
-	private Double compra_pago_caja;
-	private Double compra_efectivo;
-	private Double compra_deposito;
-	private Double compra_transferencia;
-	private Double compra_cheque;
+	@Column(name = "total_pagado")
+	private Double totalPagado = 0.0;
 	
+	@Column(name = "total_restante")
+	private Double totalRestante = 0.0;
+	
+	@Column(name = "total_devuelto")
+	private Double totalDevuelto = 0.0;
+	
+	@Column(name = "total_compra")
+	private Double totalCompra = 0.0;
+
 	public Integer getId() {
 		return id;
 	}
@@ -146,36 +153,6 @@ public class Compra {
 	public void setAlmacen(Almacen almacen) {
 		this.almacen = almacen;
 	}
-	public Double getCompra_pago_caja() {
-		return compra_pago_caja;
-	}
-	public void setCompra_pago_caja(Double compra_pago_caja) {
-		this.compra_pago_caja = compra_pago_caja;
-	}
-	public Double getCompra_efectivo() {
-		return compra_efectivo;
-	}
-	public void setCompra_efectivo(Double compra_efectivo) {
-		this.compra_efectivo = compra_efectivo;
-	}
-	public Double getCompra_deposito() {
-		return compra_deposito;
-	}
-	public void setCompra_deposito(Double compra_deposito) {
-		this.compra_deposito = compra_deposito;
-	}
-	public Double getCompra_transferencia() {
-		return compra_transferencia;
-	}
-	public void setCompra_transferencia(Double compra_transferencia) {
-		this.compra_transferencia = compra_transferencia;
-	}
-	public Double getCompra_cheque() {
-		return compra_cheque;
-	}
-	public void setCompra_cheque(Double compra_cheque) {
-		this.compra_cheque = compra_cheque;
-	}
 	public CondicionPago getCondicion() {
 		return condicion;
 	}
@@ -188,14 +165,43 @@ public class Compra {
 	public void setEn_proceso(Integer en_proceso) {
 		this.en_proceso = en_proceso;
 	}
+	public Integer getPagada() {
+		return pagada;
+	}
+	public void setPagada(Integer pagada) {
+		this.pagada = pagada;
+	}
+	public Double getTotalPagado() {
+		return totalPagado;
+	}
+	public void setTotalPagado(Double totalPagado) {
+		this.totalPagado = totalPagado;
+	}
+	public Double getTotalRestante() {
+		return totalRestante;
+	}
+	public void setTotalRestante(Double totalRestante) {
+		this.totalRestante = totalRestante;
+	}
+	public Double getTotalDevuelto() {
+		return totalDevuelto;
+	}
+	public void setTotalDevuelto(Double totalDevuelto) {
+		this.totalDevuelto = totalDevuelto;
+	}
+	public Double getTotalCompra() {
+		return totalCompra;
+	}
+	public void setTotalCompra(Double totalCompra) {
+		this.totalCompra = totalCompra;
+	}
 	@Override
 	public String toString() {
 		return "Compra [id=" + id + ", fecha=" + fecha + ", no_factura=" + no_factura + ", suplidor=" + suplidor
-				+ ", condicion=" + condicion + ", comprobanteFiscal=" + comprobanteFiscal + ", ncf=" + ncf
-				+ ", vendedor=" + vendedor + ", observacion=" + observacion + ", subTotal=" + subTotal + ", itBis="
-				+ itBis + ", totalNeto=" + totalNeto + ", usuario=" + usuario + ", almacen=" + almacen
-				+ ", compra_pago_caja=" + compra_pago_caja + ", compra_efectivo=" + compra_efectivo
-				+ ", compra_deposito=" + compra_deposito + ", compra_transferencia=" + compra_transferencia
-				+ ", compra_cheque=" + compra_cheque + "]";
+				+ ", condicion=" + condicion + ", comprobanteFiscal=" + comprobanteFiscal + ", ncf=" + ncf + ", pagada="
+				+ pagada + ", en_proceso=" + en_proceso + ", vendedor=" + vendedor + ", observacion=" + observacion
+				+ ", subTotal=" + subTotal + ", itBis=" + itBis + ", totalNeto=" + totalNeto + ", usuario=" + usuario
+				+ ", almacen=" + almacen + ", totalPagado=" + totalPagado + ", totalRestante=" + totalRestante
+				+ ", totalDevuelto=" + totalDevuelto + ", totalCompra=" + totalCompra + "]";
 	}
 }

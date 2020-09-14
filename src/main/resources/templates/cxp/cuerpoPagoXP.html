@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
+<head>
+</head>
+
+<body>
+	<div th:fragment="cuerpoPago">
+		<input type="hidden" th:value="${mostrarCambio}" id="mostrarCambio">
+		<div class="col col-md-3 pull-right">
+			<div class="form-group">
+				<span style="font-size: 18px;">Total &nbsp; <span th:text="${totalPagos}">600</span></span><br> <span
+					style="font-size: 18px;">Resta &nbsp; <span id="totalRestaPagos" th:text="${totalRestaPagos}">250</span></span><br> 
+				<span id="totalCambioPagos" style="font-size: 18px;">Cambio &nbsp; <span th:text="${totalCambioPagos}">0</span></span><br>
+			</div>
+		</div>
+		<div class="col col-md-9">
+			<div class="form-group">
+				<table class="table table-hover" style="width: 100%;">
+					<thead>
+						<tr style="background-color: #17a2b8; color: #fff">
+							<th>Forma de pago</th>
+							<th>Monto</th>
+							<th></th>
+						</tr>
+					</thead>
+					<tbody class="items">
+						<tr th:each="pago:${listaPagosTemp}">
+							<td style="color: #fff;" th:text="${pago.formaPago.nombre}">Efectivo</td>
+							<td style="color: #fff;" th:text="${pago.monto}">0.0</td>
+							<td><a href="#" th:onclick="'eliminarPagoCXP(\'' + ${pago.id} + '\');'"><i class="icono fa fa-trash text-danger pull-right"></i></a></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+		
+		<br>
+		
+		<h4>&nbsp;</h4>
+		
+		<div class="row">
+			<div class="col col-md-12">
+					<h4><center><span style="color:#fff;">Lista de Abonos Realizados</span></center></h4>
+			
+				<div class="form-group">
+					<table class="table table-hover" style="width: 100%;">
+						<thead>
+							<tr style="background-color: #17a2b8; color: #fff">
+								<th>Fecha</th>
+								<th>Abono</th>
+							</tr>
+						</thead>
+						<tbody class="items">
+							<tr th:each="detalle:${detalles}">
+								<td style="color: #fff;" th:text="${#dates.format(detalle.fecha, 'dd-MM-yyyy')}">Fecha</td>
+								<td style="color: #fff;" th:text="${detalle.abono}">0.0</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+		<input type="hidden" th:value="${nombreSuplidor}" id="nombreSuplidor">
+	</div>
+</body>
+</html>

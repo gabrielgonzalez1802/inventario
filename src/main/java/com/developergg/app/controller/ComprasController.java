@@ -412,26 +412,30 @@ public class ComprasController {
 
 		}
 		
-        DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("KK:mm:ss a", Locale.ENGLISH);
-        String now = LocalDateTime.now().format(formatter2);
-		
-		//Si la condicion de pago es a credito genera una cuenta por pagar
+		//Si la condicion es a contado se actualiza la informacion en la compra
         CondicionPago condicionDePago = serviceCondicionesPago.buscarPorId(condicion.getId());
-		if(condicionDePago.getDia()>0) {
+		if(condicionDePago.getDia()==0) {
+			compra.setPagada(1);
+			compra.setTotalCompra(compra.getTotalNeto());
+		}else {
+			compra.setTotalCompra(compra.getTotalNeto());
+			compra.setTotalRestante(compra.getTotalNeto());
+	        DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("KK:mm:ss a", Locale.ENGLISH);
+	        String now = LocalDateTime.now().format(formatter2);
 			AbonoCxP cxP = new AbonoCxP();
-			cxP.setAlmacen(usuario.getAlmacen());
+			cxP.setAlmacen(compra.getAlmacen());
 			cxP.setCompra(compra);
-			cxP.setFecha(compra.getFecha());
+			cxP.setFecha(new Date());
 			cxP.setHora(now);
-			cxP.setSuplidor(suplidor);
-			cxP.setTotalAbono(0.0);
-			cxP.setTotalDevuelto(0.0);
-			cxP.setTotalPagado(0.0);
-			cxP.setTotalRestante(compra.getTotalNeto());
+			cxP.setSuplidor(compra.getSuplidor());
+			cxP.setTotalCompra(compra.getTotalCompra());
+			cxP.setTotalDevuelto(compra.getTotalDevuelto());
+			cxP.setTotalPagado(compra.getTotalPagado());
+			cxP.setTotalRestante(compra.getTotalRestante());
 			cxP.setUsuario(usuario);
 			serviceAbonosCxP.guardar(cxP);
 		}
-		
+		serviceCompras.guardar(compra);
 		model.addAttribute("responseSave", 1);
 		return "compras/compra :: #responseSave";
 	}

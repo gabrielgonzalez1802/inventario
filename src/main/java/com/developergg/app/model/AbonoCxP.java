@@ -30,9 +30,6 @@ public class AbonoCxP {
 
 	private Date fecha;
 	private String hora;
-	
-	@Column(name = "total_abono")
-	private Double totalAbono = 0.0;
 
 	@Column(name = "total_pagado")
 	private Double totalPagado = 0.0;
@@ -42,6 +39,9 @@ public class AbonoCxP {
 	
 	@Column(name = "total_devuelto")
 	private Double totalDevuelto = 0.0;
+	
+	@Column(name = "total_compra")
+	private Double totalCompra = 0.0;
 	
 	@OneToOne
 	@JoinColumn(name = "id_almacen")
@@ -73,14 +73,6 @@ public class AbonoCxP {
 
 	public void setUsuario(Usuario usuario) {
 		this.usuario = usuario;
-	}
-
-	public Double getTotalAbono() {
-		return totalAbono;
-	}
-
-	public void setTotalAbono(Double totalAbono) {
-		this.totalAbono = totalAbono;
 	}
 
 	public Double getTotalPagado() {
@@ -139,11 +131,11 @@ public class AbonoCxP {
 		this.hora = hora;
 	}
 
-	@Override
-	public String toString() {
-		return "AbonoCxP [id=" + id + ", suplidor=" + suplidor + ", compra=" + compra + ", fecha=" + fecha + ", hora="
-				+ hora + ", totalAbono=" + totalAbono + ", totalPagado=" + totalPagado + ", totalRestante="
-				+ totalRestante + ", totalDevuelto=" + totalDevuelto + ", almacen=" + almacen + ", usuario=" + usuario
-				+ "]";
+	public Double getTotalCompra() {
+		return totalCompra;
+	}
+
+	public void setTotalCompra(Double totalCompra) {
+		this.totalCompra = totalCompra;
 	}
 }

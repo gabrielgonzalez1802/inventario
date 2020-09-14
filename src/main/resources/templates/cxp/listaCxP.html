@@ -50,7 +50,7 @@
 				<h1 class="card-title" style="font-size: 16px;">Cuentas por Pagar</h1>
 				<br>
 
-<!-- Modal abonar a factura -->
+<!-- Modal abonar a cxp -->
  <div class="modal" id="abonoModal">
     <div class="modal-dialog modal-md" data-backdrop="static">
       <div class="modal-content all">
@@ -69,15 +69,10 @@
 					<input type="hidden" id="responseAddPago" th:value="${responseAddPago}">
 
 					<div class="row">
-						<div class="col col-md-4">
+						<div class="col col-md-12">
 							<div class="form-group">
-								<input class="form-control" type="text" placeholder="Factura" id="codeFactura" disabled="disabled">
-							</div>
-						</div>
-						
-						<div class="col col-md-8">
-							<div class="form-group">
-	                       		<input class="form-control" type="text" placeholder="Cliente" id="nameCliente" disabled="disabled">
+								<input type="hidden" id="idCompra">
+	                       		<input class="form-control" type="text" placeholder="Suplidor" id="nameSuplidor" disabled="disabled">
 							</div>
 						</div>
 					</div>
@@ -139,16 +134,16 @@
 								</tr>
 							</thead>
 							<tbody>
-								 <tr th:each="cxp:${listaAbonoCxP}">
-				                  <td th:text="${#dates.format(cxp.fecha, 'dd-MM-yyyy')}"></td>
-				                  <td th:text="${cxp.suplidor.nombre}"></td> 
-				                  <td th:text="${cxp.suplidor.telefono}"></td> 
-				                  <td th:text="${cxp.totalAbono}"></td>
-				                  <td th:text="${#numbers.formatDecimal(cxp.compra.totalNeto - cxp.totalAbono, 0, 'COMMA', 2, 'POINT')}"></td>
-				                  <td th:text="${#numbers.formatDecimal(cxp.compra.totalNeto, 0, 'COMMA', 2, 'POINT')}"></td>
+								 <tr th:each="compra:${compras}">
+				                  <td th:text="${#dates.format(compra.fecha, 'dd-MM-yyyy')}"></td>
+				                  <td th:text="${compra.suplidor.nombre}"></td> 
+				                  <td th:text="${compra.suplidor.telefono}"></td> 
+				                  <td th:text="${compra.totalPagado}"></td>
+				                  <td th:text="${compra.totalRestante}"></td>
+				                  <td th:text="${compra.totalCompra}"></td>
 				                  <td>
 <!-- 				                    <a th:href="@{/facturas/print/{id} (id=${cxp.id})}" th:target="_blank" class="btn btn-success btn-sm" data-toggle="tooltip" data-placement="top" title="Imprimir" role="button"><i class="fa fa-print" aria-hidden="true"></i></a> -->
-<!-- 				                  	<a th:onclick="'abonar(\'' + ${cxp.id} + '\');'" class="btn btn-primary btn-sm" data-toggle="tooltip" data-placement="top" title="Abonar" role="button"><i class="fa fa-money" aria-hidden="true"></i></a> -->
+				                  	<a th:onclick="'abonar(\'' + ${compra.id} + '\');'" class="btn btn-primary btn-sm" data-toggle="tooltip" data-placement="top" title="Abonar" role="button"><i class="fa fa-money" aria-hidden="true"></i></a>
 				                  </td>
 				                </tr>
 							</tbody>
@@ -192,8 +187,8 @@
 	var idFactura;
 	
 	function abonar(id){
-		idFactura = id;
-		$('#cuerpoPago').load("/facturas/ajax/loadCuerpoFacturaPagoCxC/"+idFactura,function(){
+		$('#cuerpoPago').load("/cxp/ajax/loadCuerpoCxP/"+id,function(){
+			$("#idCompra").val(id);
 			if($("#mostrarCambio").val()==0){
 				$("#totalCambioPagos").hide();
 			}else{
@@ -201,7 +196,7 @@
 			}
 			$('#abonoModal').modal({backdrop: 'static', keyboard: false})
 			$("#codeFactura").val($("#numFactura").val());
-			$("#nameCliente").val($("#nombreCliente").val());
+			$("#nameSuplidor").val($("#nombreSuplidor").val());
 			$("#abonoModal").modal("show");
 		});
 	}
@@ -211,6 +206,7 @@
 		var formaPago = $("#selectFormaPago").val();
 		var montoFormaPago = $("#montoFormaPago").val();
 		var restaPago = parseFloat($("#totalRestaPagos").text());
+		var idCompra = $("#idCompra").val();
 		if(restaPago>0){
 			if(montoFormaPago<0){
 				Swal.fire({
@@ -222,10 +218,10 @@
 				})
 				$("#montoFormaPago").val("");
 			}else{
-				 $.post("/formasPago/ajax/addPagoTempFacturaCXC/", {
+				 $.post("/cxp/ajax/addPagoTempCXP/", {
 						 'formaPago' : formaPago,
 						 'montoFormaPago': montoFormaPago,
-						 'idFactura': idFactura
+						 'idCompra': idCompra
 				   },function(response){
 						$('#responseAddPago').replaceWith(response);
 						if($("#responseAddPago").val() == 0){
@@ -238,12 +234,13 @@
 							})
 						}
 						$("#montoFormaPago").val("");
-						$('#cuerpoPago').load("/facturas/ajax/loadCuerpoFacturaPagoCxC/"+idFactura,function(){});
-						if($("#mostrarCambio").val()==0){
-							$("#totalCambioPagos").hide();
-						}else{
-							$("#totalCambioPagos").show();
-						}
+						$('#cuerpoPago').load("/cxp/ajax/loadCuerpoCxP/"+idCompra,function(){
+							if($("#mostrarCambio").val()==0){
+								$("#totalCambioPagos").hide();
+							}else{
+								$("#totalCambioPagos").show();
+							}
+						});
 				   });
 			}
 		}else{
@@ -257,11 +254,12 @@
 		}
 	});
 	
-	function eliminarPagoFactura(idPagoFactura){
-		$.post("/formasPago/ajax/deletePagoTemporalCxC/", {
-			 'idPagoFactura': idPagoFactura
+	function eliminarPagoCXP(idPagoTemp){
+		var idCompra = $("#idCompra").val();
+		$.post("/cxp/ajax/deletePagoTemporalCxP/", {
+			 'idPagoTemp': idPagoTemp
 	   },function(response){
-			$('#cuerpoPago').load("/facturas/ajax/loadCuerpoFacturaPagoCxC/"+idFactura,function(){
+			$('#cuerpoPago').load("/cxp/ajax/loadCuerpoCxP/"+idCompra,function(){
 				if($("#mostrarCambio").val()==0){
 					$("#totalCambioPagos").hide();
 				}else{
@@ -272,10 +270,11 @@
 	}
 	
 	$("#btnCancelar").click(function(e) {
-		$.post("/formasPago/ajax/deleteAllTemporalCxC/", {
-			 'idFactura': idFactura
+		var idCompra = $("#idCompra").val();
+		$.post("/cxp/ajax/deleteAllTemporalCxP/", {
+			 'idCompra': idCompra
 	   },function(response){
-			$('#cuerpoPago').load("/facturas/ajax/loadCuerpoFacturaPagoCxC/"+idFactura,function(){
+			$('#cuerpoPago').load("/cxp/ajax/loadCuerpoCxP/"+idFactura,function(){
 				if($("#mostrarCambio").val()==0){
 					$("#totalCambioPagos").hide();
 				}else{
@@ -289,10 +288,13 @@
 	});
 	
 	$("#btnGuardar").click(function(e) {
-		$.post("/formasPago/ajax/guardarAbonoCxC/", {
-			 'idFactura': idFactura
+		var idCompra = $("#idCompra").val();
+		var devuelto = parseFloat($("#totalCambioPagos").text());
+		$.post("/cxp/ajax/guardarAbonoCxP/", {
+			 'idCompra': idCompra,
+			 'devuelto': devuelto
 	   },function(response){
-			location.href = '/facturas/cxc';
+			location.href = '/cxp/';
 	   });
 	});
 
