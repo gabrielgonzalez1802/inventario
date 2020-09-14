@@ -42,6 +42,8 @@ public class ArticuloSerial {
 	private Integer id_compra;
 	private Integer id_factura;
 	
+	private int en_uso = 0;
+	
 	private String estado = "Disponible";
 	
 	//fixme luego se llevaran a objetos relacionados
@@ -202,15 +204,21 @@ public class ArticuloSerial {
 	public void setTemporalPrice(Double temporalPrice) {
 		this.temporalPrice = temporalPrice;
 	}
-	
+	public int getEn_uso() {
+		return en_uso;
+	}
+	public void setEn_uso(int en_uso) {
+		this.en_uso = en_uso;
+	}
 	@Override
 	public String toString() {
 		return "ArticuloSerial [id=" + id + ", articulo=" + articulo + ", almacen=" + almacen + ", serial=" + serial
 				+ ", fecha=" + fecha + ", suplidor=" + suplidor + ", id_cliente=" + id_cliente + ", id_ajuste="
-				+ id_ajuste + ", id_compra=" + id_compra + ", id_factura=" + id_factura + ", estado=" + estado
-				+ ", id_usuario=" + id_usuario + ", costo=" + costo + ", no_factura=" + no_factura + ", eliminado="
-				+ eliminado + ", id_usuario_eliminar=" + id_usuario_eliminar + ", fecha_eliminado=" + fecha_eliminado
-				+ ", id_envio=" + id_envio + ", fecha_envio=" + fecha_envio + ", precio_maximo=" + precio_maximo
-				+ ", precio_minimo=" + precio_minimo + ", precio_mayor=" + precio_mayor + "]";
+				+ id_ajuste + ", id_compra=" + id_compra + ", id_factura=" + id_factura + ", en_uso=" + en_uso
+				+ ", estado=" + estado + ", id_usuario=" + id_usuario + ", costo=" + costo + ", no_factura="
+				+ no_factura + ", eliminado=" + eliminado + ", id_usuario_eliminar=" + id_usuario_eliminar
+				+ ", fecha_eliminado=" + fecha_eliminado + ", id_envio=" + id_envio + ", fecha_envio=" + fecha_envio
+				+ ", precio_maximo=" + precio_maximo + ", precio_minimo=" + precio_minimo + ", precio_mayor="
+				+ precio_mayor + ", temporalPrice=" + temporalPrice + "]";
 	}
 }

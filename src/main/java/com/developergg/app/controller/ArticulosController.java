@@ -549,10 +549,10 @@ public class ArticulosController {
 		Articulo articulo = serviceArticulos.buscarPorId(idArticulo);
 		List<ArticuloSerial> lista = null;
 		if(articulo!=null) {
-			//Buscamos los seriales que pertenezcan al articulo, por almacen que no esten eliminados y esten disponibles
+			//Buscamos los seriales que pertenezcan al articulo, por almacen que no esten eliminados y esten disponibles y no esten en uso
 			lista = serviceArticulosSeriales.buscarPorArticuloAlmacen(articulo, usuario.getAlmacen()).
 					stream().filter(s -> 
-					(s.getEliminado() == 0 && s.getEstado().equalsIgnoreCase("Disponible"))).
+					(s.getEliminado() == 0 && s.getEstado().equalsIgnoreCase("Disponible") && s.getEn_uso() == 0)).
 					collect(Collectors.toList());
 		}
 		model.addAttribute("listaMultiSerial", lista);
@@ -732,7 +732,7 @@ public class ArticulosController {
 	public String agregarArticuloConSerial(HttpSession session, @RequestParam("idArticulo") Integer idArticulo,
 			@RequestParam("cantidad") Integer cantidad, @RequestParam("precio") Double precio,
 			@RequestParam("seriales") String seriales, @RequestParam("idCliente") Integer idCliente,
-			@RequestParam("comprobanteFiscalId") Integer comprobanteFiscalId, @RequestParam("initialPrice") Double initialPrice, 
+			@RequestParam("comprobanteFiscalId") Integer comprobanteFiscalId, @RequestParam(name = "initialPrice",required = false) Double initialPrice, 
 			@RequestParam("realPrice") Double realPrice, String columnas) {
 		Double itBis = 0.0;
 		Usuario usuario = (Usuario) session.getAttribute("usuario");
@@ -849,6 +849,8 @@ public class ArticulosController {
 					facturaTemp.setConItbis(articulo.getItbis().equals("SI")?"1":"0");
 					facturaTemp.setImei(articulo.getImei().equals("SI")?"1":"0");
 					
+					initialPrice = listSerial.getPrecio();
+
 					precio = listSerial.getPrecio();
 					double precioUnitario = listSerial.getPrecio();
 					
@@ -887,6 +889,8 @@ public class ArticulosController {
 					List<ArticuloSerial> serialesDelArticulo = serviceArticulosSeriales.buscarPorSerialAndAlmacen(String.valueOf(listSerial.getSerial()), usuario.getAlmacen());
 					if(!serialesDelArticulo.isEmpty()) {
 						serialTemp.setArticuloSerial(serialesDelArticulo.get(0));
+						serialesDelArticulo.get(0).setEn_uso(1);
+						serviceArticulosSeriales.guardar(serialesDelArticulo.get(0));
 					}
 					serviceSerialesTemp.guardar(serialTemp);
 				}
@@ -943,6 +947,8 @@ public class ArticulosController {
 						List<ArticuloSerial> serialesDelArticulo = serviceArticulosSeriales.buscarPorSerialAndAlmacen(String.valueOf(serial), usuario.getAlmacen());
 						if(!serialesDelArticulo.isEmpty()) {
 							serialTemp.setArticuloSerial(serialesDelArticulo.get(0));
+							serialesDelArticulo.get(0).setEn_uso(1);
+							serviceArticulosSeriales.guardar(serialesDelArticulo.get(0));
 						}
 						serviceSerialesTemp.guardar(serialTemp);
 					}
@@ -1001,6 +1007,8 @@ public class ArticulosController {
 					List<ArticuloSerial> serialesDelArticulo = serviceArticulosSeriales.buscarPorSerialAndAlmacen(String.valueOf(serial), usuario.getAlmacen());
 					if(!serialesDelArticulo.isEmpty()) {
 						serialTemp.setArticuloSerial(serialesDelArticulo.get(0));
+						serialesDelArticulo.get(0).setEn_uso(1);
+						serviceArticulosSeriales.guardar(serialesDelArticulo.get(0));
 					}
 					serviceSerialesTemp.guardar(serialTemp);
 				}
@@ -1376,6 +1384,7 @@ public class ArticulosController {
 	@PostMapping("/ajax/deleteArticuloFactura/")
 	public String borrarArticuloFactura(Model model, @RequestParam("idDetalle") Integer idDetalle, 
 			HttpSession session) {
+		Usuario usuario = (Usuario) session.getAttribute("usuario");
 		FacturaDetalleTemp detalleTemp = serviceFacturasDetallesTemp.buscarPorId(idDetalle);
 		//validacion para articulos con imei
 		Articulo articulo = detalleTemp.getArticulo();
@@ -1383,6 +1392,15 @@ public class ArticulosController {
 			//obtenemos los seriales asociados al articulo en la factura
 			List<FacturaSerialTemp> seriales = serviceSerialesTemp.buscarPorDetalleTemp(detalleTemp);
 			//recorremos todos los seriales
+			for (FacturaSerialTemp facturaSerialTemp : seriales) {
+				//verificamos el serial del articulo
+				List<ArticuloSerial> serialesDelArticulo = serviceArticulosSeriales.buscarPorSerialAndAlmacen(String.valueOf(facturaSerialTemp.getId_serial()), usuario.getAlmacen());
+				if(!serialesDelArticulo.isEmpty()) {
+					ArticuloSerial temp = serialesDelArticulo.get(0);
+					temp.setEn_uso(0);
+					serviceArticulosSeriales.guardar(temp);
+				}
+			}
 			serviceSerialesTemp.eliminarListaSeriales(seriales);
 			//borramos el detalle en la factura
 			serviceFacturasDetallesTemp.eliminar(idDetalle);

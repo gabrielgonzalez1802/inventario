@@ -794,6 +794,14 @@ public class FacturasController {
 		//borramos registros temporales
 		if(!listaSerialesTemp.isEmpty()) {
 			//borramos los articulos con serial
+			for (FacturaSerialTemp seriales : listaSerialesTemp) {
+				List<ArticuloSerial> serialesDelArticulo = serviceArticulosSeriales.buscarPorSerialAndAlmacen(String.valueOf(seriales.getId_serial()), usuario.getAlmacen());
+				if(!serialesDelArticulo.isEmpty()) {
+					ArticuloSerial temp = serialesDelArticulo.get(0);
+					temp.setEn_uso(0);
+					serviceArticulosSeriales.guardar(temp);
+				}
+			}
 			serviceFacturasSerialesTemp.eliminarListaSeriales(listaSerialesTemp);
 		}
 		if(!facturaDetallesTemp.isEmpty()) {
