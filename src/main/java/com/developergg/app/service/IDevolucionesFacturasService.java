@@ -9,4 +9,5 @@ public interface IDevolucionesFacturasService {
 	DevolucionFactura buscarPorId(Integer id);
 	List<DevolucionFactura> buscarPorAlmacen(Almacen almacen);
 	void guardar(DevolucionFactura devolucionFactura);
+	void eliminar(DevolucionFactura devolucionFactura);
 }

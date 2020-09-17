@@ -36,4 +36,9 @@ public class DevolucionesFacturasServiceJpa implements IDevolucionesFacturasServ
 		repo.save(devolucionFactura);
 	}
 
+	@Override
+	public void eliminar(DevolucionFactura devolucionFactura) {
+		repo.delete(devolucionFactura);
+	}
+
 }

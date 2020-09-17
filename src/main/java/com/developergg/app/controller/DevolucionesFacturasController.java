@@ -310,37 +310,52 @@ public class DevolucionesFacturasController {
 			//No tiene serial
 			if(facturaDetalle.getImei().equals("NO") || facturaDetalle.getImei().equals("0")) {
 				if(facturaDetalle.getTemp_devolver()>0) {
-					DevolucionFacturaDetalle devolucionFacturaDetalle = new DevolucionFacturaDetalle();
-					devolucionFacturaDetalle.setCantidad(facturaDetalle.getTemp_devolver());
-					devolucionFacturaDetalle.setCantidad_factura(facturaDetalle.getCantidad());
-					devolucionFacturaDetalle.setCantidad_restante(facturaDetalle.getCantidad()-facturaDetalle.getTemp_devolver());
-					devolucionFacturaDetalle.setDevolucionFactura(devolucionFactura);
-					devolucionFacturaDetalle.setFacturaDetalle(facturaDetalle);
-					devolucionFacturaDetalle.setPrecio(facturaDetalle.getPrecio()/facturaDetalle.getTemp_devolver());
-					serviceDevolucionesFacturasDetalles.guardar(devolucionFacturaDetalle);
-					facturaDetalle.setCantidad_devuelta(facturaDetalle.getCantidad_devuelta()+facturaDetalle.getCantidad());
-					facturaDetalle.setTemp_devolver(0);
-					serviceFacturasDetalles.guardar(facturaDetalle);
+					//Verificamos si el detalle tiene devolucion para calcular la cantidad
+					List<DevolucionFacturaDetalle> devolucionFacturaDetalles = serviceDevolucionesFacturasDetalles.buscarPorFacturaDetalle(facturaDetalle);
+					int cantidadDisponible = 0;
+					int cantidadDevuelta = 0;
+					if(!devolucionFacturaDetalles.isEmpty()) {
+						for (DevolucionFacturaDetalle devolucionFacturaDetalle : devolucionFacturaDetalles) {
+							cantidadDevuelta += devolucionFacturaDetalle.getCantidad();
+						}
+					}else {
+						cantidadDevuelta += 0;
+					}
+					cantidadDisponible = facturaDetalle.getCantidad()-cantidadDevuelta;
 					
-					monto+=devolucionFacturaDetalle.getPrecio();
-					
-					//Vuelve al inventario
-					//ordenamos el ultimo elemento de la lista
-					List<ArticuloAjuste> lista = serviceArticulosAjustes.buscarPorArticuloYAlmacen(facturaDetalle.getArticulo(), usuario.getAlmacen());
-					ArticuloAjuste newArticuloAjuste = lista.get(lista.size()-1);
-					ArticuloAjuste newArticuloAjusteDefinitive = new ArticuloAjuste();
-					newArticuloAjusteDefinitive.setAlmacen(usuario.getAlmacen());
-					newArticuloAjusteDefinitive.setFecha(new Date());
-					newArticuloAjusteDefinitive.setUsuario(usuario);
-					newArticuloAjusteDefinitive.setTipoMovimiento("Entrada");
-					newArticuloAjusteDefinitive.setCantidad(facturaDetalle.getTemp_devolver());
-					newArticuloAjusteDefinitive.setCosto(facturaDetalle.getCosto());
-					newArticuloAjusteDefinitive.setExistencia(newArticuloAjuste.getDisponible());
-					newArticuloAjusteDefinitive.setArticulo(facturaDetalle.getArticulo());
-					newArticuloAjusteDefinitive.setNo_factura(facturaDetalle.getFactura().getCodigo().toString());
-					newArticuloAjusteDefinitive.setUsuario(usuario); //quitarlo
-					newArticuloAjusteDefinitive.setDisponible(newArticuloAjusteDefinitive.getExistencia()+newArticuloAjusteDefinitive.getCantidad());
-					serviceArticulosAjustes.guardar(newArticuloAjusteDefinitive);
+					if(cantidadDisponible > 0) {
+						DevolucionFacturaDetalle devolucionFacturaDetalle = new DevolucionFacturaDetalle();
+						devolucionFacturaDetalle.setCantidad(facturaDetalle.getTemp_devolver());
+						devolucionFacturaDetalle.setCantidad_factura(cantidadDisponible);
+						devolucionFacturaDetalle.setCantidad_restante(cantidadDisponible-facturaDetalle.getTemp_devolver());
+						devolucionFacturaDetalle.setDevolucionFactura(devolucionFactura);
+						devolucionFacturaDetalle.setFacturaDetalle(facturaDetalle);
+						devolucionFacturaDetalle.setPrecio(facturaDetalle.getPrecio());
+						serviceDevolucionesFacturasDetalles.guardar(devolucionFacturaDetalle);
+
+						monto+=devolucionFacturaDetalle.getPrecio()*facturaDetalle.getTemp_devolver();
+						
+						//Vuelve al inventario
+						//ordenamos el ultimo elemento de la lista
+						List<ArticuloAjuste> lista = serviceArticulosAjustes.buscarPorArticuloYAlmacen(facturaDetalle.getArticulo(), usuario.getAlmacen());
+						ArticuloAjuste newArticuloAjuste = lista.get(lista.size()-1);
+						ArticuloAjuste newArticuloAjusteDefinitive = new ArticuloAjuste();
+						newArticuloAjusteDefinitive.setAlmacen(usuario.getAlmacen());
+						newArticuloAjusteDefinitive.setFecha(new Date());
+						newArticuloAjusteDefinitive.setUsuario(usuario);
+						newArticuloAjusteDefinitive.setTipoMovimiento("Entrada");
+						newArticuloAjusteDefinitive.setCantidad(facturaDetalle.getTemp_devolver());
+						newArticuloAjusteDefinitive.setCosto(facturaDetalle.getCosto());
+						newArticuloAjusteDefinitive.setExistencia(newArticuloAjuste.getDisponible());
+						newArticuloAjusteDefinitive.setArticulo(facturaDetalle.getArticulo());
+						newArticuloAjusteDefinitive.setNo_factura(facturaDetalle.getFactura().getCodigo().toString());
+						newArticuloAjusteDefinitive.setDisponible(newArticuloAjusteDefinitive.getExistencia()+newArticuloAjusteDefinitive.getCantidad());
+						serviceArticulosAjustes.guardar(newArticuloAjusteDefinitive);
+						
+						facturaDetalle.setCantidad_devuelta(facturaDetalle.getCantidad_devuelta()+facturaDetalle.getTemp_devolver());
+						facturaDetalle.setTemp_devolver(0);
+						serviceFacturasDetalles.guardar(facturaDetalle);
+					}
 				}
 			}else {
 				//Tiene serial
@@ -376,40 +391,52 @@ public class DevolucionesFacturasController {
 		List<FacturaDetalleTaller> facturaDetalleTalleres = serviceFacturasDetallesTalleres.buscarPorFactura(factura);
 		for (FacturaDetalleTaller facturaDetalleTaller : facturaDetalleTalleres) {
 			if(facturaDetalleTaller.getArticulo()!=null && facturaDetalleTaller.getTemp_devolver()>0) {
-				DevolucionFacturaDetalle devolucionFacturaDetalle = new DevolucionFacturaDetalle();
-				devolucionFacturaDetalle.setCantidad(facturaDetalleTaller.getTemp_devolver());
-				devolucionFacturaDetalle.setCantidad_factura(devolucionFacturaDetalle.getCantidad());
-				devolucionFacturaDetalle.setCantidad_restante(devolucionFacturaDetalle.getCantidad()-facturaDetalleTaller.getTemp_devolver());
-				devolucionFacturaDetalle.setDevolucionFactura(devolucionFactura);
-				devolucionFacturaDetalle.setFacturaDetalleTaller(facturaDetalleTaller);
-				devolucionFacturaDetalle.setPrecio(facturaDetalleTaller.getPrecio()/facturaDetalleTaller.getTemp_devolver());
-				serviceDevolucionesFacturasDetalles.guardar(devolucionFacturaDetalle);
-				facturaDetalleTaller.setCantidad_devuelta(facturaDetalleTaller.getCantidad_devuelta()+facturaDetalleTaller.getTemp_devolver());
-				facturaDetalleTaller.setTemp_devolver(0);
-				serviceFacturasDetallesTalleres.guardar(facturaDetalleTaller);
 				
-				//Vuelve al inventario
-				//ordenamos el ultimo elemento de la lista
-				List<ArticuloAjuste> lista = serviceArticulosAjustes.buscarPorArticuloYAlmacen(facturaDetalleTaller.getArticulo(), usuario.getAlmacen());
-				ArticuloAjuste newArticuloAjuste = lista.get(lista.size()-1);
-				ArticuloAjuste newArticuloAjusteDefinitive = new ArticuloAjuste();
-				newArticuloAjusteDefinitive.setAlmacen(usuario.getAlmacen());
-				newArticuloAjusteDefinitive.setFecha(new Date());
-				newArticuloAjusteDefinitive.setUsuario(usuario);
-				newArticuloAjusteDefinitive.setTipoMovimiento("Entrada");
-				newArticuloAjusteDefinitive.setCantidad(facturaDetalleTaller.getTemp_devolver());
-				newArticuloAjusteDefinitive.setCosto(facturaDetalleTaller.getArticulo().getCosto());
-				newArticuloAjusteDefinitive.setExistencia(newArticuloAjuste.getDisponible());
-				newArticuloAjusteDefinitive.setArticulo(facturaDetalleTaller.getArticulo());
-				newArticuloAjusteDefinitive.setNo_factura(facturaDetalleTaller.getFactura().getCodigo().toString());
-				newArticuloAjusteDefinitive.setUsuario(usuario);
-				newArticuloAjusteDefinitive.setDisponible(newArticuloAjusteDefinitive.getExistencia()+newArticuloAjusteDefinitive.getCantidad());
-				serviceArticulosAjustes.guardar(newArticuloAjusteDefinitive);
+				//Verificamos si el detalle tiene devolucion para calcular la cantidad
+				List<DevolucionFacturaDetalle> devolucionFacturaDetalles = serviceDevolucionesFacturasDetalles.buscarPorFacturaDetalleTaller(facturaDetalleTaller);
+				int cantidadDisponible = 0;
+				int cantidadDevuelta = 0;
+				if(!devolucionFacturaDetalles.isEmpty()) {
+					for (DevolucionFacturaDetalle devolucionFacturaDetalle : devolucionFacturaDetalles) {
+						cantidadDevuelta += devolucionFacturaDetalle.getCantidad();
+					}
+				}else {
+					cantidadDevuelta += 0;
+				}
+				cantidadDisponible = facturaDetalleTaller.getCantidad()-cantidadDevuelta;
 				
-				facturaDetalleTaller.setTemp_devolver(0);
-				serviceFacturasDetallesTalleres.guardar(facturaDetalleTaller);
-				
-				monto+=devolucionFacturaDetalle.getPrecio();
+				if(cantidadDisponible > 0) {
+					DevolucionFacturaDetalle devolucionFacturaDetalle = new DevolucionFacturaDetalle();
+					devolucionFacturaDetalle.setCantidad(facturaDetalleTaller.getTemp_devolver());
+					devolucionFacturaDetalle.setCantidad_factura(cantidadDisponible);
+					devolucionFacturaDetalle.setCantidad_restante(cantidadDisponible-facturaDetalleTaller.getTemp_devolver());
+					devolucionFacturaDetalle.setDevolucionFactura(devolucionFactura);
+					devolucionFacturaDetalle.setFacturaDetalleTaller(facturaDetalleTaller);
+					devolucionFacturaDetalle.setPrecio(facturaDetalleTaller.getPrecio());
+					serviceDevolucionesFacturasDetalles.guardar(devolucionFacturaDetalle);
+					facturaDetalleTaller.setCantidad_devuelta(facturaDetalleTaller.getCantidad_devuelta()+facturaDetalleTaller.getTemp_devolver());
+
+					//Vuelve al inventario
+					//ordenamos el ultimo elemento de la lista
+					List<ArticuloAjuste> lista = serviceArticulosAjustes.buscarPorArticuloYAlmacen(facturaDetalleTaller.getArticulo(), usuario.getAlmacen());
+					ArticuloAjuste newArticuloAjuste = lista.get(lista.size()-1);
+					ArticuloAjuste newArticuloAjusteDefinitive = new ArticuloAjuste();
+					newArticuloAjusteDefinitive.setAlmacen(usuario.getAlmacen());
+					newArticuloAjusteDefinitive.setFecha(new Date());
+					newArticuloAjusteDefinitive.setUsuario(usuario);
+					newArticuloAjusteDefinitive.setTipoMovimiento("Entrada");
+					newArticuloAjusteDefinitive.setCantidad(facturaDetalleTaller.getTemp_devolver());
+					newArticuloAjusteDefinitive.setCosto(facturaDetalleTaller.getArticulo().getCosto());
+					newArticuloAjusteDefinitive.setExistencia(newArticuloAjuste.getDisponible());
+					newArticuloAjusteDefinitive.setArticulo(facturaDetalleTaller.getArticulo());
+					newArticuloAjusteDefinitive.setNo_factura(facturaDetalleTaller.getFactura().getCodigo().toString());
+					newArticuloAjusteDefinitive.setUsuario(usuario);
+					newArticuloAjusteDefinitive.setDisponible(newArticuloAjusteDefinitive.getExistencia()+newArticuloAjusteDefinitive.getCantidad());
+					serviceArticulosAjustes.guardar(newArticuloAjusteDefinitive);
+					facturaDetalleTaller.setTemp_devolver(0);
+					serviceFacturasDetallesTalleres.guardar(facturaDetalleTaller);
+					monto+=devolucionFacturaDetalle.getPrecio();
+				}
 			}
 		}
 		
@@ -420,6 +447,11 @@ public class DevolucionesFacturasController {
 		devolucionFactura.setItbis(itbisTemp);
 		devolucionFactura.setTotal(monto+itbisTemp);
 		serviceDevolucionesFacturas.guardar(devolucionFactura);
+		
+		//Si la devolucion se creo vacia se elimina
+		if(devolucionFactura.getPrecio()==0) {
+			serviceDevolucionesFacturas.eliminar(devolucionFactura);
+		}
 		
 		return "devoluciones/facturas/devolucion :: #temporal";
 	}
