@@ -73,15 +73,22 @@ $("#devolverArticuloTaller").click(function(e){
 })
 
 $("#btnGuardar").click(function(e){
-	alert("en desarrollo");
-//	e.preventDefault();
-//	var idFactura = $("#idFactura").val();
-//	 $.post("/devolucionesFacturas/ajax/crearDevolucion/", {
-//		 'idFactura':idFactura
-//	   },function(response){
-////		   $("#articuloTallerModal").modal("hide");
-////		   $("#cuerpoDevolucion").load("/devolucionesFacturas/cuerpoDevolucion/"+idFactura);
-//	   });
+	e.preventDefault();
+	var idFactura = $("#idFactura").val();
+	 $.post("/devolucionesFacturas/ajax/crearDevolucion/", {
+		 'idFactura':idFactura
+	   },function(response){
+		   Swal.fire({
+				title : 'Muy bien!',
+				text : 'Se ha creado la devolucion',
+				position : 'top',
+				icon : 'success',
+				confirmButtonText : 'Cool'
+			})
+		   setTimeout(function() {
+				location.href = '/devolucionesFacturas/';
+			}, 2000);
+	   });
 });
 
 function seleccionarSeriales(){
@@ -117,10 +124,13 @@ function devolverArticulo(id) {
 	$("#tipoArticulo").load("/devolucionesFacturas/verificarTipoArticulo/"+id,function(){
 		if($("#conSerial").val() == 0){
 			//No tiene serial
+			var cantidadDevuelta = $("#cantidadDevuelta").val();
+			var cantidadArticulo = $("#cantidadArticulo").val();
+			var disponible = parseFloat(cantidadArticulo)-parseFloat(cantidadDevuelta);
 			$("#nombreArticuloSinSerial").val($("#nombreArticulo").val());
 			$("#precioArticuloSinSerial").val($("#precioArticulo").val());	
-			$("#cantidadTotalArticuloSinSerial").val($("#cantidadArticulo").val());	
-			$('#cantidadArticuloSinSerial').prop('max', $("#cantidadArticulo").val());
+			$("#cantidadTotalArticuloSinSerial").val(disponible);	
+			$('#cantidadArticuloSinSerial').prop('max', disponible);
 			$("#articuloModal").modal("show");
 		}else{
 			//articulo con serial

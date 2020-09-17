@@ -36,11 +36,12 @@
 					<td th:text="${detalles.precio}" class="text-center">Precio</td>
 					<td th:text="${detalles.itbis}" class="text-right">Itbis</td>
 					<td th:text="${detalles.subtotal}" class="text-right">Subtotal</td>
-					<td class='text-right' th:if="${detalles.articulo != null}"><a
+					<td class='text-right' th:if="${detalles.articulo != null && detalles.cantidad - detalles.cantidad_devuelta > 0}"><a
 						href="#" th:onclick="'devolverArticulo(\'' + ${detalles.id} + '\');'">
 							<i class="icono fa fa-plus text-primary"></i>
 					</a></td>
-					<td th:unless="${detalles.articulo != null}" class='text-right'>&nbsp;</td>
+					<td class='text-right' th:if="${detalles.articulo != null && detalles.cantidad - detalles.cantidad_devuelta == 0}">&nbsp;</td>
+					<td th:if="${detalles.articulo == null}" class='text-right'>&nbsp;</td>
 				</tr>
 				<!--  Fin detalles -->
 				<!-- Servicios  -->
@@ -70,7 +71,7 @@
 						taller</td>
 					<td class="text-right" th:text="${taller.itbis}">0.00</td>
 					<td th:text="${taller.subtotal}" class="text-right">SubTotal</td>
-					<td class='text-right' th:if="${taller.articulo != null}"><a
+					<td class='text-right' th:if="${taller.articulo != null && taller.cantidad - taller.cantidad_devuelta > 0}"><a
 						href="#"
 						th:onclick="'devolverArticuloTaller(\'' + ${taller.id} + '\');'">
 							<i class="icono fa fa-plus text-primary"></i>

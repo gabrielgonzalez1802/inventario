@@ -37,7 +37,10 @@ public class DevolucionFactura {
 	private Usuario usuario;
 	
 	@Column(name = "total_devolucion")
-	private Double total;
+	private Double total = 0.0;
+	
+	private Double itbis = 0.0;
+	private Double precio = 0.0;
 
 	public Integer getId() {
 		return id;
@@ -103,9 +106,26 @@ public class DevolucionFactura {
 		this.total = total;
 	}
 
+	public Double getPrecio() {
+		return precio;
+	}
+
+	public void setPrecio(Double precio) {
+		this.precio = precio;
+	}
+
+	public Double getItbis() {
+		return itbis;
+	}
+
+	public void setItbis(Double itbis) {
+		this.itbis = itbis;
+	}
+
 	@Override
 	public String toString() {
 		return "DevolucionFactura [id=" + id + ", codigo=" + codigo + ", fecha=" + fecha + ", hora=" + hora
-				+ ", factura=" + factura + ", almacen=" + almacen + ", usuario=" + usuario + ", total=" + total + "]";
+				+ ", factura=" + factura + ", almacen=" + almacen + ", usuario=" + usuario + ", total=" + total
+				+ ", itbis=" + itbis + ", precio=" + precio + "]";
 	}
 }

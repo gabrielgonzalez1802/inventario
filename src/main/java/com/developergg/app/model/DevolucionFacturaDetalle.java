@@ -26,6 +26,10 @@ public class DevolucionFacturaDetalle {
 	@JoinColumn(name = "id_factura_detalle")
 	private FacturaDetalle facturaDetalle;
 	
+	@OneToOne
+	@JoinColumn(name = "id_factura_detalle_taller")
+	private FacturaDetalleTaller facturaDetalleTaller;
+	
 	private Integer cantidad=0;
 	private Integer cantidad_factura=0;
 	private Integer cantidad_restante=0;
@@ -88,10 +92,19 @@ public class DevolucionFacturaDetalle {
 		this.precio = precio;
 	}
 
+	public FacturaDetalleTaller getFacturaDetalleTaller() {
+		return facturaDetalleTaller;
+	}
+
+	public void setFacturaDetalleTaller(FacturaDetalleTaller facturaDetalleTaller) {
+		this.facturaDetalleTaller = facturaDetalleTaller;
+	}
+
 	@Override
 	public String toString() {
 		return "DevolucionFacturaDetalle [id=" + id + ", devolucionFactura=" + devolucionFactura + ", facturaDetalle="
-				+ facturaDetalle + ", cantidad=" + cantidad + ", cantidad_factura=" + cantidad_factura
-				+ ", cantidad_restante=" + cantidad_restante + ", precio=" + precio + "]";
+				+ facturaDetalle + ", facturaDetalleTaller=" + facturaDetalleTaller + ", cantidad=" + cantidad
+				+ ", cantidad_factura=" + cantidad_factura + ", cantidad_restante=" + cantidad_restante + ", precio="
+				+ precio + "]";
 	}
 }

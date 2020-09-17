@@ -8,7 +8,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 
 @Entity
 @Table(name = "facturas_detalle")
@@ -27,7 +26,7 @@ public class FacturaDetalle {
 	private Articulo articulo;
 	
 	private Integer cantidad;
-	private Double cantidad_devuelta = 0.0;
+	private Integer cantidad_devuelta = 0;
 	private Double precio;
 	private Double itbis;
 	private String imei;
@@ -77,11 +76,11 @@ public class FacturaDetalle {
 		this.cantidad = cantidad;
 	}
 
-	public Double getCantidad_devuelta() {
+	public Integer getCantidad_devuelta() {
 		return cantidad_devuelta;
 	}
 
-	public void setCantidad_devuelt(Double cantidad_devuelta) {
+	public void setCantidad_devuelta(Integer cantidad_devuelta) {
 		this.cantidad_devuelta = cantidad_devuelta;
 	}
 
@@ -165,24 +164,20 @@ public class FacturaDetalle {
 		this.subtotal = subtotal;
 	}
 
-	public Almacen getAlmacen() {
-		return almacen;
-	}
-
-	public void setAlmacen(Almacen almacen) {
-		this.almacen = almacen;
-	}
-
-	public void setCantidad_devuelta(Double cantidad_devuelta) {
-		this.cantidad_devuelta = cantidad_devuelta;
-	}
-
 	public Integer getTemp_devolver() {
 		return temp_devolver;
 	}
 
 	public void setTemp_devolver(Integer temp_devolver) {
 		this.temp_devolver = temp_devolver;
+	}
+
+	public Almacen getAlmacen() {
+		return almacen;
+	}
+
+	public void setAlmacen(Almacen almacen) {
+		this.almacen = almacen;
 	}
 
 	@Override

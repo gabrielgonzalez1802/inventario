@@ -63,6 +63,8 @@ public class ArticuloSerial {
 	private Double precio_minimo;
 	private Double precio_mayor;
 	
+	private Integer devuelto = 0;
+	
 	@Transient
 	private Double temporalPrice;
 	
@@ -210,6 +212,12 @@ public class ArticuloSerial {
 	public void setEn_uso(int en_uso) {
 		this.en_uso = en_uso;
 	}
+	public Integer getDevuelto() {
+		return devuelto;
+	}
+	public void setDevuelto(Integer devuelto) {
+		this.devuelto = devuelto;
+	}
 	@Override
 	public String toString() {
 		return "ArticuloSerial [id=" + id + ", articulo=" + articulo + ", almacen=" + almacen + ", serial=" + serial
@@ -219,6 +227,6 @@ public class ArticuloSerial {
 				+ no_factura + ", eliminado=" + eliminado + ", id_usuario_eliminar=" + id_usuario_eliminar
 				+ ", fecha_eliminado=" + fecha_eliminado + ", id_envio=" + id_envio + ", fecha_envio=" + fecha_envio
 				+ ", precio_maximo=" + precio_maximo + ", precio_minimo=" + precio_minimo + ", precio_mayor="
-				+ precio_mayor + ", temporalPrice=" + temporalPrice + "]";
+				+ precio_mayor + ", devuelto=" + devuelto + ", temporalPrice=" + temporalPrice + "]";
 	}
 }

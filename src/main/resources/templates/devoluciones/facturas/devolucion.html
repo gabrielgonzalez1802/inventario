@@ -106,6 +106,7 @@
 			<input type="hidden" th:value="${nombreArticulo}" id="nombreArticulo">
 			<input type="hidden" th:value="${precioArticulo}" id="precioArticulo">
 			<input type="hidden" th:value="${cantidadArticulo}" id="cantidadArticulo">
+			<input type="hidden" th:value="${cantidadDevuelta}" id="cantidadDevuelta">
 			<input type="hidden" id="temporal"> 
 		</div>
 		
@@ -353,8 +354,9 @@
 										<tbody class="items">
 											<tr th:each="serial: ${listaSeriales}">
 												<td th:text="${serial.serial}" class="text-center">Serial</td>
-												<td class="text-center" th:if="${serial.tempDevuelto == 1}">Pendiente por devolver</td>
-												<td th:unless="${serial.tempDevuelto == 1}">&nbsp;</td>
+												<td th:if="${serial.devuelto == 1}">Devuelto</td>
+												<td th:if="${serial.devuelto == 0 && serial.tempDevuelto == 0}"></td>
+												<td class="text-center" th:if="${serial.devuelto == 0 && serial.tempDevuelto == 1}">Pendiente por devolver</td>
 											</tr>
 										</tbody>
 									</table>

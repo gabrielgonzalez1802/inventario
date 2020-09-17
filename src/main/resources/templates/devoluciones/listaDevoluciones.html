@@ -52,18 +52,24 @@
 					<table class="table table-striped" id="tabla">
 							<thead>
 								<tr class="table-primary">
-									<th>No. Factura</th>
 									<th>Fecha</th>
-									<th>Suplidor</th>
+									<th>Nombre</th>
+									<th>No. Factura</th>
+									<th>Monto</th>
+									<th>Itbis</th>
 									<th>Total</th>
+									<th>Usuario</th>
 								</tr>
 							</thead>
 							<tbody>
 								 <tr th:each="devolucion:${devoluciones}">
-				                  <td th:text="${compra.no_factura}"></td>
-				                  <td th:text="${#dates.format(compra.fecha, 'dd-MM-yyyy')}"></td> 
-				                   <td th:text="${compra.suplidor.nombre}"></td> 
-				                   <td th:text="${compra.totalNeto}"></td> 
+				                  <td th:text="${#dates.format(devolucion.fecha, 'dd-MM-yyyy')}"></td>
+				                  <td th:text="${devolucion.factura.nombre_cliente}"></td>
+				                  <td th:text="${devolucion.factura.codigo}"></td>
+				                   <td th:text="${devolucion.precio}"></td> 
+				                   <td th:text="${devolucion.itbis}"></td> 
+				                   <td th:text="${devolucion.total}"></td> 
+				                   <td th:text="${devolucion.usuario.nombre}"></td> 
 <!-- 				                  <td> -->
 <!-- 				                     <a th:href="@{/almacenes/edit/{id} (id=${almacen.id})}" class="btn btn-success btn-sm" data-toggle="tooltip" data-placement="top" title="Modificar" role="button"><i class="fa fa-edit" aria-hidden="true"></i></a> -->
 <!-- 				                  	<a th:href="@{/almacenes/delete/{id} (id=${almacen.id})}" onclick="return confirm('¿Estas seguro?')" class="btn btn-danger btn-sm" data-toggle="tooltip" data-placement="top" title="Eliminar" role="button"><i class="fa fa-trash" aria-hidden="true"></i></a> -->

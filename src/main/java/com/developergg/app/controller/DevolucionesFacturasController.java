@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpSession;
 
@@ -18,13 +19,21 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.developergg.app.model.ArticuloAjuste;
+import com.developergg.app.model.ArticuloSerial;
 import com.developergg.app.model.DevolucionFactura;
+import com.developergg.app.model.DevolucionFacturaDetalle;
+import com.developergg.app.model.DevolucionFacturaSerial;
 import com.developergg.app.model.Factura;
 import com.developergg.app.model.FacturaDetalle;
 import com.developergg.app.model.FacturaDetalleSerial;
 import com.developergg.app.model.FacturaDetalleServicio;
 import com.developergg.app.model.FacturaDetalleTaller;
 import com.developergg.app.model.Usuario;
+import com.developergg.app.service.IArticulosAjustesService;
+import com.developergg.app.service.IArticulosSeriales;
+import com.developergg.app.service.IDevolucionesFacturasDetallesService;
+import com.developergg.app.service.IDevolucionesFacturasSerialesService;
 import com.developergg.app.service.IDevolucionesFacturasService;
 import com.developergg.app.service.IFacturasDetallesSerialesService;
 import com.developergg.app.service.IFacturasDetallesService;
@@ -37,8 +46,11 @@ import com.developergg.app.service.IFacturasService;
 public class DevolucionesFacturasController {
 	
 	@Autowired
-	private IDevolucionesFacturasService serviceDevolucionesFacturas;
-
+	private IArticulosSeriales serviceArticulosSeriales;
+	
+	@Autowired
+	private IArticulosAjustesService serviceArticulosAjustes;
+	
 	@Autowired
 	private IFacturasService serviceFacturas;
 	
@@ -56,6 +68,15 @@ public class DevolucionesFacturasController {
 	
 	@Autowired
 	private IFacturasDetallesTallerService serviceFacturasDetallesTalleres;
+	
+	@Autowired
+	private IDevolucionesFacturasService serviceDevolucionesFacturas;
+	
+	@Autowired
+	private IDevolucionesFacturasDetallesService serviceDevolucionesFacturasDetalles;
+	
+	@Autowired
+	private IDevolucionesFacturasSerialesService serviceDevolucionesFacturasSeriales;
 	
 	@GetMapping("/")
 	public String listaDevoluciones(Model model, HttpSession session) {
@@ -146,6 +167,7 @@ public class DevolucionesFacturasController {
 		model.addAttribute("nombreArticulo", detalle.getArticulo().getNombre());
 		model.addAttribute("precioArticulo", detalle.getPrecio());
 		model.addAttribute("cantidadArticulo", detalle.getCantidad());
+		model.addAttribute("cantidadDevuelta", detalle.getCantidad_devuelta());
 		return "devoluciones/facturas/devolucion :: #tipoArticulo";
 	}
 	
@@ -167,7 +189,9 @@ public class DevolucionesFacturasController {
 		FacturaDetalle facturaDetalle = serviceFacturasDetalles.buscarPorId(idFacturaDetalle);
 		List<FacturaDetalleSerial> seriales = new LinkedList<>();
 		if(facturaDetalle.getImei().equals("SI") || facturaDetalle.getImei().equals("1")){
-			seriales = serviceFacturasDetallesSeriales.buscarPorDetalle(facturaDetalle);
+			//Seriales que no esten devueltos
+			seriales = serviceFacturasDetallesSeriales.buscarPorDetalle(facturaDetalle).
+					stream().filter(s -> s.getDevuelto() == 0).collect(Collectors.toList());
 		}
 		model.addAttribute("listaSeriales", seriales);
 		model.addAttribute("idDetalleArticulo", facturaDetalle.getId());
@@ -244,7 +268,7 @@ public class DevolucionesFacturasController {
 	public String infoArticuloTaller(Model model, @PathVariable("id") Integer idFacturaTaller) {
 		FacturaDetalleTaller facturaTaller = serviceFacturasTaller.buscarPorId(idFacturaTaller);
 		model.addAttribute("articuloTaller", facturaTaller.getArticulo().getNombre());
-		model.addAttribute("cantidadTaller", facturaTaller.getCantidad());
+		model.addAttribute("cantidadTaller", facturaTaller.getCantidad()-facturaTaller.getCantidad_devuelta());
 		model.addAttribute("precioTaller", facturaTaller.getPrecio());
 		model.addAttribute("itbisTaller", facturaTaller.getItbis());
 		model.addAttribute("subTotalTaller", facturaTaller.getSubtotal());
@@ -267,6 +291,9 @@ public class DevolucionesFacturasController {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("KK:mm:ss a", Locale.ENGLISH);
 		String now = LocalDateTime.now().format(formatter);
 		
+		Double monto = 0.0;
+		Integer itbis = factura.getComprobanteFiscal().getValor_itbis();
+		
 		//Creamos la devolucion
 		DevolucionFactura devolucionFactura = new DevolucionFactura();
 		devolucionFactura.setAlmacen(factura.getAlmacen());
@@ -282,11 +309,118 @@ public class DevolucionesFacturasController {
 		for (FacturaDetalle facturaDetalle : facturaDetalles) {
 			//No tiene serial
 			if(facturaDetalle.getImei().equals("NO") || facturaDetalle.getImei().equals("0")) {
-//				DevolucionFacturaDetalle 
+				if(facturaDetalle.getTemp_devolver()>0) {
+					DevolucionFacturaDetalle devolucionFacturaDetalle = new DevolucionFacturaDetalle();
+					devolucionFacturaDetalle.setCantidad(facturaDetalle.getTemp_devolver());
+					devolucionFacturaDetalle.setCantidad_factura(facturaDetalle.getCantidad());
+					devolucionFacturaDetalle.setCantidad_restante(facturaDetalle.getCantidad()-facturaDetalle.getTemp_devolver());
+					devolucionFacturaDetalle.setDevolucionFactura(devolucionFactura);
+					devolucionFacturaDetalle.setFacturaDetalle(facturaDetalle);
+					devolucionFacturaDetalle.setPrecio(facturaDetalle.getPrecio()/facturaDetalle.getTemp_devolver());
+					serviceDevolucionesFacturasDetalles.guardar(devolucionFacturaDetalle);
+					facturaDetalle.setCantidad_devuelta(facturaDetalle.getCantidad_devuelta()+facturaDetalle.getCantidad());
+					facturaDetalle.setTemp_devolver(0);
+					serviceFacturasDetalles.guardar(facturaDetalle);
+					
+					monto+=devolucionFacturaDetalle.getPrecio();
+					
+					//Vuelve al inventario
+					//ordenamos el ultimo elemento de la lista
+					List<ArticuloAjuste> lista = serviceArticulosAjustes.buscarPorArticuloYAlmacen(facturaDetalle.getArticulo(), usuario.getAlmacen());
+					ArticuloAjuste newArticuloAjuste = lista.get(lista.size()-1);
+					ArticuloAjuste newArticuloAjusteDefinitive = new ArticuloAjuste();
+					newArticuloAjusteDefinitive.setAlmacen(usuario.getAlmacen());
+					newArticuloAjusteDefinitive.setFecha(new Date());
+					newArticuloAjusteDefinitive.setUsuario(usuario);
+					newArticuloAjusteDefinitive.setTipoMovimiento("Entrada");
+					newArticuloAjusteDefinitive.setCantidad(facturaDetalle.getTemp_devolver());
+					newArticuloAjusteDefinitive.setCosto(facturaDetalle.getCosto());
+					newArticuloAjusteDefinitive.setExistencia(newArticuloAjuste.getDisponible());
+					newArticuloAjusteDefinitive.setArticulo(facturaDetalle.getArticulo());
+					newArticuloAjusteDefinitive.setNo_factura(facturaDetalle.getFactura().getCodigo().toString());
+					newArticuloAjusteDefinitive.setUsuario(usuario); //quitarlo
+					newArticuloAjusteDefinitive.setDisponible(newArticuloAjusteDefinitive.getExistencia()+newArticuloAjusteDefinitive.getCantidad());
+					serviceArticulosAjustes.guardar(newArticuloAjusteDefinitive);
+				}
 			}else {
 				//Tiene serial
+				int tempDevuelto = 0;
+				List<FacturaDetalleSerial> facturaDetalleSeriales = serviceFacturasDetallesSeriales.buscarPorDetalle(facturaDetalle);
+				for (FacturaDetalleSerial facturaDetalleSerial : facturaDetalleSeriales) {
+					if(facturaDetalleSerial.getTempDevuelto()==1 && facturaDetalleSerial.getDevuelto() == 0) {
+						DevolucionFacturaSerial devolucionFacturaSerial = new DevolucionFacturaSerial();
+						devolucionFacturaSerial.setArticuloSerial(facturaDetalleSerial.getArticuloSerial());
+						devolucionFacturaSerial.setFacturaDetalle(facturaDetalle);
+						devolucionFacturaSerial.setFacturaDetalleSerial(facturaDetalleSerial);
+						devolucionFacturaSerial.setSerial(facturaDetalleSerial.getSerial());
+						serviceDevolucionesFacturasSeriales.guardar(devolucionFacturaSerial);
+						facturaDetalleSerial.setTempDevuelto(0);
+						facturaDetalleSerial.setDevuelto(1);
+						serviceFacturasDetallesSeriales.guardar(facturaDetalleSerial);
+						tempDevuelto++;
+						//Vuelve al inventario
+						ArticuloSerial articuloSerial = facturaDetalleSerial.getArticuloSerial();
+						articuloSerial.setEstado("Disponible");
+						articuloSerial.setDevuelto(1); 
+						serviceArticulosSeriales.guardar(articuloSerial);
+						
+						monto+=facturaDetalleSerial.getPrecio();
+					}
+					facturaDetalle.setCantidad_devuelta(tempDevuelto);
+					serviceFacturasDetalles.guardar(facturaDetalle);
+				}
 			}
 		}
+		
+		//talleres
+		List<FacturaDetalleTaller> facturaDetalleTalleres = serviceFacturasDetallesTalleres.buscarPorFactura(factura);
+		for (FacturaDetalleTaller facturaDetalleTaller : facturaDetalleTalleres) {
+			if(facturaDetalleTaller.getArticulo()!=null && facturaDetalleTaller.getTemp_devolver()>0) {
+				DevolucionFacturaDetalle devolucionFacturaDetalle = new DevolucionFacturaDetalle();
+				devolucionFacturaDetalle.setCantidad(facturaDetalleTaller.getTemp_devolver());
+				devolucionFacturaDetalle.setCantidad_factura(devolucionFacturaDetalle.getCantidad());
+				devolucionFacturaDetalle.setCantidad_restante(devolucionFacturaDetalle.getCantidad()-facturaDetalleTaller.getTemp_devolver());
+				devolucionFacturaDetalle.setDevolucionFactura(devolucionFactura);
+				devolucionFacturaDetalle.setFacturaDetalleTaller(facturaDetalleTaller);
+				devolucionFacturaDetalle.setPrecio(facturaDetalleTaller.getPrecio()/facturaDetalleTaller.getTemp_devolver());
+				serviceDevolucionesFacturasDetalles.guardar(devolucionFacturaDetalle);
+				facturaDetalleTaller.setCantidad_devuelta(facturaDetalleTaller.getCantidad_devuelta()+facturaDetalleTaller.getTemp_devolver());
+				facturaDetalleTaller.setTemp_devolver(0);
+				serviceFacturasDetallesTalleres.guardar(facturaDetalleTaller);
+				
+				//Vuelve al inventario
+				//ordenamos el ultimo elemento de la lista
+				List<ArticuloAjuste> lista = serviceArticulosAjustes.buscarPorArticuloYAlmacen(facturaDetalleTaller.getArticulo(), usuario.getAlmacen());
+				ArticuloAjuste newArticuloAjuste = lista.get(lista.size()-1);
+				ArticuloAjuste newArticuloAjusteDefinitive = new ArticuloAjuste();
+				newArticuloAjusteDefinitive.setAlmacen(usuario.getAlmacen());
+				newArticuloAjusteDefinitive.setFecha(new Date());
+				newArticuloAjusteDefinitive.setUsuario(usuario);
+				newArticuloAjusteDefinitive.setTipoMovimiento("Entrada");
+				newArticuloAjusteDefinitive.setCantidad(facturaDetalleTaller.getTemp_devolver());
+				newArticuloAjusteDefinitive.setCosto(facturaDetalleTaller.getArticulo().getCosto());
+				newArticuloAjusteDefinitive.setExistencia(newArticuloAjuste.getDisponible());
+				newArticuloAjusteDefinitive.setArticulo(facturaDetalleTaller.getArticulo());
+				newArticuloAjusteDefinitive.setNo_factura(facturaDetalleTaller.getFactura().getCodigo().toString());
+				newArticuloAjusteDefinitive.setUsuario(usuario);
+				newArticuloAjusteDefinitive.setDisponible(newArticuloAjusteDefinitive.getExistencia()+newArticuloAjusteDefinitive.getCantidad());
+				serviceArticulosAjustes.guardar(newArticuloAjusteDefinitive);
+				
+				facturaDetalleTaller.setTemp_devolver(0);
+				serviceFacturasDetallesTalleres.guardar(facturaDetalleTaller);
+				
+				monto+=devolucionFacturaDetalle.getPrecio();
+			}
+		}
+		
+		Double itbisTemp = itbis.doubleValue()/100;
+		itbisTemp*=monto;
+		//Actualizamos precios de devolucion
+		devolucionFactura.setPrecio(monto);
+		devolucionFactura.setItbis(itbisTemp);
+		devolucionFactura.setTotal(monto+itbisTemp);
+		serviceDevolucionesFacturas.guardar(devolucionFactura);
+		
 		return "devoluciones/facturas/devolucion :: #temporal";
 	}
 }

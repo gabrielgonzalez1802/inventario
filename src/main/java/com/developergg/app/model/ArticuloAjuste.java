@@ -39,8 +39,6 @@ public class ArticuloAjuste {
 	private String no_factura;
 	private Integer cantidad;
 	
-	private String serial;
-	
 	@Column(name = "tipo_movimiento")
 	private String tipoMovimiento;
 	
@@ -100,14 +98,6 @@ public class ArticuloAjuste {
 		this.cantidad = cantidad;
 	}
 
-	public String getSerial() {
-		return serial;
-	}
-
-	public void setSerial(String serial) {
-		this.serial = serial;
-	}
-
 	public String getTipoMovimiento() {
 		return tipoMovimiento;
 	}
@@ -160,7 +150,7 @@ public class ArticuloAjuste {
 	public String toString() {
 		return "ArticuloAjuste [id=" + id + ", articulo=" + articulo + ", almacen=" + almacen + ", suplidor=" + suplidor
 				+ ", existencia=" + existencia + ", disponible=" + disponible + ", no_factura=" + no_factura
-				+ ", cantidad=" + cantidad + ", serial=" + serial + ", tipoMovimiento=" + tipoMovimiento + ", costo="
-				+ costo + ", usuario=" + usuario + ", fecha=" + fecha + "]";
+				+ ", cantidad=" + cantidad + ", tipoMovimiento=" + tipoMovimiento + ", costo=" + costo + ", usuario="
+				+ usuario + ", fecha=" + fecha + "]";
 	}
 }
