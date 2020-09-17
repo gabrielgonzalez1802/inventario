@@ -76,7 +76,8 @@
 						th:onclick="'devolverArticuloTaller(\'' + ${taller.id} + '\');'">
 							<i class="icono fa fa-plus text-primary"></i>
 					</a></td>
-					<td th:unless="${taller.articulo != null}" class='text-right'>&nbsp;</td>
+					<td class='text-right' th:unless="${taller.articulo != null && taller.cantidad - taller.cantidad_devuelta > 0}">&nbsp;</td>
+<!-- 					<td th:unless="${taller.articulo != null}" class='text-right'></td> -->
 				</tr>
 			</tbody>
 		</table>
