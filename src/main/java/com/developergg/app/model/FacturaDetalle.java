@@ -8,6 +8,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 @Entity
 @Table(name = "facturas_detalle")
@@ -37,6 +38,8 @@ public class FacturaDetalle {
 	private Double precio_mayor;
 	private Double costo;
 	private Double subtotal;
+	
+	private Integer temp_devolver = 0;
 	
 	@OneToOne
 	@JoinColumn(name = "id_almacen")
@@ -170,12 +173,24 @@ public class FacturaDetalle {
 		this.almacen = almacen;
 	}
 
+	public void setCantidad_devuelta(Double cantidad_devuelta) {
+		this.cantidad_devuelta = cantidad_devuelta;
+	}
+
+	public Integer getTemp_devolver() {
+		return temp_devolver;
+	}
+
+	public void setTemp_devolver(Integer temp_devolver) {
+		this.temp_devolver = temp_devolver;
+	}
+
 	@Override
 	public String toString() {
 		return "FacturaDetalle [id=" + id + ", factura=" + factura + ", articulo=" + articulo + ", cantidad=" + cantidad
-				+ ", cantidad_devuelt=" + cantidad_devuelta + ", precio=" + precio + ", itbis=" + itbis + ", imei="
+				+ ", cantidad_devuelta=" + cantidad_devuelta + ", precio=" + precio + ", itbis=" + itbis + ", imei="
 				+ imei + ", paga_itbis=" + paga_itbis + ", existencia=" + existencia + ", precio_maximo="
 				+ precio_maximo + ", precio_minimo=" + precio_minimo + ", precio_mayor=" + precio_mayor + ", costo="
-				+ costo + ", subtotal=" + subtotal + ", almacen=" + almacen + "]";
+				+ costo + ", subtotal=" + subtotal + ", temp_devolver=" + temp_devolver + ", almacen=" + almacen + "]";
 	}
 }

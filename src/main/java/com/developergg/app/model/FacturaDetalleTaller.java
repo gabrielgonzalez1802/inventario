@@ -22,6 +22,7 @@ public class FacturaDetalleTaller {
 	private Double costo;
 	private Integer cantidad;
 	private Double precio;
+	private Integer temp_devolver = 0;
 	
 	@OneToOne
 	@JoinColumn(name = "id_almacen")
@@ -154,11 +155,20 @@ public class FacturaDetalleTaller {
 		this.tallerArticulo = tallerArticulo;
 	}
 
+	public Integer getTemp_devolver() {
+		return temp_devolver;
+	}
+
+	public void setTemp_devolver(Integer temp_devolver) {
+		this.temp_devolver = temp_devolver;
+	}
+
 	@Override
 	public String toString() {
 		return "FacturaDetalleTaller [id=" + id + ", descripcion=" + descripcion + ", costo=" + costo + ", cantidad="
-				+ cantidad + ", precio=" + precio + ", almacen=" + almacen + ", itbis=" + itbis + ", subtotal="
-				+ subtotal + ", usuario=" + usuario + ", comprobanteFiscal=" + comprobanteFiscal + ", factura="
-				+ factura + ", articulo=" + articulo + ", tallerArticulo=" + tallerArticulo + "]";
+				+ cantidad + ", precio=" + precio + ", temp_devolver=" + temp_devolver + ", almacen=" + almacen
+				+ ", itbis=" + itbis + ", subtotal=" + subtotal + ", usuario=" + usuario + ", comprobanteFiscal="
+				+ comprobanteFiscal + ", factura=" + factura + ", articulo=" + articulo + ", tallerArticulo="
+				+ tallerArticulo + "]";
 	}
 }

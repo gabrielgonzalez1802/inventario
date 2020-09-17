@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <title>Sistema Celulares</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" sizes="64x64" th:href="@{/img/icon.png}">
+    <!-- Font-icon css-->
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap" rel="stylesheet">
+ 	<link rel="stylesheet" type="text/css" th:href="@{/css/Minimal-tabs.css}">
+ 	<link rel="stylesheet" type="text/css" th:href="@{/css/dashboard.css}">
+ 	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+ 	
+ 	<style type="text/css">
+ 	        .dual-list .list-group {
+            margin-top: 8px;
+        }
+
+        .list-left li, .list-right li {
+            cursor: pointer;
+        }
+
+        .list-arrows {
+            padding-top: 100px;
+        }
+
+        .list-arrows button {
+                margin-bottom: 20px;
+        }
+        .list-group-item.active, .list-group-item.active:focus, .list-group-item.active:hover {
+		    z-index: 2;
+		    background-color: #17a2b8;
+		    border-color: #17a2b8;
+		    color:#fff;
+		}
+		.btn-standar {
+		    color: #fff;
+		    background-color: #17a2b8;
+		    border-color: #17a2b8;
+		}
+		.list-group-item:hover{
+			 background-color:#17a2b882;
+			 border-color: #17a2b882;
+		}
+		.table {
+		    background-color: #fff;
+		    color: black;
+		}
+		tr:hover {
+			 color: #fff;
+		}
+		.table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th {
+		    border-top: 1px solid #68c5ca;
+		}
+ 	</style>
+ 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+ 	<style>
+	  	.table-primary, .table-primary>th, .table-primary>td {
+	   		 background-color: #25396d;
+	   		 color:#ffff;
+		}
+		.table-primary th, .table-primary td, .table-primary thead th, .table-primary tbody+tbody {
+		    border-color: #25396d;
+		}
+		.table-hover tbody tr:hover td, .table-hover tbody tr:hover th {
+		  background-color: #085865;
+		}
+		
+		.personalized > input{
+		    border: 0px;
+		    -webkit-box-shadow: none;
+		    -moz-box-shadow: none;
+		    box-shadow: none;
+			background: transparent;
+			border: none;
+    		border-bottom: solid 1px #fff;
+    		border-radius: 0px;
+    		color: #fff;
+		}
+  </style>
+  <link rel="stylesheet" type="text/css" th:href="@{/css/swal.css}">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" rel="stylesheet"/>
+  </head>
+  <body>
+     <br>
+	<div class="container">
+		<div class="panel panel-default">
+		<div class="panel-heading all" style="border-bottom: 0px;">
+		 <form class="form-inline" action="#">
+		 	<div class="row">
+		 		<div class="col-md-12">
+			  		 <label style="color: #fff;font-size: 25px;">Devoluci&oacute;n de Articulos | &nbsp;&nbsp;</label>
+			  		  <a class="btn btn-warning" th:href="@{/devolucionesFacturas/}">Regresar</a>
+			  		  <button class="btn btn-success pull-right" id="btnGuardar">Guardar</button>
+		 		</div>
+		 	</div>	    
+		</form>
+		<br>
+		
+		<div id="tipoArticulo">
+			<input type="hidden" th:value="${idArticulo}" id="idArticulo">
+			<input type="hidden" th:value="${conSerial}" id="conSerial">
+			<input type="hidden" th:value="${nombreArticulo}" id="nombreArticulo">
+			<input type="hidden" th:value="${precioArticulo}" id="precioArticulo">
+			<input type="hidden" th:value="${cantidadArticulo}" id="cantidadArticulo">
+			<input type="hidden" id="temporal"> 
+		</div>
+		
+		<div class="panel panel-default">
+		  <div class="panel-body">
+		    <div class="row">
+		    	<div class="col-md-12"> 
+		    		<form th:object="${factura}">
+		    			<input type="hidden" id="idFactura" th:field="*{id}">
+		    			<div class="row">
+		    				<div class="col col-md-3">
+								<div class="form-group">			
+									 <label for="">Nombre</label> 
+									 <input type="text" th:field="*{nombre_cliente}" class="form-control" placeholder="Nombre del cliente" disabled="disabled">
+								</div>
+							</div>
+							<div class="col col-md-3">
+								<div class="form-group">			
+									 <label for="">Telefono</label> 
+									 <input type="text" th:field="*{telefono_cliente}" class="form-control" placeholder="Telefono del cliente" disabled="disabled">
+								</div>
+							</div>
+							<div class="col col-md-3">
+								<div class="form-group">			
+									 <label for="">No. Factura</label> 
+									 <input type="text" th:field="*{codigo}" class="form-control" placeholder="No. Factura" disabled="disabled">
+								</div>
+							</div>
+							<div class="col col-md-3">
+								<div class="form-group">			
+									 <label for="">Fecha</label> <input type="date"
+										th:value="*{#dates.format(fecha, 'yyyy-MM-dd')}" class="form-control" disabled="disabled">
+								</div>
+							</div>
+						</div>
+						
+						<div class="row">
+							<div class="col col-md-4">
+								<div class="form-group">			
+									 <label for="">RNC</label> 
+									 <input type="text" th:field="*{rnc_cliente}" class="form-control" placeholder="RNC Cliente" disabled="disabled">
+								</div>
+							</div>
+							<div class="col col-md-4">
+								<div class="form-group">			
+									 <label for="">NCF</label> 
+									 <input type="text" th:field="*{ncf}" class="form-control" placeholder="NCF" disabled="disabled">
+								</div>
+							</div>
+							<div class="col col-md-4">
+								<div class="form-group">			
+									 <label for="">Total Factura</label> 
+									 <input type="text" th:field="*{total_venta}" class="form-control" placeholder="NCF" disabled="disabled">
+								</div>
+							</div>
+						</div>
+		    			
+		    		</form>
+		    	</div>
+		    </div>
+		  </div>
+		</div>
+		
+		<div id="infoArticulo">
+			<input type="hidden" th:value="${infoIdArticulo}" id="infoIdArticulo">
+			<input type="hidden" th:value="${infoSerial}" id="infoSerial">
+		</div>
+		 
+		</div>
+		  <div class="panel-body all">
+				<div class="col-lg-12 col-md-12 col-sm-12">
+					<div class="table-responsive">
+						<div id="cuerpoDevolucion">
+							<!-- Load ajax  -->		
+						</div>
+					</div>
+				</div>
+
+<!--  Articulo Sin serial Modal -->				
+<div id="articuloModal" class="modal fade" role="dialog" data-backdrop="static">
+  <div class="modal-dialog">
+    <div class="modal-content all">
+      <div class="modal-header bg-primary">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h3 class="modal-title">Devolver Articulo</h3>
+      </div>
+      <div class="modal-body">
+		<form>
+			<div id="">
+				<div class="row">
+					<div class="col col-md-12">
+						<div class="form-group">
+							 <label>Articulo</label>
+							 <input class="form-control" type="text" placeholder="Articulo" id="nombreArticuloSinSerial" disabled="disabled">
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col col-md-4">
+						<div class="form-group">
+							 <label>Precio</label>
+							 <input class="form-control" min="1" type="number" placeholder="Precio" id="precioArticuloSinSerial" disabled="disabled">
+						</div>
+					</div>
+					<div class="col col-md-4">
+						<div class="form-group">
+							 <label>Cantidad Total</label>
+							 <input class="form-control" type="number" min="0" placeholder="Cantidad Total" id="cantidadTotalArticuloSinSerial" disabled="disabled">
+						</div>
+					</div>
+					<div class="col col-md-4">
+						<div class="form-group">
+							 <label>Cantidad a Devolver</label>
+							 <input class="form-control" id="cantidadArticuloSinSerial" value="0" type="number" min="0" placeholder="Cantidad a devolver">
+						</div>
+					</div>
+				</div>
+			</div>
+       	 </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-warning" data-dismiss="modal">Regresar</button>
+        <button type="button" class="btn btn-standar" id="devolverArticuloSinSerial">Devolver</button>
+      </div>
+    </div>
+  </div>
+</div>	
+
+<!-- Articulo con serial Modal -->
+<div id="articuloSerialModal" class="modal fade" role="dialog" data-backdrop="static">
+  <div class="modal-dialog">
+    <div class="modal-content all">
+      <div class="modal-header bg-primary">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h3 class="modal-title">Devolver Articulo</h3>
+      </div>
+      <div class="modal-body">
+		<form>
+			<div id="serialesADevolver">
+				<div class="row">
+					<div class="col col-md-12">
+						<div class="form-group">
+							 <label>Articulo</label>
+							 <input class="form-control" type="text" placeholder="Articulo" th:value="${detalleArticulo}" id="nombreArticuloConSerial" disabled="disabled">
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col col-md-12">
+						<div class="form-group">
+							 <label>Seriales a devolver</label>
+							 <select id="seleccionSeriales" onclick="javascript:seleccionarSeriales();" class="form-control" multiple="multiple">
+							 	<option th:each="serial:${listaSeriales}"
+							 	th:value="${serial.id}" th:text="${serial.serial}"></option>
+							 </select>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col col-md-6">
+						<div class="form-group">
+							 <label>Precio</label>
+							 <input class="form-control" value="0" min="1" type="number" placeholder="Precio" id="precioTotalSerial" disabled="disabled">
+						</div>
+					</div>
+					<div class="col col-md-6">
+						<div class="form-group">
+							 <label>Itbis</label>
+							 <input class="form-control" type="number" min="0" id="itbisArticuloConSerial" th:value="${itbisArticuloConSerial}" placeholder="Cantidad a devolver" disabled="disabled">
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col col-md-6">
+						<div class="form-group">
+							 <label>Cantidad a Devolver</label>
+							 <input class="form-control" type="number" min="0" id="cantArticuloSerialADevolver" value="0" placeholder="Cantidad a devolver" disabled="disabled">
+						</div>
+					</div>
+					<div class="col col-md-6">
+						<div class="form-group">
+							 <label>Total</label>
+							 <input class="form-control" type="number" min="0" id="totalSerialConItbis" value="0" placeholder="Total con Itbis" disabled="disabled">
+						</div>
+					</div>
+				</div>
+			</div>
+       	 </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-warning" data-dismiss="modal">Regresar</button>
+        <button type="button" class="btn btn-standar" id="devolverArticuloConSerial">Devolver</button>
+      </div>
+    </div>
+  </div>
+</div>	
+
+<div id="precioArticuloConSerial">
+	<input type="hidden" id="totalPrecioSerial" th:value="${totalPrecioSerial}">
+	<input type="hidden" id="totalPrecioSerialItbis" th:value="${totalPrecioSerialItbis}">
+</div>
+
+<div id="infoTaller">
+	<input type="hidden" id="articuloTaller" th:value="${articuloTaller}">
+	<input type="hidden"id="cantidadTaller" th:value="${cantidadTaller}">
+	<input type="hidden"id="precioTaller" th:value="${precioTaller}">
+	<input type="hidden"id="itbisTaller" th:value="${itbisTaller}">
+	<input type="hidden"id="subTotalTaller" th:value="${subTotalTaller}">
+</div>
+
+<!-- Modal de agregar seriales -->
+<div id="serialesAcctModal" class="modal fade" role="dialog" data-backdrop="static">
+	<div class="modal-dialog">
+		<!-- Modal content-->
+		<div class="modal-content all">
+			<div class="modal-header bg-primary">
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				<h3 class="modal-title">Seriales</h3>
+			</div>
+		<div class="modal-body">
+			<div id="serialesAcct">
+				<div th:fragment="infoSeriales">
+					<div class="row">
+						<div class="col col-md-12">
+							<div class="form-group">
+								<input type="hidden" id="detalleArticuloId" th:value="${idDetalleArticulo}">
+									<label>Nombre del art&iacute;culo</label> <input
+									th:value="${detalleArticulo}" class="form-control"
+									id="detalleArticulo" type="text"
+									placeholder="Nombre del art&iacute;culo" disabled="disabled">
+							</div>
+						</div>
+					</div>
+					<div class="row" id="rowAddSerial"></div>
+						<div class="row">
+							<div class="col col-md-12">
+								<div class="table-responsive">
+									<table class="table table-hover">
+										<thead>
+											<tr style="background-color: #17a2b8; color: #fff">
+												<th class="text-center">Serial</th>
+												<th></th>
+											</tr>
+										</thead>
+										<tbody class="items">
+											<tr th:each="serial: ${listaSeriales}">
+												<td th:text="${serial.serial}" class="text-center">Serial</td>
+												<td class="text-center" th:if="${serial.tempDevuelto == 1}">Pendiente por devolver</td>
+												<td th:unless="${serial.tempDevuelto == 1}">&nbsp;</td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-warning" data-dismiss="modal">Regresar</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!--  Articulo Taller Modal -->
+<div id="articuloTallerModal" class="modal fade" role="dialog" data-backdrop="static">
+  <div class="modal-dialog">
+    <div class="modal-content all">
+      <div class="modal-header bg-primary">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h3 class="modal-title">Devolver Articulo</h3>
+      </div>
+      <div class="modal-body">
+		<form>
+			<div id="">
+				<div class="row">
+					<div class="col col-md-12">
+						<div class="form-group">
+							 <label>Articulo</label>
+							 <input class="form-control" type="text" placeholder="Articulo" id="nombreArticuloTaller" disabled="disabled">
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col col-md-4">
+						<div class="form-group">
+							 <label>Precio</label>
+							 <input class="form-control" min="1" type="number" placeholder="Precio" id="precioArticuloTaller" disabled="disabled">
+						</div>
+					</div>
+					<div class="col col-md-4">
+						<div class="form-group">
+							 <label>Cantidad Total</label>
+							 <input class="form-control" type="number" min="0" placeholder="Cantidad Total" id="cantidadTotalTaller" disabled="disabled">
+						</div>
+					</div>
+					<div class="col col-md-4">
+						<div class="form-group">
+							 <label>Cantidad a Devolver</label>
+							 <input class="form-control" id="cantidadDevolverTaller" value="0" type="number" min="0" placeholder="Cantidad a devolver">
+						</div>
+					</div>
+				</div>
+			</div>
+       	 </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-warning" data-dismiss="modal">Regresar</button>
+        <button type="button" class="btn btn-standar" id="devolverArticuloTaller">Devolver</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+			</div> <!--  Fin del panel body -->
+		</div>
+	</div>
+	<script th:src="@{/js/jquery.min.js}"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
+	<span th:if="${msg != null}" class="alert alert-success" role="alert">
+		<script type="text/javascript">
+		Swal.fire({
+			  title: 'Muy bien!',
+			  text: 'Registro Creado',
+			  icon: 'success',
+			  confirmButtonText: 'Cool'
+			})
+		</script>
+	</span>
+	<span th:if="${msg2 != null}" class="alert alert-success" role="alert">
+		<script type="text/javascript">
+		Swal.fire({
+			  title: 'Muy bien!',
+			  text: 'Registro Modificado',
+			  icon: 'success',
+			  confirmButtonText: 'Cool'
+			})
+		</script>	
+	</span>
+	<script th:src="@{/js/jquery.hotkeys.js}"></script>
+	<script th:src="@{/js/devolucion.js}"></script>
+	<span th:insert="fragments/footer :: footer"></span>  
+</body>
+</html>

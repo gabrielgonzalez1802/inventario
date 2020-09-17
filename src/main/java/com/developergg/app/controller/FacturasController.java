@@ -46,6 +46,7 @@ import com.developergg.app.model.DetalleFactura;
 import com.developergg.app.model.Factura;
 import com.developergg.app.model.FacturaDetalle;
 import com.developergg.app.model.FacturaDetallePagoTemp;
+import com.developergg.app.model.FacturaDetalleSerial;
 import com.developergg.app.model.FacturaDetalleServicio;
 import com.developergg.app.model.FacturaDetalleTaller;
 import com.developergg.app.model.FacturaDetalleTemp;
@@ -71,6 +72,7 @@ import com.developergg.app.service.IClientesService;
 import com.developergg.app.service.IComprobantesFiscalesService;
 import com.developergg.app.service.ICondicionesPagoService;
 import com.developergg.app.service.IFacturasDetallesPagoTempService;
+import com.developergg.app.service.IFacturasDetallesSerialesService;
 import com.developergg.app.service.IFacturasDetallesService;
 import com.developergg.app.service.IFacturasDetallesServiciosService;
 import com.developergg.app.service.IFacturasDetallesTallerService;
@@ -179,6 +181,9 @@ public class FacturasController {
 	
 	@Autowired
 	private IAbonosCxCDetallesService serviceDetallesAbonosCxC;
+	
+	@Autowired
+	private IFacturasDetallesSerialesService serviceFacturasDetallesSeriales;
 	
 	@Autowired
 	private DataSource dataSource;
@@ -469,14 +474,14 @@ public class FacturasController {
 			facturaDetalle.setSubtotal(facturaDetalleTemp.getSubtotal());
 			
 			//obtenemos la lista de seriales en la factura
-			List<FacturaSerialTemp> facturasSerialesTemp = serviceFacturasSerialesTemp.buscarPorFacturaTemp(facturaTemp);
-			
+//			List<FacturaSerialTemp> facturasSerialesTemp = serviceFacturasSerialesTemp.buscarPorFacturaTemp(facturaTemp);
+			List<FacturaSerialTemp> seriales = serviceFacturasSerialesTemp.buscarPorDetalleTemp(facturaDetalleTemp);
 			if(facturaDetalle.getArticulo().getImei().equalsIgnoreCase("NO") || facturaDetalle.getArticulo().getImei().equalsIgnoreCase("0")) {
 				facturaDetalle.setPrecio_minimo(facturaDetalleTemp.getArticulo().getPrecio_minimo()); //validar el precio por serial
 				facturaDetalle.setPrecio_mayor(facturaDetalleTemp.getArticulo().getPrecio_mayor()); //validar el precio por serial
 				facturaDetalle.setPrecio_maximo(facturaDetalleTemp.getArticulo().getPrecio_maximo());
 			}else {
-				for (FacturaSerialTemp fs : facturasSerialesTemp) {
+				for (FacturaSerialTemp fs : seriales) {
 					facturaDetalle.setPrecio_minimo(fs.getArticuloSerial().getPrecio_minimo());
 					facturaDetalle.setPrecio_mayor(fs.getArticuloSerial().getPrecio_mayor());
 					facturaDetalle.setPrecio_maximo(fs.getArticuloSerial().getPrecio_maximo());
@@ -485,10 +490,20 @@ public class FacturasController {
 
 			facturasDetallesService.guardar(facturaDetalle);
 			
+			//Guardamos los seriales en la factura
+			for (FacturaSerialTemp serialesTemp : seriales) {
+				FacturaDetalleSerial facturaDetalleSerial = new FacturaDetalleSerial();
+				facturaDetalleSerial.setArticuloSerial(serialesTemp.getArticuloSerial());
+				facturaDetalleSerial.setFacturaDetalle(facturaDetalle);
+				facturaDetalleSerial.setPrecio(facturaDetalleTemp.getPrecio());
+				facturaDetalleSerial.setSerial(serialesTemp.getArticuloSerial().getSerial());
+				serviceFacturasDetallesSeriales.guardar(facturaDetalleSerial);
+			}
+
 			//Proceso para crear una salida con o sin serial
 			//verificamos si el producto tiene serial
 			if(facturaDetalle.getArticulo().getImei().equalsIgnoreCase("SI") || facturaDetalle.getArticulo().getImei().equalsIgnoreCase("1")) {
-				for (FacturaSerialTemp facturaSerialTemporal : facturasSerialesTemp) {
+				for (FacturaSerialTemp facturaSerialTemporal : seriales) {
 					ArticuloSerial articuloSerial = facturaSerialTemporal.getArticuloSerial();
 					articuloSerial.setEstado("Vendido");
 					serviceArticulosSeriales.guardar(articuloSerial);

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
+<head>
+</head>
+
+<body>
+	<div th:fragment="cuerpoDevolucion">
+		<table class="table table-hover">
+			<thead>
+				<tr style="background-color: #17a2b8; color: #fff">
+					<th class="text-center">C&oacute;digo</th>
+					<th class="text-center">Descripci&oacute;n</th>
+					<th>Cantidad</th>
+					<th>Devolver</th>
+					<th class="text-center">Precio</th>
+					<th class="text-right">Itbis</th>
+					<th class="text-right">SubTotal</th>
+					<th class="text-right"></th>
+				</tr>
+			</thead>
+			<tbody class="items">
+				<!-- detalles  -->
+				<tr th:each="detalles:${facturaDetalles}">
+					<td th:text="${detalles.articulo.codigo}" class="text-center">C&oacute;digo</td>
+					<td th:if="${detalles.articulo.imei == 'SI'}"
+						style="cursor: pointer;" class="text-center"
+						th:onclick="'modalSerialesDetalleFactura(\'' + ${detalles.id} + '\');'"
+						th:text="${detalles.articulo.nombre}">Descripcion del
+						articulo</td>
+					<td th:unless="${detalles.articulo.imei == 'SI'}"
+						class="text-center" th:text="${detalles.articulo.nombre}">Descripcion
+						del articulo</td>
+					<td th:text="${detalles.cantidad}">Cantidad de articulo</td>
+					<td th:text="${detalles.temp_devolver}">temp_devolver</td>
+					<td th:text="${detalles.precio}" class="text-center">Precio</td>
+					<td th:text="${detalles.itbis}" class="text-right">Itbis</td>
+					<td th:text="${detalles.subtotal}" class="text-right">Subtotal</td>
+					<td class='text-right' th:if="${detalles.articulo != null}"><a
+						href="#" th:onclick="'devolverArticulo(\'' + ${detalles.id} + '\');'">
+							<i class="icono fa fa-plus text-primary"></i>
+					</a></td>
+					<td th:unless="${detalles.articulo != null}" class='text-right'>&nbsp;</td>
+				</tr>
+				<!--  Fin detalles -->
+				<!-- Servicios  -->
+				<tr th:each="servicio : ${facturaServicios}">
+					<td></td>
+					<td th:text="${servicio.descripcion}" class="text-center">Nombre
+						del Servicio</td>
+					<td th:text="${servicio.cantidad}">Cantidad del Servicio</td>
+					<td>0</td>
+					<td th:text="${servicio.precio}" class="text-center">Precio
+						del Servicio</td>
+					<td class="text-right" th:text="${servicio.itbis}">0.00</td>
+					<td th:text="${servicio.subtotal}" class="text-right">SubTotal</td>
+					<td class='text-right'>&nbsp;</td>
+				</tr>
+				<!--  Talleres  -->
+				<tr th:each="taller : ${facturaTalleres}">
+					<td th:if="${taller.articulo != null}" class="text-center"
+						th:text="${taller.articulo.codigo}"></td>
+					<td th:unless="${taller.articulo != null}">&nbsp;</td>
+					<td th:text="${taller.descripcion}" class="text-center">Nombre
+						del taller</td>
+					<td th:text="${taller.cantidad}">Cantidad del Servicio</td>
+					<td th:if="${taller.articulo != null}" th:text="${taller.temp_devolver}"></td>
+					<td th:if="${taller.articulo == null}">0</td>
+					<td th:text="${taller.precio}" class="text-center">Precio del
+						taller</td>
+					<td class="text-right" th:text="${taller.itbis}">0.00</td>
+					<td th:text="${taller.subtotal}" class="text-right">SubTotal</td>
+					<td class='text-right' th:if="${taller.articulo != null}"><a
+						href="#"
+						th:onclick="'devolverArticuloTaller(\'' + ${taller.id} + '\');'">
+							<i class="icono fa fa-plus text-primary"></i>
+					</a></td>
+					<td th:unless="${taller.articulo != null}" class='text-right'>&nbsp;</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</body>
+</html>
