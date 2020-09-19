@@ -411,16 +411,23 @@ public class FacturasController {
 		
 		serviceFacturas.guardar(factura);
 		
-		//Logica para facturas con taller y abono
-		if(credito == 1 && factura.getTaller()!=null && factura.getAvance_taller().doubleValue()>0) {
-			AbonoCxC abono = new AbonoCxC();
+		AbonoCxC abono = null;
+		
+		if(credito == 1){
+			//creamos el abono
+			abono = new AbonoCxC();
 			abono.setAlmacen(usuario.getAlmacen());
 			abono.setCliente(factura.getCliente());
 			abono.setFactura(factura);
+			abono.setFecha(factura.getFecha());
 			abono.setUsuario(usuario);
 			abono.setCodigo(factura.getCodigo());
 			serviceAbonosCxC.guardar(abono);
-			
+		}
+		
+		//Logica para facturas con taller y abono
+		if(credito == 1 && factura.getTaller()!=null && factura.getAvance_taller().doubleValue()>0) {
+
 			Double restante = formato2d(factura.getTotal_venta()-factura.getAvance_taller());
 			
 			AbonoCxCDetalle detalle = new AbonoCxCDetalle();

@@ -1,5 +1,7 @@
 package com.developergg.app.model;
 
+import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -35,6 +37,8 @@ public class AbonoCxC {
 	private Usuario usuario;
 	
 	private Integer codigo;
+	
+	private Date fecha;
 	
 	@Column(name = "total_abono")
 	private Double totalAbono = 0.0;
@@ -128,10 +132,19 @@ public class AbonoCxC {
 		this.totalDevuelto = totalDevuelto;
 	}
 
+	public Date getFecha() {
+		return fecha;
+	}
+
+	public void setFecha(Date fecha) {
+		this.fecha = fecha;
+	}
+
 	@Override
 	public String toString() {
 		return "AbonoCxC [id=" + id + ", factura=" + factura + ", cliente=" + cliente + ", almacen=" + almacen
-				+ ", usuario=" + usuario + ", codigo=" + codigo + ", totalAbono=" + totalAbono + ", totalPagado="
-				+ totalPagado + ", totalRestante=" + totalRestante + ", totalDevuelto=" + totalDevuelto + "]";
+				+ ", usuario=" + usuario + ", codigo=" + codigo + ", fecha=" + fecha + ", totalAbono=" + totalAbono
+				+ ", totalPagado=" + totalPagado + ", totalRestante=" + totalRestante + ", totalDevuelto="
+				+ totalDevuelto + "]";
 	}
 }

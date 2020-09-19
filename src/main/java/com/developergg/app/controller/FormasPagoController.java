@@ -230,8 +230,8 @@ public class FormasPagoController {
 				abono.setAlmacen(usuario.getAlmacen());
 				abono.setCliente(factura.getCliente());
 				abono.setFactura(factura);
+				abono.setFecha(factura.getFecha());
 				abono.setUsuario(usuario);
-//				abono.setCodigo(factura.getCodigo());
 				serviceAbonosCxC.guardar(abono);
 				listaAbonos.add(abono);
 	        }else {

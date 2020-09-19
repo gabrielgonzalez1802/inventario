@@ -1,6 +1,6 @@
 package com.developergg.app.model;
 
-public class VentaCredito{
+public class CuadreVentaContadoTaller{
 	
 	private Integer id;
 	private String fecha;
@@ -9,7 +9,6 @@ public class VentaCredito{
 	private Integer cantidad = 0;
 	private Double precio = 0.0;
 	private Double subTotal = 0.0;
-	private String table;
 	
 	public Integer getId() {
 		return id;
@@ -53,16 +52,9 @@ public class VentaCredito{
 	public void setSubTotal(Double subTotal) {
 		this.subTotal = subTotal;
 	}
-	public String getTable() {
-		return table;
-	}
-	public void setTable(String table) {
-		this.table = table;
-	}
 	@Override
 	public String toString() {
-		return "VentaCredito [id=" + id + ", fecha=" + fecha + ", noFactura=" + noFactura + ", nombreArticulo="
-				+ nombreArticulo + ", cantidad=" + cantidad + ", precio=" + precio + ", subTotal=" + subTotal
-				+ ", table=" + table + "]";
+		return "VentaContado [id=" + id + ", fecha=" + fecha + ", noFactura=" + noFactura + ", nombreArticulo="
+				+ nombreArticulo + ", cantidad=" + cantidad + ", precio=" + precio + ", subTotal=" + subTotal + "]";
 	}
 }

@@ -87,6 +87,33 @@
 			<rightPen lineWidth="0.5" lineColor="#000000"/>
 		</box>
 	</style>
+	<style name="Table 4_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table 4_CH" mode="Opaque" backcolor="#17A2B8">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table 4_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
 	<subDataset name="Dataset1" uuid="f588e5ab-e745-47cb-b30a-0c16efea3531">
 		<queryString>
 			<![CDATA[]]>
@@ -152,12 +179,24 @@
 			<variableExpression><![CDATA[$F{subTotal}]]></variableExpression>
 		</variable>
 	</subDataset>
+	<subDataset name="Dataset5" uuid="2d8145ca-40bf-4455-b9c7-b879ba768600">
+		<queryString>
+			<![CDATA[]]>
+		</queryString>
+		<field name="fecha" class="java.lang.String"/>
+		<field name="factura" class="java.lang.String"/>
+		<field name="monto" class="java.lang.Double"/>
+		<variable name="monto1" class="java.lang.Double" resetType="Column" calculation="Sum">
+			<variableExpression><![CDATA[$F{monto}]]></variableExpression>
+		</variable>
+	</subDataset>
 	<parameter name="idUsuario" class="java.lang.Integer"/>
 	<parameter name="ventasContado" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
 	<parameter name="imagen" class="java.lang.String"/>
 	<parameter name="ventasContadoTaller" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
 	<parameter name="ventasCredito" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
 	<parameter name="ventasCreditoTaller" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
+	<parameter name="cuadreAbonosCxC" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
 	<queryString>
 		<![CDATA[SELECT a.nombre, a.direccion, a.telefono FROM usuarios AS u 
 INNER JOIN almacenes a ON a.id_almacen = u.id_almacen
@@ -228,7 +267,7 @@ WHERE u.id_usuario = $P{idUsuario}]]>
 		<band height="83">
 			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.FreeLayout"/>
 			<componentElement>
-				<reportElement x="0" y="12" width="210" height="67" uuid="d247fb1d-ec16-47f8-a030-0e9e8611855f">
+				<reportElement x="0" y="12" width="210" height="60" uuid="d247fb1d-ec16-47f8-a030-0e9e8611855f">
 					<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
 					<property name="com.jaspersoft.studio.table.style.table_header" value="Table_TH"/>
 					<property name="com.jaspersoft.studio.table.style.column_header" value="Table_CH"/>
@@ -249,7 +288,7 @@ WHERE u.id_usuario = $P{idUsuario}]]>
 								<text><![CDATA[Fecha]]></text>
 							</staticText>
 						</jr:columnHeader>
-						<jr:columnFooter style="Table_CH" height="20" rowSpan="1"/>
+						<jr:columnFooter style="Table 4_CH" height="20" rowSpan="1"/>
 						<jr:detailCell style="Table_TD" height="20">
 							<textField>
 								<reportElement x="0" y="0" width="30" height="20" uuid="00fd04f3-9cf4-44e9-b2f3-284ffd5d1f51"/>
@@ -277,7 +316,7 @@ WHERE u.id_usuario = $P{idUsuario}]]>
 								<text><![CDATA[No. Factura]]></text>
 							</staticText>
 						</jr:columnHeader>
-						<jr:columnFooter style="Table_CH" height="20" rowSpan="1"/>
+						<jr:columnFooter style="Table 4_CH" height="20" rowSpan="1"/>
 						<jr:detailCell style="Table_TD" height="20">
 							<textField>
 								<reportElement x="0" y="0" width="20" height="20" uuid="13957082-b9e7-4256-a0a5-a39b56b0cc53"/>
@@ -299,7 +338,7 @@ WHERE u.id_usuario = $P{idUsuario}]]>
 								<text><![CDATA[Articulo]]></text>
 							</staticText>
 						</jr:columnHeader>
-						<jr:columnFooter style="Table_CH" height="20" rowSpan="1"/>
+						<jr:columnFooter style="Table 4_CH" height="20" rowSpan="1"/>
 						<jr:detailCell style="Table_TD" height="20">
 							<textField>
 								<reportElement x="0" y="0" width="90" height="20" uuid="885336f8-17c9-4757-99f5-176442071099"/>
@@ -321,7 +360,7 @@ WHERE u.id_usuario = $P{idUsuario}]]>
 								<text><![CDATA[Cant]]></text>
 							</staticText>
 						</jr:columnHeader>
-						<jr:columnFooter style="Table_CH" height="20" rowSpan="1"/>
+						<jr:columnFooter style="Table 4_CH" height="20" rowSpan="1"/>
 						<jr:detailCell style="Table_TD" height="20">
 							<textField>
 								<reportElement x="0" y="0" width="20" height="20" uuid="8163b87b-229e-4a5e-8850-068138ac5f7d"/>
@@ -343,7 +382,7 @@ WHERE u.id_usuario = $P{idUsuario}]]>
 								<text><![CDATA[Precio]]></text>
 							</staticText>
 						</jr:columnHeader>
-						<jr:columnFooter style="Table_CH" height="20" rowSpan="1">
+						<jr:columnFooter style="Table 4_CH" height="20" rowSpan="1">
 							<staticText>
 								<reportElement x="0" y="0" width="20" height="20" uuid="7eb530ca-c30b-492f-a3e2-4be26996a9ee"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
@@ -373,7 +412,7 @@ WHERE u.id_usuario = $P{idUsuario}]]>
 								<text><![CDATA[SubTotal]]></text>
 							</staticText>
 						</jr:columnHeader>
-						<jr:columnFooter style="Table_CH" height="20" rowSpan="1">
+						<jr:columnFooter style="Table 4_CH" height="20" rowSpan="1">
 							<textField>
 								<reportElement x="0" y="0" width="30" height="20" uuid="707a4f3a-6be0-405c-9fc8-f361a0ef6270"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
@@ -413,7 +452,7 @@ WHERE u.id_usuario = $P{idUsuario}]]>
 		</band>
 		<band height="66">
 			<componentElement>
-				<reportElement x="0" y="0" width="210" height="66" uuid="c4aecce2-8b35-40c9-8aea-9edd46922962">
+				<reportElement x="0" y="0" width="210" height="60" uuid="c4aecce2-8b35-40c9-8aea-9edd46922962">
 					<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
 					<property name="com.jaspersoft.studio.table.style.table_header" value="Table_TH"/>
 					<property name="com.jaspersoft.studio.table.style.column_header" value="Table_CH"/>
@@ -434,7 +473,7 @@ WHERE u.id_usuario = $P{idUsuario}]]>
 								<text><![CDATA[Fecha]]></text>
 							</staticText>
 						</jr:columnHeader>
-						<jr:columnFooter style="Table_CH" height="20" rowSpan="1"/>
+						<jr:columnFooter style="Table 4_CH" height="20" rowSpan="1"/>
 						<jr:detailCell style="Table_TD" height="20">
 							<textField>
 								<reportElement x="0" y="0" width="30" height="20" uuid="1df7df25-a313-4660-b510-6da21f797b6e"/>
@@ -456,7 +495,7 @@ WHERE u.id_usuario = $P{idUsuario}]]>
 								<text><![CDATA[No. Factura]]></text>
 							</staticText>
 						</jr:columnHeader>
-						<jr:columnFooter style="Table_CH" height="20" rowSpan="1"/>
+						<jr:columnFooter style="Table 4_CH" height="20" rowSpan="1"/>
 						<jr:detailCell style="Table_TD" height="20">
 							<textField>
 								<reportElement x="0" y="0" width="20" height="20" uuid="b4005e7b-b850-4b02-948a-4f2896b347b3"/>
@@ -478,7 +517,7 @@ WHERE u.id_usuario = $P{idUsuario}]]>
 								<text><![CDATA[Articulo]]></text>
 							</staticText>
 						</jr:columnHeader>
-						<jr:columnFooter style="Table_CH" height="20" rowSpan="1"/>
+						<jr:columnFooter style="Table 4_CH" height="20" rowSpan="1"/>
 						<jr:detailCell style="Table_TD" height="20">
 							<textField>
 								<reportElement x="0" y="0" width="90" height="20" uuid="39b6ad9d-8592-4571-9cb4-065b30ac47c3"/>
@@ -500,7 +539,7 @@ WHERE u.id_usuario = $P{idUsuario}]]>
 								<text><![CDATA[Cant]]></text>
 							</staticText>
 						</jr:columnHeader>
-						<jr:columnFooter style="Table_CH" height="20" rowSpan="1"/>
+						<jr:columnFooter style="Table 4_CH" height="20" rowSpan="1"/>
 						<jr:detailCell style="Table_TD" height="20">
 							<textField>
 								<reportElement x="0" y="0" width="20" height="20" uuid="87f57a80-2fd1-41e9-979d-d60cf72fd070"/>
@@ -522,7 +561,7 @@ WHERE u.id_usuario = $P{idUsuario}]]>
 								<text><![CDATA[Precio]]></text>
 							</staticText>
 						</jr:columnHeader>
-						<jr:columnFooter style="Table_CH" height="20" rowSpan="1">
+						<jr:columnFooter style="Table 4_CH" height="20" rowSpan="1">
 							<staticText>
 								<reportElement x="0" y="0" width="20" height="20" uuid="b1ca0d97-0f78-4800-8dde-afed797b0001"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
@@ -552,7 +591,7 @@ WHERE u.id_usuario = $P{idUsuario}]]>
 								<text><![CDATA[SubTotal]]></text>
 							</staticText>
 						</jr:columnHeader>
-						<jr:columnFooter style="Table_CH" height="20" rowSpan="1">
+						<jr:columnFooter style="Table 4_CH" height="20" rowSpan="1">
 							<textField>
 								<reportElement x="0" y="0" width="30" height="20" uuid="2842cbc5-73ff-4671-94c4-4d9f3e6126fc"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
@@ -606,7 +645,7 @@ WHERE u.id_usuario = $P{idUsuario}]]>
 								<text><![CDATA[Fecha]]></text>
 							</staticText>
 						</jr:columnHeader>
-						<jr:columnFooter style="Table_CH" height="20" rowSpan="1"/>
+						<jr:columnFooter style="Table 4_CH" height="20" rowSpan="1"/>
 						<jr:detailCell style="Table_TD" height="20">
 							<textField>
 								<reportElement x="0" y="0" width="30" height="20" uuid="73d68af4-5e97-4e63-ae10-41e71e4c44b8"/>
@@ -628,7 +667,7 @@ WHERE u.id_usuario = $P{idUsuario}]]>
 								<text><![CDATA[No. Factura]]></text>
 							</staticText>
 						</jr:columnHeader>
-						<jr:columnFooter style="Table_CH" height="20" rowSpan="1"/>
+						<jr:columnFooter style="Table 4_CH" height="20" rowSpan="1"/>
 						<jr:detailCell style="Table_TD" height="20">
 							<textField>
 								<reportElement x="0" y="0" width="20" height="20" uuid="562931de-5cf9-4881-aab6-5ef2b0d895ca"/>
@@ -650,7 +689,7 @@ WHERE u.id_usuario = $P{idUsuario}]]>
 								<text><![CDATA[Articulo]]></text>
 							</staticText>
 						</jr:columnHeader>
-						<jr:columnFooter style="Table_CH" height="20" rowSpan="1"/>
+						<jr:columnFooter style="Table 4_CH" height="20" rowSpan="1"/>
 						<jr:detailCell style="Table_TD" height="20">
 							<textField>
 								<reportElement x="0" y="0" width="90" height="20" uuid="83498b9b-0df1-4f96-b06f-259f3cc4bf0b"/>
@@ -672,7 +711,7 @@ WHERE u.id_usuario = $P{idUsuario}]]>
 								<text><![CDATA[Cant]]></text>
 							</staticText>
 						</jr:columnHeader>
-						<jr:columnFooter style="Table_CH" height="20" rowSpan="1"/>
+						<jr:columnFooter style="Table 4_CH" height="20" rowSpan="1"/>
 						<jr:detailCell style="Table_TD" height="20">
 							<textField>
 								<reportElement x="0" y="0" width="20" height="20" uuid="1c4b8f7e-e11c-4cb6-822d-7e22c00e39e9"/>
@@ -694,7 +733,7 @@ WHERE u.id_usuario = $P{idUsuario}]]>
 								<text><![CDATA[Precio]]></text>
 							</staticText>
 						</jr:columnHeader>
-						<jr:columnFooter style="Table_CH" height="20" rowSpan="1">
+						<jr:columnFooter style="Table 4_CH" height="20" rowSpan="1">
 							<staticText>
 								<reportElement x="0" y="0" width="20" height="20" uuid="aa9caa63-0111-4f47-999c-fc4068ad04ad"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
@@ -724,7 +763,7 @@ WHERE u.id_usuario = $P{idUsuario}]]>
 								<text><![CDATA[SubTotal]]></text>
 							</staticText>
 						</jr:columnHeader>
-						<jr:columnFooter style="Table_CH" height="20" rowSpan="1">
+						<jr:columnFooter style="Table 4_CH" height="20" rowSpan="1">
 							<textField>
 								<reportElement x="0" y="0" width="30" height="20" uuid="69c716ca-c770-4ec9-bf34-7278ac81e247"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
@@ -757,7 +796,7 @@ WHERE u.id_usuario = $P{idUsuario}]]>
 		</band>
 		<band height="68">
 			<componentElement>
-				<reportElement x="0" y="0" width="210" height="68" uuid="16358574-b33b-49b2-8918-47b8c4aa283c">
+				<reportElement x="0" y="0" width="210" height="60" uuid="16358574-b33b-49b2-8918-47b8c4aa283c">
 					<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
 					<property name="com.jaspersoft.studio.table.style.table_header" value="Table_TH"/>
 					<property name="com.jaspersoft.studio.table.style.column_header" value="Table_CH"/>
@@ -778,7 +817,7 @@ WHERE u.id_usuario = $P{idUsuario}]]>
 								<text><![CDATA[Fecha]]></text>
 							</staticText>
 						</jr:columnHeader>
-						<jr:columnFooter style="Table_CH" height="20" rowSpan="1"/>
+						<jr:columnFooter style="Table 4_CH" height="20" rowSpan="1"/>
 						<jr:detailCell style="Table_TD" height="20">
 							<textField>
 								<reportElement x="0" y="0" width="30" height="20" uuid="08360551-53ba-4869-8ef1-1e2425f921f5"/>
@@ -800,7 +839,7 @@ WHERE u.id_usuario = $P{idUsuario}]]>
 								<text><![CDATA[No. Factura]]></text>
 							</staticText>
 						</jr:columnHeader>
-						<jr:columnFooter style="Table_CH" height="20" rowSpan="1"/>
+						<jr:columnFooter style="Table 4_CH" height="20" rowSpan="1"/>
 						<jr:detailCell style="Table_TD" height="20">
 							<textField>
 								<reportElement x="0" y="0" width="20" height="20" uuid="951a40be-ac4a-45b3-952d-79bb74eb34b2"/>
@@ -822,7 +861,7 @@ WHERE u.id_usuario = $P{idUsuario}]]>
 								<text><![CDATA[Articulo]]></text>
 							</staticText>
 						</jr:columnHeader>
-						<jr:columnFooter style="Table_CH" height="20" rowSpan="1"/>
+						<jr:columnFooter style="Table 4_CH" height="20" rowSpan="1"/>
 						<jr:detailCell style="Table_TD" height="20">
 							<textField>
 								<reportElement x="0" y="0" width="90" height="20" uuid="59b51304-318f-41dd-a5a7-a085ca29c8e3"/>
@@ -844,7 +883,7 @@ WHERE u.id_usuario = $P{idUsuario}]]>
 								<text><![CDATA[Cant]]></text>
 							</staticText>
 						</jr:columnHeader>
-						<jr:columnFooter style="Table_CH" height="20" rowSpan="1"/>
+						<jr:columnFooter style="Table 4_CH" height="20" rowSpan="1"/>
 						<jr:detailCell style="Table_TD" height="20">
 							<textField>
 								<reportElement x="0" y="0" width="20" height="20" uuid="e95364de-7722-4006-9076-cce2c9e8ebd0"/>
@@ -866,7 +905,7 @@ WHERE u.id_usuario = $P{idUsuario}]]>
 								<text><![CDATA[Precio]]></text>
 							</staticText>
 						</jr:columnHeader>
-						<jr:columnFooter style="Table_CH" height="20" rowSpan="1">
+						<jr:columnFooter style="Table 4_CH" height="20" rowSpan="1">
 							<staticText>
 								<reportElement x="0" y="0" width="20" height="20" uuid="773303c6-2a46-4940-bd18-0264dc8c9c88"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
@@ -896,7 +935,7 @@ WHERE u.id_usuario = $P{idUsuario}]]>
 								<text><![CDATA[SubTotal]]></text>
 							</staticText>
 						</jr:columnHeader>
-						<jr:columnFooter style="Table_CH" height="20" rowSpan="1">
+						<jr:columnFooter style="Table 4_CH" height="20" rowSpan="1">
 							<textField>
 								<reportElement x="0" y="0" width="30" height="20" uuid="de6e8e95-a18a-4907-af70-5893aad91e5e"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
@@ -912,6 +951,109 @@ WHERE u.id_usuario = $P{idUsuario}]]>
 									<font size="6"/>
 								</textElement>
 								<textFieldExpression><![CDATA[$F{subTotal}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+				</jr:table>
+			</componentElement>
+		</band>
+		<band height="12">
+			<staticText>
+				<reportElement x="0" y="0" width="70" height="12" uuid="836ffbf2-9b7c-4d8e-916a-4def4939117b"/>
+				<textElement>
+					<font size="6"/>
+				</textElement>
+				<text><![CDATA[Abono a CXC]]></text>
+			</staticText>
+		</band>
+		<band height="60">
+			<componentElement>
+				<reportElement x="0" y="0" width="210" height="60" uuid="094cf33c-7f74-40a7-b9e7-6a5ecde5f8ee">
+					<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
+					<property name="com.jaspersoft.studio.table.style.table_header" value="Table 4_TH"/>
+					<property name="com.jaspersoft.studio.table.style.column_header" value="Table 4_CH"/>
+					<property name="com.jaspersoft.studio.table.style.detail" value="Table 4_TD"/>
+				</reportElement>
+				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+					<datasetRun subDataset="Dataset5" uuid="b5c55333-48df-4485-9410-b52c70a2c79b">
+						<dataSourceExpression><![CDATA[$P{cuadreAbonosCxC}]]></dataSourceExpression>
+					</datasetRun>
+					<jr:column width="70" uuid="bd14b4d2-5372-4fc4-acc1-9ec0feb1a60e">
+						<jr:columnHeader style="Table 4_CH" height="20">
+							<staticText>
+								<reportElement x="0" y="0" width="70" height="20" uuid="27b2b549-094a-4577-bc09-7cd230656d9e"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="6" isBold="true"/>
+								</textElement>
+								<text><![CDATA[Fecha]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:columnFooter style="Table 4_CH" height="20"/>
+						<jr:detailCell style="Table 4_TD" height="20">
+							<textField>
+								<reportElement x="0" y="0" width="70" height="20" uuid="242f9d41-f32e-4cf3-9dc4-859f6e7f6536"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="6"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{fecha}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="70" uuid="9d86c81f-a488-441b-b729-1d295153742c">
+						<jr:columnHeader style="Table 4_CH" height="20">
+							<staticText>
+								<reportElement x="0" y="0" width="70" height="20" uuid="d47c0090-30c2-4331-bfc0-7ed85defa4d9"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="6" isBold="true"/>
+								</textElement>
+								<text><![CDATA[Factura]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:columnFooter style="Table 4_CH" height="20">
+							<staticText>
+								<reportElement x="0" y="0" width="70" height="20" uuid="cd1a3e3f-aa62-4593-b293-1d1520a6965a"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="6" isBold="true"/>
+								</textElement>
+								<text><![CDATA[Total]]></text>
+							</staticText>
+						</jr:columnFooter>
+						<jr:detailCell style="Table 4_TD" height="20">
+							<textField>
+								<reportElement x="0" y="0" width="70" height="20" uuid="934c6b01-7194-4916-8b21-f7edffd2bf15"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="6"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{factura}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="70" uuid="2c132728-6307-49fc-83d5-b642dcff8623">
+						<jr:columnHeader style="Table 4_CH" height="20">
+							<staticText>
+								<reportElement x="0" y="0" width="70" height="20" uuid="44b685c5-6ee8-4acd-8be1-66896b748030"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="6" isBold="true"/>
+								</textElement>
+								<text><![CDATA[Monto]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:columnFooter style="Table 4_CH" height="20">
+							<textField>
+								<reportElement x="0" y="0" width="70" height="20" uuid="49398cfa-c881-4224-a907-4fa6be8b3f04"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="6" isBold="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{monto1}]]></textFieldExpression>
+							</textField>
+						</jr:columnFooter>
+						<jr:detailCell style="Table 4_TD" height="20">
+							<textField>
+								<reportElement x="0" y="0" width="70" height="20" uuid="400bd362-a402-4734-b4c1-e863fd96d0dc"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="6"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{monto}]]></textFieldExpression>
 							</textField>
 						</jr:detailCell>
 					</jr:column>

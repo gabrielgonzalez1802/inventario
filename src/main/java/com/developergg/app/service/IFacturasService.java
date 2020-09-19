@@ -14,10 +14,12 @@ public interface IFacturasService {
 	Factura buscarPorTaller(Taller taller);
 	void guardar(Factura factura);
 	void eliminar(Integer id);
-	List<Factura> buscarFacturaCuadreContado(Usuario usuario, Almacen almacen,
+	List<Factura> buscarFacturaCuadre(Usuario usuario, Almacen almacen,
 			Integer credito, Taller taller, Date desde, Date hasta);
-	List<Factura> buscarFacturaCuadreContadoMultiUsuario(Almacen almacen, Integer credito, Taller taller,
+	List<Factura> buscarFacturaCuadreMultiUsuario(Almacen almacen, Integer credito, Taller taller,
 			Date desde, Date hasta, List<Usuario> usuarios);
-	List<Factura> buscarFacturaCuadreContadoTallerMultiUsuario(Almacen almacen,
+	List<Factura> buscarFacturaCuadreTallerMultiUsuario(Almacen almacen,
+			Integer credito, Date desde, Date hasta, List<Usuario> usuarios);
+	List<Factura> buscarFacturaCuadreMultiUsuario(Almacen almacen,
 			Integer credito, Date desde, Date hasta, List<Usuario> usuarios);
 }

@@ -1,8 +1,6 @@
 package com.developergg.app.model;
 
-import java.util.Date;
-
-public class VentaContadoTaller{
+public class CuadreVentaCreditoTaller{
 	
 	private Integer id;
 	private String fecha;

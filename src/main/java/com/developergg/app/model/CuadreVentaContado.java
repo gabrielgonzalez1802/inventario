@@ -1,6 +1,6 @@
 package com.developergg.app.model;
 
-public class VentaContado{
+public class CuadreVentaContado{
 	
 	private Integer id;
 	private String fecha;

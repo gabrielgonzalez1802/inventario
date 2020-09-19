@@ -1,8 +1,6 @@
 package com.developergg.app.model;
 
-import java.util.Date;
-
-public class VentaCreditoTaller{
+public class CuadreVentaCredito{
 	
 	private Integer id;
 	private String fecha;
@@ -11,6 +9,7 @@ public class VentaCreditoTaller{
 	private Integer cantidad = 0;
 	private Double precio = 0.0;
 	private Double subTotal = 0.0;
+	private String table;
 	
 	public Integer getId() {
 		return id;
@@ -54,9 +53,16 @@ public class VentaCreditoTaller{
 	public void setSubTotal(Double subTotal) {
 		this.subTotal = subTotal;
 	}
+	public String getTable() {
+		return table;
+	}
+	public void setTable(String table) {
+		this.table = table;
+	}
 	@Override
 	public String toString() {
-		return "VentaContado [id=" + id + ", fecha=" + fecha + ", noFactura=" + noFactura + ", nombreArticulo="
-				+ nombreArticulo + ", cantidad=" + cantidad + ", precio=" + precio + ", subTotal=" + subTotal + "]";
+		return "VentaCredito [id=" + id + ", fecha=" + fecha + ", noFactura=" + noFactura + ", nombreArticulo="
+				+ nombreArticulo + ", cantidad=" + cantidad + ", precio=" + precio + ", subTotal=" + subTotal
+				+ ", table=" + table + "]";
 	}
 }

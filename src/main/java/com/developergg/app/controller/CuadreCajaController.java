@@ -27,16 +27,21 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.developergg.app.model.AbonoCxC;
+import com.developergg.app.model.AbonoCxCDetalle;
+import com.developergg.app.model.CuadreAbonoCxC;
+import com.developergg.app.model.CuadreVentaContado;
+import com.developergg.app.model.CuadreVentaContadoTaller;
+import com.developergg.app.model.CuadreVentaCredito;
+import com.developergg.app.model.CuadreVentaCreditoTaller;
 import com.developergg.app.model.Factura;
 import com.developergg.app.model.FacturaDetalle;
 import com.developergg.app.model.FacturaDetalleSerial;
 import com.developergg.app.model.FacturaDetalleServicio;
 import com.developergg.app.model.FacturaDetalleTaller;
 import com.developergg.app.model.Usuario;
-import com.developergg.app.model.VentaContado;
-import com.developergg.app.model.VentaContadoTaller;
-import com.developergg.app.model.VentaCredito;
-import com.developergg.app.model.VentaCreditoTaller;
+import com.developergg.app.service.IAbonosCxCDetallesService;
+import com.developergg.app.service.IAbonosCxCService;
 import com.developergg.app.service.IFacturasDetallesSerialesService;
 import com.developergg.app.service.IFacturasDetallesService;
 import com.developergg.app.service.IFacturasDetallesServiciosService;
@@ -73,6 +78,12 @@ public class CuadreCajaController {
 	
 	@Autowired
 	private IFacturasDetallesTallerService serviceFacturaDetallesTalleres;
+	
+	@Autowired
+	private IAbonosCxCService serviceAbonosCxC;
+	
+	@Autowired
+	private IAbonosCxCDetallesService serviceAbonosCxCDetalle;
 	
 	@Autowired
 	private DataSource dataSource;
@@ -122,13 +133,14 @@ public class CuadreCajaController {
 			usuarios.add(usuario);
 		}
 		
-		List<VentaContado> ventasContado = new LinkedList<>();
-		List<VentaContadoTaller> ventasContadoTaller = new LinkedList<>();
-		List<VentaCredito> ventasCredito = new LinkedList<>();
-		List<VentaCreditoTaller> ventasCreditoTaller = new LinkedList<>();
+		List<CuadreVentaContado> ventasContado = new LinkedList<>();
+		List<CuadreVentaContadoTaller> ventasContadoTaller = new LinkedList<>();
+		List<CuadreVentaCredito> ventasCredito = new LinkedList<>();
+		List<CuadreVentaCreditoTaller> ventasCreditoTaller = new LinkedList<>();
+		List<CuadreAbonoCxC> cuadreAbonosCxC = new LinkedList<>();
 		
 		//Venta al contado
-		List<Factura> facturasContado = serviceFacturas.buscarFacturaCuadreContadoMultiUsuario(usuarios.get(0).getAlmacen(),
+		List<Factura> facturasContado = serviceFacturas.buscarFacturaCuadreMultiUsuario(usuarios.get(0).getAlmacen(),
 				0, null, newDesde, newHasta, usuarios);
 	
 		for (Factura factura : facturasContado) {
@@ -148,7 +160,7 @@ public class CuadreCajaController {
 					}
 				}
 				
-				VentaContado ventaContado = new VentaContado();
+				CuadreVentaContado ventaContado = new CuadreVentaContado();
 				ventaContado.setId(detalle.getId());
 				ventaContado.setCantidad(detalle.getCantidad());
 				ventaContado.setFecha(formato.format(factura.getFecha()));
@@ -162,7 +174,7 @@ public class CuadreCajaController {
 			
 			//Servicios
 			for (FacturaDetalleServicio facturaDetalleServicio : facturaDetalleServicios) {
-				VentaContado ventaContadoServicio = new VentaContado();
+				CuadreVentaContado ventaContadoServicio = new CuadreVentaContado();
 				ventaContadoServicio.setId(facturaDetalleServicio.getId());
 				ventaContadoServicio.setCantidad(facturaDetalleServicio.getCantidad());
 				ventaContadoServicio.setFecha(formato.format(factura.getFecha()));
@@ -176,13 +188,13 @@ public class CuadreCajaController {
 		}
 		
 		//Ventas al contado Taller
-		List<Factura> facturasContadoTalleres = serviceFacturas.buscarFacturaCuadreContadoTallerMultiUsuario(usuarios.get(0).getAlmacen(),
+		List<Factura> facturasContadoTalleres = serviceFacturas.buscarFacturaCuadreTallerMultiUsuario(usuarios.get(0).getAlmacen(),
 				0, newDesde, newHasta, usuarios);
 		
 		for (Factura facturaContadoTaller : facturasContadoTalleres) {
 			List<FacturaDetalleTaller> facturaDetalleTalleres = serviceFacturaDetallesTalleres.buscarPorFactura(facturaContadoTaller);
 			for (FacturaDetalleTaller detalleTaller : facturaDetalleTalleres) {
-				VentaContadoTaller ventaContadoTaller = new VentaContadoTaller();
+				CuadreVentaContadoTaller ventaContadoTaller = new CuadreVentaContadoTaller();
 				ventaContadoTaller.setCantidad(detalleTaller.getCantidad());
 				ventaContadoTaller.setFecha(formato.format(facturaContadoTaller.getFecha()));
 				ventaContadoTaller.setNoFactura(facturaContadoTaller.getCodigo());
@@ -194,7 +206,7 @@ public class CuadreCajaController {
 		}
 		
 		//Ventas a credito
-		List<Factura> facturasCreditos = serviceFacturas.buscarFacturaCuadreContadoMultiUsuario(usuarios.get(0).getAlmacen(),
+		List<Factura> facturasCreditos = serviceFacturas.buscarFacturaCuadreMultiUsuario(usuarios.get(0).getAlmacen(),
 				1, null, newDesde, newHasta, usuarios);
 		
 		for (Factura facturaCredito : facturasCreditos) {
@@ -214,7 +226,7 @@ public class CuadreCajaController {
 					}
 				}
 				
-				VentaCredito ventaCredito = new VentaCredito();
+				CuadreVentaCredito ventaCredito = new CuadreVentaCredito();
 				ventaCredito.setId(detalleCredito.getId());
 				ventaCredito.setCantidad(detalleCredito.getCantidad());
 				ventaCredito.setFecha(formato.format(facturaCredito.getFecha()));
@@ -228,7 +240,7 @@ public class CuadreCajaController {
 			
 			//Servicios
 			for (FacturaDetalleServicio facturaDetalleServicioCredito : facturaDetalleServiciosCredito) {
-				VentaCredito ventaCreditoServicio = new VentaCredito();
+				CuadreVentaCredito ventaCreditoServicio = new CuadreVentaCredito();
 				ventaCreditoServicio.setId(facturaDetalleServicioCredito.getId());
 				ventaCreditoServicio.setCantidad(facturaDetalleServicioCredito.getCantidad());
 				ventaCreditoServicio.setFecha(formato.format(facturaCredito.getFecha()));
@@ -242,13 +254,13 @@ public class CuadreCajaController {
 		}
 		
 		//Ventas credito taller
-		List<Factura> facturasCreditoTalleres = serviceFacturas.buscarFacturaCuadreContadoTallerMultiUsuario(usuarios.get(0).getAlmacen(),
+		List<Factura> facturasCreditoTalleres = serviceFacturas.buscarFacturaCuadreTallerMultiUsuario(usuarios.get(0).getAlmacen(),
 				1, newDesde, newHasta, usuarios);
 		
 		for (Factura facturaCreditoTaller : facturasCreditoTalleres) {
 			List<FacturaDetalleTaller> facturaDetalleCreditoTalleres = serviceFacturaDetallesTalleres.buscarPorFactura(facturaCreditoTaller);
 			for (FacturaDetalleTaller detalleCreditoTaller : facturaDetalleCreditoTalleres) {
-				VentaCreditoTaller ventaCreditoTaller = new VentaCreditoTaller();
+				CuadreVentaCreditoTaller ventaCreditoTaller = new CuadreVentaCreditoTaller();
 				ventaCreditoTaller.setCantidad(detalleCreditoTaller.getCantidad());
 				ventaCreditoTaller.setFecha(formato.format(facturaCreditoTaller.getFecha()));
 				ventaCreditoTaller.setNoFactura(facturaCreditoTaller.getCodigo());
@@ -256,6 +268,25 @@ public class CuadreCajaController {
 				ventaCreditoTaller.setPrecio(detalleCreditoTaller.getPrecio());
 				ventaCreditoTaller.setSubTotal(detalleCreditoTaller.getSubtotal());
 				ventasCreditoTaller.add(ventaCreditoTaller);
+			}
+		}
+		
+		//Abono a CxC
+		List<Factura> facturasCxC = serviceFacturas.buscarFacturaCuadreMultiUsuario(usuarios.get(0).getAlmacen(),
+				1, newDesde, newHasta, usuarios);
+		
+		for (Factura facturaCxC : facturasCxC) {
+			List<AbonoCxC> abonosCxC = serviceAbonosCxC.buscarPorFactura(facturaCxC);
+			for (AbonoCxC ingreso : abonosCxC) {
+				List<AbonoCxCDetalle> abonoCxCDetalles = serviceAbonosCxCDetalle.buscarPorIngreso(ingreso);
+				for (AbonoCxCDetalle abonoCxCDetalle : abonoCxCDetalles) {
+					CuadreAbonoCxC cuadreAbonoCxC = new CuadreAbonoCxC();
+					cuadreAbonoCxC.setFactura(facturaCxC.getCodigo().toString());
+					cuadreAbonoCxC.setFecha(formato.format(abonoCxCDetalle.getFecha()));
+					cuadreAbonoCxC.setId(abonoCxCDetalle.getId());
+					cuadreAbonoCxC.setMonto(abonoCxCDetalle.getAbono());
+					cuadreAbonosCxC.add(cuadreAbonoCxC);
+				}
 			}
 		}
 				
@@ -268,13 +299,15 @@ public class CuadreCajaController {
 		JRBeanCollectionDataSource ventasContadoTallerJRBean = new JRBeanCollectionDataSource(ventasContadoTaller);
 		JRBeanCollectionDataSource ventasCreditoJRBean = new JRBeanCollectionDataSource(ventasCredito);
 		JRBeanCollectionDataSource ventasCreditoTallerJRBean = new JRBeanCollectionDataSource(ventasCreditoTaller);
-				
+		JRBeanCollectionDataSource abonoCxCJRBean = new JRBeanCollectionDataSource(cuadreAbonosCxC);		
+		
 		parameters.put("idUsuario", usuarioAcct.getId());
 		parameters.put("imagen", rutaImagenes+usuarioAcct.getAlmacen().getImagen());
 		parameters.put("ventasContado", ventasContadoJRBean);
 		parameters.put("ventasContadoTaller", ventasContadoTallerJRBean);
 		parameters.put("ventasCredito", ventasCreditoJRBean);
 		parameters.put("ventasCreditoTaller", ventasCreditoTallerJRBean);
+		parameters.put("cuadreAbonosCxC", abonoCxCJRBean);
 		
 		JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource.getConnection());
 		
@@ -283,10 +316,7 @@ public class CuadreCajaController {
 		tempFolder += pathSeparator;
 
 		JasperExportManager.exportReportToPdfFile(jasperPrint,dataDirectory);
-		
-		 //If user is not authorized - he should be thrown out from here itself
-         
-        //Authorized user will download the file
+		         
         Path file = Paths.get(tempFolder, "factura"+usuarioAcct.getId()+".pdf");
         if (Files.exists(file)) 
         {

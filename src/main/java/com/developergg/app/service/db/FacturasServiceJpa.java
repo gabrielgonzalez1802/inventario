@@ -53,24 +53,31 @@ public class FacturasServiceJpa implements IFacturasService {
 	}
 
 	@Override
-	public List<Factura> buscarFacturaCuadreContado(Usuario usuario, Almacen almacen, Integer credito, Taller taller,
+	public List<Factura> buscarFacturaCuadre(Usuario usuario, Almacen almacen, Integer credito, Taller taller,
 			Date desde, Date hasta) {
 		return repo.findByUsuarioAndAlmacenAndCreditoAndTallerAndFechaBetween(usuario,
 				almacen, credito, taller, desde, hasta);
 	}
 
 	@Override
-	public List<Factura> buscarFacturaCuadreContadoMultiUsuario(Almacen almacen, Integer credito, Taller taller,
+	public List<Factura> buscarFacturaCuadreMultiUsuario(Almacen almacen, Integer credito, Taller taller,
 			Date desde, Date hasta, List<Usuario> usuarios) {
 		return repo.findByAlmacenAndCreditoAndTallerAndFechaBetweenAndUsuarioIn(almacen, credito,
 				taller, desde, hasta, usuarios);
 	}
 
 	@Override
-	public List<Factura> buscarFacturaCuadreContadoTallerMultiUsuario(Almacen almacen, Integer credito, Date desde,
+	public List<Factura> buscarFacturaCuadreTallerMultiUsuario(Almacen almacen, Integer credito, Date desde,
 			Date hasta, List<Usuario> usuarios) {
 		return  repo.findByAlmacenAndCreditoAndFechaBetweenAndUsuarioInAndTallerIsNotNull(almacen, credito,
 				desde, hasta, usuarios);
+	}
+
+	@Override
+	public List<Factura> buscarFacturaCuadreMultiUsuario(Almacen almacen, Integer credito, Date desde, Date hasta,
+			List<Usuario> usuarios) {
+		return repo.findByAlmacenAndCreditoAndFechaBetweenAndUsuarioIn(almacen,
+				credito, desde, hasta, usuarios);
 	}
 
 
