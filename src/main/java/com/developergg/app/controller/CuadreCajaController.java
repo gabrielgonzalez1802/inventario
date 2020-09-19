@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.developergg.app.model.AbonoCxC;
 import com.developergg.app.model.AbonoCxCDetalle;
 import com.developergg.app.model.CuadreAbonoCxC;
+import com.developergg.app.model.CuadreGasto;
 import com.developergg.app.model.CuadreIngreso;
 import com.developergg.app.model.CuadreVentaContado;
 import com.developergg.app.model.CuadreVentaContadoTaller;
@@ -40,6 +41,7 @@ import com.developergg.app.model.FacturaDetalle;
 import com.developergg.app.model.FacturaDetalleSerial;
 import com.developergg.app.model.FacturaDetalleServicio;
 import com.developergg.app.model.FacturaDetalleTaller;
+import com.developergg.app.model.Gasto;
 import com.developergg.app.model.Ingreso;
 import com.developergg.app.model.Usuario;
 import com.developergg.app.service.IAbonosCxCDetallesService;
@@ -49,6 +51,7 @@ import com.developergg.app.service.IFacturasDetallesService;
 import com.developergg.app.service.IFacturasDetallesServiciosService;
 import com.developergg.app.service.IFacturasDetallesTallerService;
 import com.developergg.app.service.IFacturasService;
+import com.developergg.app.service.IGastosService;
 import com.developergg.app.service.IIngresosService;
 import com.developergg.app.service.IUsuariosService;
 
@@ -90,6 +93,9 @@ public class CuadreCajaController {
 	
 	@Autowired
 	private IIngresosService serviceIngresos;
+	
+	@Autowired
+	private IGastosService serviceGastos;
 	
 	@Autowired
 	private DataSource dataSource;
@@ -145,6 +151,7 @@ public class CuadreCajaController {
 		List<CuadreVentaCreditoTaller> ventasCreditoTaller = new LinkedList<>();
 		List<CuadreAbonoCxC> cuadreAbonosCxC = new LinkedList<>();
 		List<CuadreIngreso> cuadreIngresos = new LinkedList<>();
+		List<CuadreGasto> cuadreGastos = new LinkedList<>();
 		
 		//Venta al contado
 		List<Factura> facturasContado = serviceFacturas.buscarFacturaCuadreMultiUsuario(usuarios.get(0).getAlmacen(),
@@ -308,7 +315,18 @@ public class CuadreCajaController {
 			cuadreIngreso.setTipo(ingreso.getTipo_ingreso());
 			cuadreIngresos.add(cuadreIngreso);
 		}
-				
+		
+		List<Gasto> gastos = serviceGastos.buscarPorUsuariosAlmacenFechas(usuarios, usuarios.get(0).getAlmacen(), newDesde, newHasta);
+		for (Gasto gasto : gastos) {
+			CuadreGasto cuadreGasto = new CuadreGasto();
+			cuadreGasto.setFecha(formato.format(gasto.getFecha()));
+			cuadreGasto.setId(gasto.getId());
+			cuadreGasto.setMonto(gasto.getMonto());
+			cuadreGasto.setNombre(gasto.getNombre());
+			cuadreGasto.setTipo(gasto.getTipo_gasto());
+			cuadreGastos.add(cuadreGasto);
+		}		
+		
 		JasperReport jasperReport = JasperCompileManager.compileReport(rutaJreport);
 		
 		Map<String, Object> parameters = new HashMap<String, Object>();
@@ -320,6 +338,7 @@ public class CuadreCajaController {
 		JRBeanCollectionDataSource ventasCreditoTallerJRBean = new JRBeanCollectionDataSource(ventasCreditoTaller);
 		JRBeanCollectionDataSource abonoCxCJRBean = new JRBeanCollectionDataSource(cuadreAbonosCxC);
 		JRBeanCollectionDataSource ingresosRBean = new JRBeanCollectionDataSource(cuadreIngresos);
+		JRBeanCollectionDataSource gastosRBean = new JRBeanCollectionDataSource(cuadreGastos);
 		
 		parameters.put("idUsuario", usuarioAcct.getId());
 		parameters.put("imagen", rutaImagenes+usuarioAcct.getAlmacen().getImagen());
@@ -329,6 +348,7 @@ public class CuadreCajaController {
 		parameters.put("ventasCreditoTaller", ventasCreditoTallerJRBean);
 		parameters.put("cuadreAbonosCxC", abonoCxCJRBean);
 		parameters.put("cuadreIngresos", ingresosRBean);
+		parameters.put("cuadreGastos", gastosRBean);
 		
 		JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource.getConnection());
 		

@@ -1,5 +1,6 @@
 package com.developergg.app.service.db;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.developergg.app.model.Almacen;
 import com.developergg.app.model.Gasto;
+import com.developergg.app.model.Usuario;
 import com.developergg.app.repository.GastosRepository;
 import com.developergg.app.service.IGastosService;
 
@@ -42,6 +44,11 @@ public class GastosServiceJpa implements IGastosService{
 		if(optional.isPresent()) {
 			repo.delete(optional.get());
 		}
+	}
+
+	@Override
+	public List<Gasto> buscarPorUsuariosAlmacenFechas(List<Usuario> usuarios, Almacen almacen, Date desde, Date hasta) {
+		return repo.findByUsuarioInAndAlmacenAndFechaBetween(usuarios, almacen, desde, hasta);
 	}
 	
 }
