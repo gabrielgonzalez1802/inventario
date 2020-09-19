@@ -53,4 +53,9 @@ public class UsuariosServiceJpa implements IUsuariosService{
 		return repo.findByAlmacenAndPrivilegio(almacen, privilegio);
 	}
 
+	@Override
+	public List<Usuario> buscarPorAlmacen(Almacen almacen) {
+		return repo.findByAlmacen(almacen);
+	}
+
 }

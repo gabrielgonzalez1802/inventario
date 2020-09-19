@@ -11,4 +11,5 @@ import com.developergg.app.model.Usuario;
 public interface UsuariosRepository extends JpaRepository<Usuario, Integer> {
 	Usuario findByUsername(String username);
 	List<Usuario> findByAlmacenAndPrivilegio(Almacen almacen, Perfil privilegio);
+	List<Usuario> findByAlmacen(Almacen almacen);
 }

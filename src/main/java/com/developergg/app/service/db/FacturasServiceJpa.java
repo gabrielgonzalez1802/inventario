@@ -1,5 +1,6 @@
 package com.developergg.app.service.db;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 import com.developergg.app.model.Almacen;
 import com.developergg.app.model.Factura;
 import com.developergg.app.model.Taller;
+import com.developergg.app.model.Usuario;
 import com.developergg.app.repository.FacturasRepository;
 import com.developergg.app.service.IFacturasService;
 
@@ -49,5 +51,27 @@ public class FacturasServiceJpa implements IFacturasService {
 	public Factura buscarPorTaller(Taller taller) {
 		return repo.findByTaller(taller);
 	}
+
+	@Override
+	public List<Factura> buscarFacturaCuadreContado(Usuario usuario, Almacen almacen, Integer credito, Taller taller,
+			Date desde, Date hasta) {
+		return repo.findByUsuarioAndAlmacenAndCreditoAndTallerAndFechaBetween(usuario,
+				almacen, credito, taller, desde, hasta);
+	}
+
+	@Override
+	public List<Factura> buscarFacturaCuadreContadoMultiUsuario(Almacen almacen, Integer credito, Taller taller,
+			Date desde, Date hasta, List<Usuario> usuarios) {
+		return repo.findByAlmacenAndCreditoAndTallerAndFechaBetweenAndUsuarioIn(almacen, credito,
+				taller, desde, hasta, usuarios);
+	}
+
+	@Override
+	public List<Factura> buscarFacturaCuadreContadoTallerMultiUsuario(Almacen almacen, Integer credito, Date desde,
+			Date hasta, List<Usuario> usuarios) {
+		return  repo.findByAlmacenAndCreditoAndFechaBetweenAndUsuarioInAndTallerIsNotNull(almacen, credito,
+				desde, hasta, usuarios);
+	}
+
 
 }

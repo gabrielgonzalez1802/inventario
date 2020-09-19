@@ -377,6 +377,7 @@ public class DevolucionesFacturasController {
 						ArticuloSerial articuloSerial = facturaDetalleSerial.getArticuloSerial();
 						articuloSerial.setEstado("Disponible");
 						articuloSerial.setDevuelto(1); 
+						articuloSerial.setEn_uso(0);
 						serviceArticulosSeriales.guardar(articuloSerial);
 						
 						monto+=facturaDetalleSerial.getPrecio();
