@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.developergg.app.model.AbonoCxC;
 import com.developergg.app.model.AbonoCxCDetalle;
 import com.developergg.app.model.CuadreAbonoCxC;
+import com.developergg.app.model.CuadreIngreso;
 import com.developergg.app.model.CuadreVentaContado;
 import com.developergg.app.model.CuadreVentaContadoTaller;
 import com.developergg.app.model.CuadreVentaCredito;
@@ -39,6 +40,7 @@ import com.developergg.app.model.FacturaDetalle;
 import com.developergg.app.model.FacturaDetalleSerial;
 import com.developergg.app.model.FacturaDetalleServicio;
 import com.developergg.app.model.FacturaDetalleTaller;
+import com.developergg.app.model.Ingreso;
 import com.developergg.app.model.Usuario;
 import com.developergg.app.service.IAbonosCxCDetallesService;
 import com.developergg.app.service.IAbonosCxCService;
@@ -47,6 +49,7 @@ import com.developergg.app.service.IFacturasDetallesService;
 import com.developergg.app.service.IFacturasDetallesServiciosService;
 import com.developergg.app.service.IFacturasDetallesTallerService;
 import com.developergg.app.service.IFacturasService;
+import com.developergg.app.service.IIngresosService;
 import com.developergg.app.service.IUsuariosService;
 
 import net.sf.jasperreports.engine.JRException;
@@ -84,6 +87,9 @@ public class CuadreCajaController {
 	
 	@Autowired
 	private IAbonosCxCDetallesService serviceAbonosCxCDetalle;
+	
+	@Autowired
+	private IIngresosService serviceIngresos;
 	
 	@Autowired
 	private DataSource dataSource;
@@ -138,6 +144,7 @@ public class CuadreCajaController {
 		List<CuadreVentaCredito> ventasCredito = new LinkedList<>();
 		List<CuadreVentaCreditoTaller> ventasCreditoTaller = new LinkedList<>();
 		List<CuadreAbonoCxC> cuadreAbonosCxC = new LinkedList<>();
+		List<CuadreIngreso> cuadreIngresos = new LinkedList<>();
 		
 		//Venta al contado
 		List<Factura> facturasContado = serviceFacturas.buscarFacturaCuadreMultiUsuario(usuarios.get(0).getAlmacen(),
@@ -289,6 +296,18 @@ public class CuadreCajaController {
 				}
 			}
 		}
+		
+		//Ingresos
+		List<Ingreso> ingresos = serviceIngresos.buscarPorUsuariosAlmacenFechas(usuarios, usuarios.get(0).getAlmacen(), newDesde, newHasta);
+		for (Ingreso ingreso : ingresos) {
+			CuadreIngreso cuadreIngreso = new CuadreIngreso();
+			cuadreIngreso.setId(ingreso.getId());
+			cuadreIngreso.setFecha(formato.format(ingreso.getFecha()));
+			cuadreIngreso.setMonto(ingreso.getMonto());
+			cuadreIngreso.setNombre(ingreso.getNombre());
+			cuadreIngreso.setTipo(ingreso.getTipo_ingreso());
+			cuadreIngresos.add(cuadreIngreso);
+		}
 				
 		JasperReport jasperReport = JasperCompileManager.compileReport(rutaJreport);
 		
@@ -299,7 +318,8 @@ public class CuadreCajaController {
 		JRBeanCollectionDataSource ventasContadoTallerJRBean = new JRBeanCollectionDataSource(ventasContadoTaller);
 		JRBeanCollectionDataSource ventasCreditoJRBean = new JRBeanCollectionDataSource(ventasCredito);
 		JRBeanCollectionDataSource ventasCreditoTallerJRBean = new JRBeanCollectionDataSource(ventasCreditoTaller);
-		JRBeanCollectionDataSource abonoCxCJRBean = new JRBeanCollectionDataSource(cuadreAbonosCxC);		
+		JRBeanCollectionDataSource abonoCxCJRBean = new JRBeanCollectionDataSource(cuadreAbonosCxC);
+		JRBeanCollectionDataSource ingresosRBean = new JRBeanCollectionDataSource(cuadreIngresos);
 		
 		parameters.put("idUsuario", usuarioAcct.getId());
 		parameters.put("imagen", rutaImagenes+usuarioAcct.getAlmacen().getImagen());
@@ -308,6 +328,7 @@ public class CuadreCajaController {
 		parameters.put("ventasCredito", ventasCreditoJRBean);
 		parameters.put("ventasCreditoTaller", ventasCreditoTallerJRBean);
 		parameters.put("cuadreAbonosCxC", abonoCxCJRBean);
+		parameters.put("cuadreIngresos", ingresosRBean);
 		
 		JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource.getConnection());
 		
