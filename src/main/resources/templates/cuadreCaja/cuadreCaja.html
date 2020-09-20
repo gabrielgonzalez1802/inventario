@@ -27,6 +27,7 @@
 		}
 
   </style>
+  <link rel="stylesheet" type="text/css" th:href="@{/css/swal.css}">
   </head>
   <body>
      <span th:insert="fragments/topMenu :: menu-principal"></span> 
@@ -42,13 +43,13 @@
                 <div class="col-md-4"> 
                   <div class="form-group">
                     <label for="nombre">Desde</label>
-                    <input type="date" class="form-control" name="desde" required="required">
+                    <input type="date" th:value="${#dates.format(dateAcct, 'yyyy-MM-dd')}" id="desde" class="form-control" name="desde" required="required">
                   </div>
                 </div>
                  <div class="col-md-4"> 
                   <div class="form-group">
                     <label for="direccion">Hasta</label>
-                    <input type="date" class="form-control" name="hasta" required="required">
+                    <input type="date" th:value="${#dates.format(dateAcct, 'yyyy-MM-dd')}" id="hasta" class="form-control" name="hasta" required="required">
                   </div>
                 </div>
                  <div class="col-md-4"> 
@@ -111,6 +112,20 @@
 	          $("#fecha").datepicker({dateFormat: 'dd-mm-yy'});
 	        }
 	      );
+	   $("#btn_cuadre_reporte").click(function(){
+		   if((new Date($("#hasta").val()).getTime() >= new Date($("#desde").val()).getTime())){
+			   return true;
+		   }else{
+			   Swal.fire({
+					  title: 'Alerta!',
+					  text: 'La fecha desde no puede ser mayor a la fecha hasta',
+					  icon: 'warning',
+					  position: 'top',
+					  confirmButtonText: 'Cool'
+					})
+			return false;
+		   }
+	   });
 	</script>
 	 <span th:insert="fragments/footer :: footer"></span>  
 </body>

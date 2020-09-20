@@ -133,6 +133,7 @@ public class CuadreCajaController {
 			user.setPassword("");
 		}
 		model.addAttribute("usuarios", usuarios);
+		model.addAttribute("dateAcct", new Date());
 		return "cuadreCaja/cuadreCaja";
 	}
 	
