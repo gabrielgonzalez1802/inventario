@@ -22,4 +22,6 @@ public interface IFacturasService {
 			Integer credito, Date desde, Date hasta, List<Usuario> usuarios);
 	List<Factura> buscarFacturaCuadreMultiUsuario(Almacen almacen,
 			Integer credito, Date desde, Date hasta, List<Usuario> usuarios);
+	List<Factura> buscarFacturaCuadreMultiUsuario(Almacen almacen, Date desde, 
+			Date hasta, List<Usuario> usuarios);
 }

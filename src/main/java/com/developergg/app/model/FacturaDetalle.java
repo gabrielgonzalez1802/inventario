@@ -25,10 +25,10 @@ public class FacturaDetalle {
 	@JoinColumn(name = "id_articulo")
 	private Articulo articulo;
 	
-	private Integer cantidad;
+	private Integer cantidad = 0;
 	private Integer cantidad_devuelta = 0;
-	private Double precio;
-	private Double itbis;
+	private Double precio = 0.0;
+	private Double itbis = 0.0;
 	private String imei;
 	private String paga_itbis;
 	private Integer existencia;
@@ -36,7 +36,7 @@ public class FacturaDetalle {
 	private Double precio_minimo;
 	private Double precio_mayor;
 	private Double costo;
-	private Double subtotal;
+	private Double subtotal = 0.0;
 	
 	private Integer temp_devolver = 0;
 	

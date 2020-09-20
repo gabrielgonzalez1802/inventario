@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.developergg.app.model.Almacen;
 import com.developergg.app.model.DevolucionFactura;
+import com.developergg.app.model.Factura;
 import com.developergg.app.repository.DevolucionesFacturasRepository;
 import com.developergg.app.service.IDevolucionesFacturasService;
 
@@ -39,6 +40,11 @@ public class DevolucionesFacturasServiceJpa implements IDevolucionesFacturasServ
 	@Override
 	public void eliminar(DevolucionFactura devolucionFactura) {
 		repo.delete(devolucionFactura);
+	}
+
+	@Override
+	public List<DevolucionFactura> buscarPorFactura(Factura factura) {
+		return repo.findByFactura(factura);
 	}
 
 }

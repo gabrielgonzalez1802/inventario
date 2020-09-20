@@ -20,16 +20,16 @@ public class FacturaDetalleTaller {
 	
 	private String descripcion;
 	private Double costo;
-	private Integer cantidad;
-	private Double precio;
+	private Integer cantidad = 0;
+	private Double precio = 0.0;
 	private Integer temp_devolver = 0;
 	
 	@OneToOne
 	@JoinColumn(name = "id_almacen")
 	private Almacen almacen;
 	
-	private Double itbis;
-	private Double subtotal;
+	private Double itbis = 0.0;
+	private Double subtotal = 0.0;
 	
 	@OneToOne
 	@JoinColumn(name = "id_usuario")

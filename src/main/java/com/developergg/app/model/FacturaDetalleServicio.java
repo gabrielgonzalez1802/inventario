@@ -24,10 +24,10 @@ public class FacturaDetalleServicio {
 	
 	private String descripcion;
 	private Double costo;
-	private Integer cantidad;
-	private Double precio;
-	private Double subtotal;
-	private Double itbis;
+	private Integer cantidad = 0;
+	private Double precio = 0.0;
+	private Double subtotal = 0.0;
+	private Double itbis = 0.0;
 	
 	public Integer getId() {
 		return id;

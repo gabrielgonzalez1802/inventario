@@ -30,12 +30,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.developergg.app.model.AbonoCxC;
 import com.developergg.app.model.AbonoCxCDetalle;
 import com.developergg.app.model.CuadreAbonoCxC;
+import com.developergg.app.model.CuadreDevolucion;
 import com.developergg.app.model.CuadreGasto;
 import com.developergg.app.model.CuadreIngreso;
 import com.developergg.app.model.CuadreVentaContado;
 import com.developergg.app.model.CuadreVentaContadoTaller;
 import com.developergg.app.model.CuadreVentaCredito;
 import com.developergg.app.model.CuadreVentaCreditoTaller;
+import com.developergg.app.model.DevolucionFactura;
+import com.developergg.app.model.DevolucionFacturaDetalle;
+import com.developergg.app.model.DevolucionFacturaSerial;
 import com.developergg.app.model.Factura;
 import com.developergg.app.model.FacturaDetalle;
 import com.developergg.app.model.FacturaDetalleSerial;
@@ -46,6 +50,9 @@ import com.developergg.app.model.Ingreso;
 import com.developergg.app.model.Usuario;
 import com.developergg.app.service.IAbonosCxCDetallesService;
 import com.developergg.app.service.IAbonosCxCService;
+import com.developergg.app.service.IDevolucionesFacturasDetallesService;
+import com.developergg.app.service.IDevolucionesFacturasSerialesService;
+import com.developergg.app.service.IDevolucionesFacturasService;
 import com.developergg.app.service.IFacturasDetallesSerialesService;
 import com.developergg.app.service.IFacturasDetallesService;
 import com.developergg.app.service.IFacturasDetallesServiciosService;
@@ -96,6 +103,15 @@ public class CuadreCajaController {
 	
 	@Autowired
 	private IGastosService serviceGastos;
+	
+	@Autowired
+	private IDevolucionesFacturasService serviceDevolucionesFacturas;
+	
+	@Autowired
+	private IDevolucionesFacturasDetallesService serviceDevolucionesFacturasDetalles;
+	
+	@Autowired
+	private IDevolucionesFacturasSerialesService serviceDevolucionesFacturasSeriales;
 	
 	@Autowired
 	private DataSource dataSource;
@@ -152,6 +168,7 @@ public class CuadreCajaController {
 		List<CuadreAbonoCxC> cuadreAbonosCxC = new LinkedList<>();
 		List<CuadreIngreso> cuadreIngresos = new LinkedList<>();
 		List<CuadreGasto> cuadreGastos = new LinkedList<>();
+		List<CuadreDevolucion> cuadreDevoluciones = new LinkedList<>();
 		
 		//Venta al contado
 		List<Factura> facturasContado = serviceFacturas.buscarFacturaCuadreMultiUsuario(usuarios.get(0).getAlmacen(),
@@ -180,7 +197,7 @@ public class CuadreCajaController {
 				ventaContado.setFecha(formato.format(factura.getFecha()));
 				ventaContado.setNoFactura(factura.getCodigo());
 				ventaContado.setNombreArticulo(nombreArticulo);
-				ventaContado.setPrecio(detalle.getPrecio());
+				ventaContado.setPrecio(detalle.getPrecio()+detalle.getItbis());
 				ventaContado.setSubTotal(detalle.getSubtotal());
 				ventaContado.setTable("facturas_detalle");
 				ventasContado.add(ventaContado);
@@ -194,7 +211,7 @@ public class CuadreCajaController {
 				ventaContadoServicio.setFecha(formato.format(factura.getFecha()));
 				ventaContadoServicio.setNoFactura(factura.getCodigo());
 				ventaContadoServicio.setNombreArticulo(facturaDetalleServicio.getDescripcion());
-				ventaContadoServicio.setPrecio(facturaDetalleServicio.getPrecio());
+				ventaContadoServicio.setPrecio(facturaDetalleServicio.getPrecio()+facturaDetalleServicio.getItbis());
 				ventaContadoServicio.setSubTotal(facturaDetalleServicio.getSubtotal());
 				ventaContadoServicio.setTable("facturas_detalle_servicio");
 				ventasContado.add(ventaContadoServicio);
@@ -213,7 +230,7 @@ public class CuadreCajaController {
 				ventaContadoTaller.setFecha(formato.format(facturaContadoTaller.getFecha()));
 				ventaContadoTaller.setNoFactura(facturaContadoTaller.getCodigo());
 				ventaContadoTaller.setNombreArticulo(detalleTaller.getDescripcion());
-				ventaContadoTaller.setPrecio(detalleTaller.getPrecio());
+				ventaContadoTaller.setPrecio(detalleTaller.getPrecio()+detalleTaller.getItbis());
 				ventaContadoTaller.setSubTotal(detalleTaller.getSubtotal());
 				ventasContadoTaller.add(ventaContadoTaller);
 			}
@@ -246,7 +263,7 @@ public class CuadreCajaController {
 				ventaCredito.setFecha(formato.format(facturaCredito.getFecha()));
 				ventaCredito.setNoFactura(facturaCredito.getCodigo());
 				ventaCredito.setNombreArticulo(nombreArticulo);
-				ventaCredito.setPrecio(detalleCredito.getPrecio());
+				ventaCredito.setPrecio(detalleCredito.getPrecio()+detalleCredito.getItbis());
 				ventaCredito.setSubTotal(detalleCredito.getSubtotal());
 				ventaCredito.setTable("facturas_detalle");
 				ventasCredito.add(ventaCredito);
@@ -260,7 +277,7 @@ public class CuadreCajaController {
 				ventaCreditoServicio.setFecha(formato.format(facturaCredito.getFecha()));
 				ventaCreditoServicio.setNoFactura(facturaCredito.getCodigo());
 				ventaCreditoServicio.setNombreArticulo(facturaDetalleServicioCredito.getDescripcion());
-				ventaCreditoServicio.setPrecio(facturaDetalleServicioCredito.getPrecio());
+				ventaCreditoServicio.setPrecio(facturaDetalleServicioCredito.getPrecio()+facturaDetalleServicioCredito.getItbis());
 				ventaCreditoServicio.setSubTotal(facturaDetalleServicioCredito.getSubtotal());
 				ventaCreditoServicio.setTable("facturas_detalle_servicio");
 				ventasCredito.add(ventaCreditoServicio);
@@ -279,7 +296,7 @@ public class CuadreCajaController {
 				ventaCreditoTaller.setFecha(formato.format(facturaCreditoTaller.getFecha()));
 				ventaCreditoTaller.setNoFactura(facturaCreditoTaller.getCodigo());
 				ventaCreditoTaller.setNombreArticulo(detalleCreditoTaller.getDescripcion());
-				ventaCreditoTaller.setPrecio(detalleCreditoTaller.getPrecio());
+				ventaCreditoTaller.setPrecio(detalleCreditoTaller.getPrecio()+detalleCreditoTaller.getItbis());
 				ventaCreditoTaller.setSubTotal(detalleCreditoTaller.getSubtotal());
 				ventasCreditoTaller.add(ventaCreditoTaller);
 			}
@@ -325,7 +342,50 @@ public class CuadreCajaController {
 			cuadreGasto.setNombre(gasto.getNombre());
 			cuadreGasto.setTipo(gasto.getTipo_gasto());
 			cuadreGastos.add(cuadreGasto);
-		}		
+		}	
+		
+		//Devoluciones
+		List<Factura> facturasDevolucion = serviceFacturas.buscarFacturaCuadreMultiUsuario(usuarios.get(0).getAlmacen(), 
+				newDesde, newHasta, usuarios);
+		
+		for (Factura facturaDevolucion : facturasDevolucion) {
+			List<DevolucionFactura> devolucionesFactura = serviceDevolucionesFacturas.buscarPorFactura(facturaDevolucion);
+			for (DevolucionFactura devolucionFactura : devolucionesFactura) {
+				List<DevolucionFacturaDetalle> devolucionFacturaDetalles = serviceDevolucionesFacturasDetalles.buscarPorDevolucionFactura(devolucionFactura);
+				for (DevolucionFacturaDetalle detalleDevolucion : devolucionFacturaDetalles) {
+					CuadreDevolucion cuadreDevolucion = new CuadreDevolucion();
+					//Verificamos si viene del taller
+					if(detalleDevolucion.getFacturaDetalleTaller()!=null) {
+						FacturaDetalleTaller detalleTaller = detalleDevolucion.getFacturaDetalleTaller();
+						cuadreDevolucion.setArticulo(detalleTaller.getDescripcion());
+						cuadreDevolucion.setFactura(detalleTaller.getFactura().getCodigo().toString());
+					}else {
+						cuadreDevolucion.setArticulo(detalleDevolucion.getFacturaDetalle().getArticulo().getNombre());
+						cuadreDevolucion.setFactura(detalleDevolucion.getFacturaDetalle().getFactura().getCodigo().toString());
+					}
+					cuadreDevolucion.setCantidad(detalleDevolucion.getCantidad());
+					cuadreDevolucion.setFecha(formato.format(detalleDevolucion.getDevolucionFactura().getFecha()));
+					cuadreDevolucion.setId(detalleDevolucion.getId());
+					cuadreDevolucion.setPrecio(detalleDevolucion.getPrecio()+detalleDevolucion.getItbis());
+					cuadreDevolucion.setSubTotal(detalleDevolucion.getSubTotal());
+					cuadreDevolucion.setTabla("devolucion_factura_detalle");
+					cuadreDevoluciones.add(cuadreDevolucion);
+				}
+				List<DevolucionFacturaSerial> facturaSerialesDevolucion = serviceDevolucionesFacturasSeriales.buscarPorDevolucionFactura(devolucionFactura);
+				for (DevolucionFacturaSerial serialDevolucion : facturaSerialesDevolucion) {
+					CuadreDevolucion cuadreDevolucionSerial = new CuadreDevolucion();
+					cuadreDevolucionSerial.setArticulo(serialDevolucion.getNombreArticulo().concat(" - ").concat(serialDevolucion.getSerial()));
+					cuadreDevolucionSerial.setCantidad(1);
+					cuadreDevolucionSerial.setFactura(serialDevolucion.getDevolucionFactura().getFactura().getCodigo().toString());
+					cuadreDevolucionSerial.setFecha(formato.format(serialDevolucion.getDevolucionFactura().getFecha()));
+					cuadreDevolucionSerial.setId(serialDevolucion.getId());
+					cuadreDevolucionSerial.setPrecio(serialDevolucion.getPrecio()+serialDevolucion.getItbis());
+					cuadreDevolucionSerial.setSubTotal(serialDevolucion.getSubTotal());
+					cuadreDevolucionSerial.setTabla("devolucion_factura_serial");
+					cuadreDevoluciones.add(cuadreDevolucionSerial);
+				}
+			}
+		}
 		
 		JasperReport jasperReport = JasperCompileManager.compileReport(rutaJreport);
 		
@@ -339,6 +399,7 @@ public class CuadreCajaController {
 		JRBeanCollectionDataSource abonoCxCJRBean = new JRBeanCollectionDataSource(cuadreAbonosCxC);
 		JRBeanCollectionDataSource ingresosRBean = new JRBeanCollectionDataSource(cuadreIngresos);
 		JRBeanCollectionDataSource gastosRBean = new JRBeanCollectionDataSource(cuadreGastos);
+		JRBeanCollectionDataSource devolucionesRBean = new JRBeanCollectionDataSource(cuadreDevoluciones);
 		
 		parameters.put("idUsuario", usuarioAcct.getId());
 		parameters.put("imagen", rutaImagenes+usuarioAcct.getAlmacen().getImagen());
@@ -349,6 +410,7 @@ public class CuadreCajaController {
 		parameters.put("cuadreAbonosCxC", abonoCxCJRBean);
 		parameters.put("cuadreIngresos", ingresosRBean);
 		parameters.put("cuadreGastos", gastosRBean);
+		parameters.put("cuadreDevoluciones", devolucionesRBean);
 		
 		JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource.getConnection());
 		

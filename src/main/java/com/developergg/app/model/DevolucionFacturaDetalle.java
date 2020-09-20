@@ -33,8 +33,9 @@ public class DevolucionFacturaDetalle {
 	private Integer cantidad=0;
 	private Integer cantidad_factura=0;
 	private Integer cantidad_restante=0;
-	
+	private Double itbis = 0.0;
 	private Double precio = 0.0;
+	private Double subTotal = 0.0;
 
 	public Integer getId() {
 		return id;
@@ -100,11 +101,27 @@ public class DevolucionFacturaDetalle {
 		this.facturaDetalleTaller = facturaDetalleTaller;
 	}
 
+	public Double getItbis() {
+		return itbis;
+	}
+
+	public void setItbis(Double itbis) {
+		this.itbis = itbis;
+	}
+
+	public Double getSubTotal() {
+		return subTotal;
+	}
+
+	public void setSubTotal(Double subTotal) {
+		this.subTotal = subTotal;
+	}
+
 	@Override
 	public String toString() {
 		return "DevolucionFacturaDetalle [id=" + id + ", devolucionFactura=" + devolucionFactura + ", facturaDetalle="
 				+ facturaDetalle + ", facturaDetalleTaller=" + facturaDetalleTaller + ", cantidad=" + cantidad
-				+ ", cantidad_factura=" + cantidad_factura + ", cantidad_restante=" + cantidad_restante + ", precio="
-				+ precio + "]";
+				+ ", cantidad_factura=" + cantidad_factura + ", cantidad_restante=" + cantidad_restante + ", itbis="
+				+ itbis + ", precio=" + precio + ", subTotal=" + subTotal + "]";
 	}
 }

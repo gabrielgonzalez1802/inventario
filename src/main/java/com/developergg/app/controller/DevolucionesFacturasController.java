@@ -331,6 +331,8 @@ public class DevolucionesFacturasController {
 						devolucionFacturaDetalle.setDevolucionFactura(devolucionFactura);
 						devolucionFacturaDetalle.setFacturaDetalle(facturaDetalle);
 						devolucionFacturaDetalle.setPrecio(facturaDetalle.getPrecio());
+						devolucionFacturaDetalle.setItbis(facturaDetalle.getItbis());
+						devolucionFacturaDetalle.setSubTotal(facturaDetalle.getSubtotal());
 						serviceDevolucionesFacturasDetalles.guardar(devolucionFacturaDetalle);
 
 						monto+=devolucionFacturaDetalle.getPrecio()*facturaDetalle.getTemp_devolver();
@@ -368,6 +370,11 @@ public class DevolucionesFacturasController {
 						devolucionFacturaSerial.setFacturaDetalle(facturaDetalle);
 						devolucionFacturaSerial.setFacturaDetalleSerial(facturaDetalleSerial);
 						devolucionFacturaSerial.setSerial(facturaDetalleSerial.getSerial());
+						devolucionFacturaSerial.setDevolucionFactura(devolucionFactura);
+						devolucionFacturaSerial.setPrecio(facturaDetalle.getPrecio());
+						devolucionFacturaSerial.setItbis(facturaDetalle.getItbis());
+						devolucionFacturaSerial.setSubTotal(facturaDetalle.getPrecio()+facturaDetalle.getItbis());
+						devolucionFacturaSerial.setNombreArticulo(facturaDetalle.getArticulo().getNombre());
 						serviceDevolucionesFacturasSeriales.guardar(devolucionFacturaSerial);
 						facturaDetalleSerial.setTempDevuelto(0);
 						facturaDetalleSerial.setDevuelto(1);
@@ -414,6 +421,8 @@ public class DevolucionesFacturasController {
 					devolucionFacturaDetalle.setDevolucionFactura(devolucionFactura);
 					devolucionFacturaDetalle.setFacturaDetalleTaller(facturaDetalleTaller);
 					devolucionFacturaDetalle.setPrecio(facturaDetalleTaller.getPrecio());
+					devolucionFacturaDetalle.setItbis(facturaDetalleTaller.getItbis());
+					devolucionFacturaDetalle.setSubTotal((facturaDetalleTaller.getTemp_devolver()*facturaDetalleTaller.getPrecio())+(facturaDetalleTaller.getTemp_devolver()*facturaDetalleTaller.getItbis()));
 					serviceDevolucionesFacturasDetalles.guardar(devolucionFacturaDetalle);
 					facturaDetalleTaller.setCantidad_devuelta(facturaDetalleTaller.getCantidad_devuelta()+facturaDetalleTaller.getTemp_devolver());
 

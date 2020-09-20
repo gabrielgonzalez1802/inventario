@@ -80,5 +80,11 @@ public class FacturasServiceJpa implements IFacturasService {
 				credito, desde, hasta, usuarios);
 	}
 
+	@Override
+	public List<Factura> buscarFacturaCuadreMultiUsuario(Almacen almacen, Date desde, Date hasta,
+			List<Usuario> usuarios) {
+		return repo.findByAlmacenAndFechaBetweenAndUsuarioIn(almacen, desde, hasta, usuarios);
+	}
+
 
 }

@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.developergg.app.model.DevolucionFactura;
 import com.developergg.app.model.DevolucionFacturaSerial;
 import com.developergg.app.model.FacturaDetalle;
 import com.developergg.app.model.FacturaDetalleSerial;
@@ -48,5 +49,10 @@ public class DevolucionesFacturasSerialesServiceJpa implements IDevolucionesFact
 		if(optional.isPresent()) {
 			repo.delete(optional.get());
 		}
+	}
+
+	@Override
+	public List<DevolucionFacturaSerial> buscarPorDevolucionFactura(DevolucionFactura devolucionFactura) {
+		return repo.findByDevolucionFactura(devolucionFactura);
 	}
 }

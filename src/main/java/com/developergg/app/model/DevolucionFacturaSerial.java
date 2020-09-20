@@ -30,7 +30,16 @@ public class DevolucionFacturaSerial {
 	@JoinColumn(name = "id_articulo_serial")
 	private ArticuloSerial articuloSerial;
 	
+	@OneToOne
+	@JoinColumn(name = "id_devolucion_factura")
+	private DevolucionFactura devolucionFactura;
+	
 	private String serial;
+	private Double precio = 0.0;
+	private Double itbis = 0.0;
+	private Double subTotal = 0.0;
+	
+	private String nombreArticulo;
 
 	public Integer getId() {
 		return id;
@@ -72,9 +81,51 @@ public class DevolucionFacturaSerial {
 		this.serial = serial;
 	}
 
+	public DevolucionFactura getDevolucionFactura() {
+		return devolucionFactura;
+	}
+
+	public void setDevolucionFactura(DevolucionFactura devolucionFactura) {
+		this.devolucionFactura = devolucionFactura;
+	}
+
+	public Double getPrecio() {
+		return precio;
+	}
+
+	public void setPrecio(Double precio) {
+		this.precio = precio;
+	}
+
+	public Double getItbis() {
+		return itbis;
+	}
+
+	public void setItbis(Double itbis) {
+		this.itbis = itbis;
+	}
+
+	public Double getSubTotal() {
+		return subTotal;
+	}
+
+	public void setSubTotal(Double subTotal) {
+		this.subTotal = subTotal;
+	}
+
+	public String getNombreArticulo() {
+		return nombreArticulo;
+	}
+
+	public void setNombreArticulo(String nombreArticulo) {
+		this.nombreArticulo = nombreArticulo;
+	}
+
 	@Override
 	public String toString() {
 		return "DevolucionFacturaSerial [id=" + id + ", facturaDetalle=" + facturaDetalle + ", facturaDetalleSerial="
-				+ facturaDetalleSerial + ", articuloSerial=" + articuloSerial + ", serial=" + serial + "]";
+				+ facturaDetalleSerial + ", articuloSerial=" + articuloSerial + ", devolucionFactura="
+				+ devolucionFactura + ", serial=" + serial + ", precio=" + precio + ", itbis=" + itbis + ", subTotal="
+				+ subTotal + ", nombreArticulo=" + nombreArticulo + "]";
 	}
 }
