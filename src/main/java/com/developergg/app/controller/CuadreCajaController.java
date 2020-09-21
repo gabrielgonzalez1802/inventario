@@ -14,6 +14,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -123,6 +126,9 @@ public class CuadreCajaController {
 	
 	@Autowired
 	private DataSource dataSource;
+	
+	@PersistenceContext
+	private EntityManager em;
 
 	@Value("${inventario.ruta.reporte.cuadreCaja}")
 	private String rutaJreport;
@@ -470,17 +476,40 @@ public class CuadreCajaController {
 				
 		Double totalPagos = 0.0;
 		Double totalGastosDevoluciones = totalGastos+totalDevoluciones;
+		Double efectivo = 0.0;
 		
-		for (FacturaPago pagos : facturasPagos) {
-			CuadrePagoFactura cuadrePagoFactura = new CuadrePagoFactura();
-			cuadrePagoFactura.setId(pagos.getId());
-			cuadrePagoFactura.setCantidad(pagos.getCantidad());
-			cuadrePagoFactura.setFactura(pagos.getFactura().getCodigo().toString());
-			cuadrePagoFactura.setFormaPago(pagos.getFormaPago().getNombre());
-			cuadrePagoFactura.setFecha(formato.format(pagos.getFecha()));
-			cuadrePagoFacturas.add(cuadrePagoFactura);
-			totalPagos+=pagos.getCantidad();
+		String multiUser = "";
+		for (Usuario user : usuarios) {
+			multiUser+=user.getId()+",";
 		}
+		multiUser=multiUser.substring(0, multiUser.length() - 1);
+		
+		StringBuilder query = new StringBuilder("SELECT fp.nombre, SUM(f.cantidad) AS cantidad ");
+		query.append("FROM ").append("facturas_pago f ").
+		append("INNER JOIN facturas fac ON fac.id_factura = f.id_factura ").
+		append("INNER JOIN almacenes a ON a.id_almacen = fac.id_almacen ").
+		append("INNER JOIN formas_pago fp ON fp.id_forma_pago = f.id_forma_pago ").
+		append("WHERE ").append("f.fecha BETWEEN '").append(desde).append("'").append(" AND '").append(hasta).append("' AND ").
+		append("fac.id_almacen = ").append(usuarioAcct.getAlmacen().getId()).append(" AND ").
+		append("fac.id_usuario IN (").append(multiUser).append(") ").
+		append("GROUP BY ").append("fp.nombre");
+		//Query para obtener los pagos agrupados en la factura
+		Query nativeQuery = em.createNativeQuery(query.toString());
+		@SuppressWarnings("unchecked")
+		List<Object[]> results = nativeQuery.getResultList();
+		
+		for (Object[] objects : results) {
+			CuadrePagoFactura cuadrePagoFactura = new CuadrePagoFactura();
+			if(objects[0].toString().equalsIgnoreCase("efectivo")) {
+				efectivo+=Double.parseDouble(objects[1].toString());
+			}
+			cuadrePagoFactura.setCantidad(Double.parseDouble(objects[1].toString()));
+			cuadrePagoFactura.setFormaPago(objects[0].toString());
+			cuadrePagoFacturas.add(cuadrePagoFactura);
+			totalPagos+=Double.parseDouble(objects[1].toString());
+		}
+		
+		Double totalEfectivo = (efectivo + totalIngresos) - totalGastos;
 		
 		JasperReport jasperReport = JasperCompileManager.compileReport(rutaJreport);
 		
@@ -526,6 +555,7 @@ public class CuadreCajaController {
 		parameters.put("totalAvanceTaller", totalAvanceTaller);
 		parameters.put("cuadrePagoFacturas", pagosFacturasRBean);
 		parameters.put("totalGastosDevoluciones", totalGastosDevoluciones);
+		parameters.put("totalEfectivo", totalEfectivo);
 		parameters.put("totalPagos", totalPagos);
 		
 		JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource.getConnection());
