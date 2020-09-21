@@ -34,6 +34,7 @@ import com.developergg.app.model.CuadreAvanceTaller;
 import com.developergg.app.model.CuadreDevolucion;
 import com.developergg.app.model.CuadreGasto;
 import com.developergg.app.model.CuadreIngreso;
+import com.developergg.app.model.CuadrePagoFactura;
 import com.developergg.app.model.CuadreVentaContado;
 import com.developergg.app.model.CuadreVentaContadoTaller;
 import com.developergg.app.model.CuadreVentaCredito;
@@ -46,6 +47,7 @@ import com.developergg.app.model.FacturaDetalle;
 import com.developergg.app.model.FacturaDetalleSerial;
 import com.developergg.app.model.FacturaDetalleServicio;
 import com.developergg.app.model.FacturaDetalleTaller;
+import com.developergg.app.model.FacturaPago;
 import com.developergg.app.model.Gasto;
 import com.developergg.app.model.Ingreso;
 import com.developergg.app.model.Taller;
@@ -59,6 +61,7 @@ import com.developergg.app.service.IFacturasDetallesSerialesService;
 import com.developergg.app.service.IFacturasDetallesService;
 import com.developergg.app.service.IFacturasDetallesServiciosService;
 import com.developergg.app.service.IFacturasDetallesTallerService;
+import com.developergg.app.service.IFacturasPagoService;
 import com.developergg.app.service.IFacturasService;
 import com.developergg.app.service.IGastosService;
 import com.developergg.app.service.IIngresosService;
@@ -114,6 +117,9 @@ public class CuadreCajaController {
 	
 	@Autowired
 	private IDevolucionesFacturasSerialesService serviceDevolucionesFacturasSeriales;
+	
+	@Autowired
+	private IFacturasPagoService serviceFacturasPago;
 	
 	@Autowired
 	private DataSource dataSource;
@@ -173,6 +179,8 @@ public class CuadreCajaController {
 		List<CuadreGasto> cuadreGastos = new LinkedList<>();
 		List<CuadreDevolucion> cuadreDevoluciones = new LinkedList<>();
 		List<CuadreAvanceTaller> cuadreAvancesTaller = new LinkedList<>();
+		List<FacturaPago> facturasPagos = new LinkedList<>();
+		List<CuadrePagoFactura> cuadrePagoFacturas = new LinkedList<>();
 		
 		//Venta al contado
 		List<Factura> facturasContado = serviceFacturas.buscarFacturaCuadreMultiUsuario(usuarios.get(0).getAlmacen(),
@@ -349,6 +357,7 @@ public class CuadreCajaController {
 		}	
 		
 		//Devoluciones
+		//Esta lista nos sirve para obtener las formas de pago
 		List<Factura> facturasDevolucion = serviceFacturas.buscarFacturaCuadreMultiUsuario(usuarios.get(0).getAlmacen(), 
 				newDesde, newHasta, usuarios);
 		
@@ -388,6 +397,12 @@ public class CuadreCajaController {
 					cuadreDevolucionSerial.setTabla("devolucion_factura_serial");
 					cuadreDevoluciones.add(cuadreDevolucionSerial);
 				}
+			}
+			
+			//Pagos
+			List<FacturaPago> facturasPago = serviceFacturasPago.buscarPorFactura(facturaDevolucion);
+			for (FacturaPago facturaPago : facturasPago) {
+				facturasPagos.add(facturaPago);
 			}
 		}
 		
@@ -452,6 +467,20 @@ public class CuadreCajaController {
 		Double totalContadoCredito = totalContado+totalCredito;
 		Double totalContadoCreditoTaller = totalContadoTaller+totalCreditoTaller;
 		Double totalFacturadoContadoCredito =  totalContado+totalContadoTaller+totalCredito+totalCreditoTaller;
+				
+		Double totalPagos = 0.0;
+		Double totalGastosDevoluciones = totalGastos+totalDevoluciones;
+		
+		for (FacturaPago pagos : facturasPagos) {
+			CuadrePagoFactura cuadrePagoFactura = new CuadrePagoFactura();
+			cuadrePagoFactura.setId(pagos.getId());
+			cuadrePagoFactura.setCantidad(pagos.getCantidad());
+			cuadrePagoFactura.setFactura(pagos.getFactura().getCodigo().toString());
+			cuadrePagoFactura.setFormaPago(pagos.getFormaPago().getNombre());
+			cuadrePagoFactura.setFecha(formato.format(pagos.getFecha()));
+			cuadrePagoFacturas.add(cuadrePagoFactura);
+			totalPagos+=pagos.getCantidad();
+		}
 		
 		JasperReport jasperReport = JasperCompileManager.compileReport(rutaJreport);
 		
@@ -467,6 +496,7 @@ public class CuadreCajaController {
 		JRBeanCollectionDataSource gastosRBean = new JRBeanCollectionDataSource(cuadreGastos);
 		JRBeanCollectionDataSource devolucionesRBean = new JRBeanCollectionDataSource(cuadreDevoluciones);
 		JRBeanCollectionDataSource avancesTallerRBean = new JRBeanCollectionDataSource(cuadreAvancesTaller);
+		JRBeanCollectionDataSource pagosFacturasRBean = new JRBeanCollectionDataSource(cuadrePagoFacturas);
 		
 		parameters.put("idUsuario", usuarioAcct.getId());
 		parameters.put("imagen", rutaImagenes+usuarioAcct.getAlmacen().getImagen());
@@ -494,6 +524,9 @@ public class CuadreCajaController {
 		parameters.put("totalGastos", totalGastos);
 		parameters.put("totalDevoluciones", totalDevoluciones);
 		parameters.put("totalAvanceTaller", totalAvanceTaller);
+		parameters.put("cuadrePagoFacturas", pagosFacturasRBean);
+		parameters.put("totalGastosDevoluciones", totalGastosDevoluciones);
+		parameters.put("totalPagos", totalPagos);
 		
 		JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource.getConnection());
 		

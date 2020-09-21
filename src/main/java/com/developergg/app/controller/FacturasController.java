@@ -460,6 +460,7 @@ public class FacturasController {
 				facturaPago.setFactura(factura);
 				facturaPago.setFormaPago(facturaDetallePagoTemp.getFormaPago());
 				facturaPago.setCantidad(facturaDetallePagoTemp.getMonto());
+				facturaPago.setFecha(new Date());
 				//facturaPago.setAplicado(); //verificar
 				serviceFacturasPagosService.guardar(facturaPago);
 			}

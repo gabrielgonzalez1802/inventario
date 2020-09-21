@@ -1,5 +1,7 @@
 package com.developergg.app.model;
 
+import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -27,6 +29,8 @@ public class FacturaPago {
 	
 	private Double cantidad;
 	private Double aplicado;
+	private Date fecha;
+	
 	public Integer getId() {
 		return id;
 	}
@@ -57,9 +61,15 @@ public class FacturaPago {
 	public void setAplicado(Double aplicado) {
 		this.aplicado = aplicado;
 	}
+	public Date getFecha() {
+		return fecha;
+	}
+	public void setFecha(Date fecha) {
+		this.fecha = fecha;
+	}
 	@Override
 	public String toString() {
 		return "FacturaPago [id=" + id + ", factura=" + factura + ", formaPago=" + formaPago + ", cantidad=" + cantidad
-				+ ", aplicado=" + aplicado + "]";
+				+ ", aplicado=" + aplicado + ", fecha=" + fecha + "]";
 	}
 }

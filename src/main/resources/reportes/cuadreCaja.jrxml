@@ -222,6 +222,33 @@
 			<rightPen lineWidth="0.5" lineColor="#000000"/>
 		</box>
 	</style>
+	<style name="Table 9_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table 9_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table 9_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
 	<subDataset name="Dataset1" uuid="f588e5ab-e745-47cb-b30a-0c16efea3531">
 		<queryString>
 			<![CDATA[]]>
@@ -349,6 +376,18 @@
 			<variableExpression><![CDATA[$F{monto}]]></variableExpression>
 		</variable>
 	</subDataset>
+	<subDataset name="Dataset10" uuid="3aceb599-78da-49a0-8194-e3f1442ee4b1">
+		<queryString>
+			<![CDATA[]]>
+		</queryString>
+		<field name="fecha" class="java.lang.String"/>
+		<field name="factura" class="java.lang.String"/>
+		<field name="formaPago" class="java.lang.String"/>
+		<field name="cantidad" class="java.lang.Double"/>
+		<variable name="cantidad1" class="java.lang.Double" resetType="Column" calculation="Sum">
+			<variableExpression><![CDATA[$F{cantidad}]]></variableExpression>
+		</variable>
+	</subDataset>
 	<parameter name="idUsuario" class="java.lang.Integer"/>
 	<parameter name="ventasContado" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
 	<parameter name="imagen" class="java.lang.String"/>
@@ -374,6 +413,9 @@
 	<parameter name="totalGastos" class="java.lang.Double"/>
 	<parameter name="totalDevoluciones" class="java.lang.Double"/>
 	<parameter name="totalAvanceTaller" class="java.lang.Double"/>
+	<parameter name="cuadrePagoFacturas" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
+	<parameter name="totalPagos" class="java.lang.Double"/>
+	<parameter name="totalGastosDevoluciones" class="java.lang.Double"/>
 	<queryString>
 		<![CDATA[SELECT a.nombre, a.direccion, a.telefono FROM usuarios AS u 
 INNER JOIN almacenes a ON a.id_almacen = u.id_almacen
@@ -1861,9 +1903,135 @@ WHERE u.id_usuario = $P{idUsuario}]]>
 				</jr:table>
 			</componentElement>
 		</band>
+		<band height="10">
+			<printWhenExpression><![CDATA[$P{totalPagos}>0]]></printWhenExpression>
+			<staticText>
+				<reportElement x="0" y="0" width="70" height="10" uuid="25a1812a-eb4d-4138-b187-6087a19cb572"/>
+				<textElement>
+					<font size="6"/>
+				</textElement>
+				<text><![CDATA[Pagos a Facturas]]></text>
+			</staticText>
+		</band>
+		<band height="36">
+			<printWhenExpression><![CDATA[$P{totalPagos}>0]]></printWhenExpression>
+			<componentElement>
+				<reportElement x="0" y="0" width="211" height="30" uuid="fc0d92d0-24f9-44e7-8c07-56e6e5cd5012">
+					<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
+					<property name="com.jaspersoft.studio.table.style.table_header" value="Table 9_TH"/>
+					<property name="com.jaspersoft.studio.table.style.column_header" value="Table 9_CH"/>
+					<property name="com.jaspersoft.studio.table.style.detail" value="Table 9_TD"/>
+				</reportElement>
+				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+					<datasetRun subDataset="Dataset10" uuid="b04f7dfd-3790-4582-937d-cd612845696c">
+						<dataSourceExpression><![CDATA[$P{cuadrePagoFacturas}]]></dataSourceExpression>
+					</datasetRun>
+					<jr:column width="52" uuid="7820a456-f08f-4555-89b9-a460a53762a3">
+						<jr:columnHeader style="Table 4_CH" height="10">
+							<staticText>
+								<reportElement x="0" y="0" width="52" height="10" uuid="11a47b09-3c08-4e98-930c-189ae85df92e"/>
+								<textElement textAlignment="Center">
+									<font size="6" isBold="true"/>
+								</textElement>
+								<text><![CDATA[Fecha]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:columnFooter style="Table 4_CH" height="10"/>
+						<jr:detailCell style="Table 9_TD" height="10">
+							<textField textAdjust="ScaleFont">
+								<reportElement x="0" y="0" width="52" height="10" uuid="2273a18a-a66c-4564-974b-f9d209f2f51f"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="6"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{fecha}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="52" uuid="5ffa2651-7072-4042-a304-eded2068d52d">
+						<jr:columnHeader style="Table 4_CH" height="10">
+							<staticText>
+								<reportElement x="0" y="0" width="52" height="10" uuid="f76cc789-da90-4308-b4b2-f0e71e96ee22"/>
+								<textElement textAlignment="Center">
+									<font size="6" isBold="true"/>
+								</textElement>
+								<text><![CDATA[Factura]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:columnFooter style="Table 4_CH" height="10"/>
+						<jr:detailCell style="Table 9_TD" height="10">
+							<textField textAdjust="ScaleFont">
+								<reportElement x="0" y="0" width="52" height="10" uuid="2faf9b80-412f-465c-a864-8c6cbc0128cc"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="6"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{factura}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="52" uuid="439984fa-c172-49b1-917c-a033531de9b2">
+						<jr:columnHeader style="Table 4_CH" height="10">
+							<staticText>
+								<reportElement x="0" y="0" width="52" height="10" uuid="8afcaee5-4925-4791-979b-fe25db7ef253"/>
+								<textElement textAlignment="Center">
+									<font size="6" isBold="true"/>
+								</textElement>
+								<text><![CDATA[Forma de Pago]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:columnFooter style="Table 4_CH" height="10">
+							<staticText>
+								<reportElement x="0" y="0" width="52" height="10" uuid="57e3aa1b-a539-4a86-907b-a8943b1eb36e"/>
+								<textElement textAlignment="Center">
+									<font size="6" isBold="true"/>
+								</textElement>
+								<text><![CDATA[Total]]></text>
+							</staticText>
+						</jr:columnFooter>
+						<jr:detailCell style="Table 9_TD" height="10">
+							<textField textAdjust="ScaleFont">
+								<reportElement x="0" y="0" width="52" height="10" uuid="f3b59b2f-c388-4f1a-97bb-752c6112a5d2"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="6"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{formaPago}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="55" uuid="67365ca1-8487-4deb-8467-9b9fda80b048">
+						<jr:columnHeader style="Table 4_CH" height="10">
+							<staticText>
+								<reportElement x="0" y="0" width="55" height="10" uuid="1ddaf0e3-2574-4376-b896-12d059abe758"/>
+								<textElement textAlignment="Center">
+									<font size="6" isBold="true"/>
+								</textElement>
+								<text><![CDATA[Cantidad]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:columnFooter style="Table 4_CH" height="10">
+							<textField textAdjust="ScaleFont">
+								<reportElement x="0" y="0" width="55" height="10" uuid="ceb05331-284b-4b0c-8d20-1cff74c91c33"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="6" isBold="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{cantidad1}]]></textFieldExpression>
+							</textField>
+						</jr:columnFooter>
+						<jr:detailCell style="Table 9_TD" height="10">
+							<textField textAdjust="ScaleFont">
+								<reportElement x="0" y="0" width="55" height="10" uuid="3d4b1dc8-5cf9-4325-b794-35e3485eee94"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="6"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{cantidad}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+				</jr:table>
+			</componentElement>
+		</band>
 	</detail>
 	<summary>
-		<band height="52">
+		<band height="50">
 			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.FreeLayout"/>
 			<staticText>
 				<reportElement x="0" y="0" width="30" height="10" uuid="75e57028-373b-466c-9431-2fbb2aa917d7">
@@ -1957,10 +2125,42 @@ WHERE u.id_usuario = $P{idUsuario}]]>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{totalContadoCreditoTaller}]]></textFieldExpression>
 			</textField>
+			<textField textAdjust="ScaleFont" isBlankWhenNull="true">
+				<reportElement x="30" y="36" width="40" height="10" uuid="c11c4629-4223-4115-b9ef-7e0611c4994b"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{totalPagos}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="36" width="30" height="10" uuid="b8ea948a-12d0-4e85-aa58-90014c0181b6">
+					<printWhenExpression><![CDATA[$P{totalPagos}>0]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="5" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Total Pagos]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="26" width="90" height="10" uuid="0eda6828-32ca-4b9e-a92f-cbf2221c8c97">
+					<printWhenExpression><![CDATA[$P{totalPagos}>0]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="5" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Total Gastos + Total Devoluciones]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="90" y="26" width="50" height="10" uuid="dd69aa96-0964-4fe3-97b2-1443ce16a3cc"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{totalGastosDevoluciones}]]></textFieldExpression>
+			</textField>
 		</band>
 	</summary>
 	<noData>
-		<band height="48">
+		<band height="29">
 			<textField>
 				<reportElement x="0" y="0" width="50" height="10" uuid="5ed3a215-7e57-4ad5-9100-037b2597c524"/>
 				<textElement>

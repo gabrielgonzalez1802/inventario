@@ -148,6 +148,7 @@ public class FormasPagoController {
 		}
 		
 		pago.setFactura(factura);
+		pago.setFecha(new Date());
 		pago.setFormaPago(formaPago);
 		pago.setCantidad(monto);
 		if(autorizado) {
