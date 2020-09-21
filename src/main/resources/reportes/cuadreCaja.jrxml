@@ -360,6 +360,20 @@
 	<parameter name="cuadreGastos" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
 	<parameter name="cuadreDevoluciones" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
 	<parameter name="cuadreAvancesTaller" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
+	<parameter name="totalContado" class="java.lang.Double"/>
+	<parameter name="totalCredito" class="java.lang.Double"/>
+	<parameter name="totalContadoCredito" class="java.lang.Double"/>
+	<parameter name="totalContadoTaller" class="java.lang.Double"/>
+	<parameter name="totalCreditoTaller" class="java.lang.Double"/>
+	<parameter name="totalContadoCreditoTaller" class="java.lang.Double"/>
+	<parameter name="fechaDesde" class="java.lang.String"/>
+	<parameter name="fechaHasta" class="java.lang.String"/>
+	<parameter name="empleado" class="java.lang.String"/>
+	<parameter name="totalAbonoCxC" class="java.lang.Double"/>
+	<parameter name="totalIngresos" class="java.lang.Double"/>
+	<parameter name="totalGastos" class="java.lang.Double"/>
+	<parameter name="totalDevoluciones" class="java.lang.Double"/>
+	<parameter name="totalAvanceTaller" class="java.lang.Double"/>
 	<queryString>
 		<![CDATA[SELECT a.nombre, a.direccion, a.telefono FROM usuarios AS u 
 INNER JOIN almacenes a ON a.id_almacen = u.id_almacen
@@ -387,7 +401,7 @@ WHERE u.id_usuario = $P{idUsuario}]]>
 		<band splitType="Stretch"/>
 	</background>
 	<title>
-		<band height="30" splitType="Stretch">
+		<band height="33" splitType="Stretch">
 			<textField>
 				<reportElement x="0" y="10" width="60" height="10" uuid="f5d5a0cc-388b-4de7-83e3-0ec339f355a5"/>
 				<textElement>
@@ -413,10 +427,52 @@ WHERE u.id_usuario = $P{idUsuario}]]>
 				<reportElement x="180" y="0" width="30" height="30" uuid="1fcb5b07-3410-4f84-9a1c-82e4780a966d"/>
 				<imageExpression><![CDATA[$P{imagen}]]></imageExpression>
 			</image>
+			<textField textAdjust="ScaleFont">
+				<reportElement x="90" y="0" width="40" height="10" uuid="2cddc99c-ca50-433e-8158-8aa755147c55"/>
+				<textElement>
+					<font size="6" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{fechaDesde}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="70" y="0" width="20" height="10" uuid="d8801b44-6057-4718-aed9-69eefbd3b672"/>
+				<textElement textAlignment="Left">
+					<font size="6" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Desde]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="70" y="10" width="20" height="10" uuid="09ee8c8b-af56-4fcf-9bc2-fb70824c762c"/>
+				<textElement textAlignment="Left">
+					<font size="6" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Hasta]]></text>
+			</staticText>
+			<textField textAdjust="ScaleFont">
+				<reportElement x="90" y="10" width="40" height="10" uuid="e77f5b6f-318a-48c5-8fe1-53905448069a"/>
+				<textElement>
+					<font size="6" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{fechaHasta}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="70" y="20" width="30" height="10" uuid="830fa082-e68a-4265-ad75-f36c3724bc8d"/>
+				<textElement textAlignment="Left">
+					<font size="6" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Empleado]]></text>
+			</staticText>
+			<textField textAdjust="ScaleFont">
+				<reportElement x="100" y="20" width="40" height="10" uuid="a08db7c2-6acc-4b98-b178-2af20acff4fa"/>
+				<textElement>
+					<font size="6" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{empleado}]]></textFieldExpression>
+			</textField>
 		</band>
 	</title>
 	<pageHeader>
-		<band height="11" splitType="Stretch">
+		<band height="13" splitType="Stretch">
 			<staticText>
 				<reportElement x="80" y="0" width="60" height="10" uuid="15d35457-ad99-4c60-bef4-4def34df7899"/>
 				<textElement>
@@ -424,11 +480,18 @@ WHERE u.id_usuario = $P{idUsuario}]]>
 				</textElement>
 				<text><![CDATA[Cuadre Caja]]></text>
 			</staticText>
+			<line direction="BottomUp">
+				<reportElement style="Table 3_TH" x="0" y="10" width="210" height="1" uuid="04a7d7ee-ce21-4301-9843-4a8ac5240480"/>
+				<graphicElement>
+					<pen lineStyle="Dotted"/>
+				</graphicElement>
+			</line>
 		</band>
 	</pageHeader>
 	<detail>
 		<band height="44">
 			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.FreeLayout"/>
+			<printWhenExpression><![CDATA[$P{totalContado} > 0]]></printWhenExpression>
 			<componentElement>
 				<reportElement x="0" y="12" width="210" height="30" uuid="d247fb1d-ec16-47f8-a030-0e9e8611855f">
 					<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
@@ -605,6 +668,7 @@ WHERE u.id_usuario = $P{idUsuario}]]>
 			</staticText>
 		</band>
 		<band height="13">
+			<printWhenExpression><![CDATA[$P{totalContadoTaller} > 0]]></printWhenExpression>
 			<staticText>
 				<reportElement x="0" y="0" width="70" height="12" uuid="0b4d9b69-95e3-4ed3-a7eb-df47656f4268"/>
 				<textElement>
@@ -614,6 +678,7 @@ WHERE u.id_usuario = $P{idUsuario}]]>
 			</staticText>
 		</band>
 		<band height="32">
+			<printWhenExpression><![CDATA[$P{totalContadoTaller} > 0]]></printWhenExpression>
 			<componentElement>
 				<reportElement x="0" y="0" width="210" height="30" uuid="c4aecce2-8b35-40c9-8aea-9edd46922962">
 					<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
@@ -777,6 +842,7 @@ WHERE u.id_usuario = $P{idUsuario}]]>
 			</componentElement>
 		</band>
 		<band height="13">
+			<printWhenExpression><![CDATA[$P{totalCredito} > 0]]></printWhenExpression>
 			<staticText>
 				<reportElement x="0" y="0" width="70" height="12" uuid="595d9f91-775a-4071-b3c0-4dc3adf42f78"/>
 				<textElement>
@@ -786,6 +852,7 @@ WHERE u.id_usuario = $P{idUsuario}]]>
 			</staticText>
 		</band>
 		<band height="32">
+			<printWhenExpression><![CDATA[$P{totalCredito} > 0]]></printWhenExpression>
 			<componentElement>
 				<reportElement x="0" y="0" width="210" height="30" uuid="568d632f-73a5-461e-bf05-9f7ae6051f44">
 					<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
@@ -949,6 +1016,7 @@ WHERE u.id_usuario = $P{idUsuario}]]>
 			</componentElement>
 		</band>
 		<band height="12">
+			<printWhenExpression><![CDATA[$P{totalCreditoTaller} > 0]]></printWhenExpression>
 			<staticText>
 				<reportElement x="0" y="0" width="70" height="12" uuid="93b52a90-097e-4852-98c4-e13c02292cd3"/>
 				<textElement>
@@ -958,6 +1026,7 @@ WHERE u.id_usuario = $P{idUsuario}]]>
 			</staticText>
 		</band>
 		<band height="32">
+			<printWhenExpression><![CDATA[$P{totalCreditoTaller} > 0]]></printWhenExpression>
 			<componentElement>
 				<reportElement x="0" y="0" width="210" height="30" uuid="16358574-b33b-49b2-8918-47b8c4aa283c">
 					<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
@@ -1121,6 +1190,7 @@ WHERE u.id_usuario = $P{idUsuario}]]>
 			</componentElement>
 		</band>
 		<band height="12">
+			<printWhenExpression><![CDATA[$P{totalAbonoCxC} > 0]]></printWhenExpression>
 			<staticText>
 				<reportElement x="0" y="0" width="70" height="12" uuid="836ffbf2-9b7c-4d8e-916a-4def4939117b"/>
 				<textElement>
@@ -1130,6 +1200,7 @@ WHERE u.id_usuario = $P{idUsuario}]]>
 			</staticText>
 		</band>
 		<band height="32">
+			<printWhenExpression><![CDATA[$P{totalAbonoCxC} > 0]]></printWhenExpression>
 			<componentElement>
 				<reportElement x="0" y="0" width="210" height="30" uuid="094cf33c-7f74-40a7-b9e7-6a5ecde5f8ee">
 					<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
@@ -1224,6 +1295,7 @@ WHERE u.id_usuario = $P{idUsuario}]]>
 			</componentElement>
 		</band>
 		<band height="13">
+			<printWhenExpression><![CDATA[$P{totalIngresos} > 0]]></printWhenExpression>
 			<staticText>
 				<reportElement x="0" y="0" width="70" height="12" uuid="7601cf00-ee34-45d4-83e7-a1f8a5fec1fa"/>
 				<textElement>
@@ -1233,6 +1305,7 @@ WHERE u.id_usuario = $P{idUsuario}]]>
 			</staticText>
 		</band>
 		<band height="33">
+			<printWhenExpression><![CDATA[$P{totalIngresos} > 0]]></printWhenExpression>
 			<componentElement>
 				<reportElement x="0" y="1" width="210" height="30" uuid="f80bf710-f55c-40aa-8166-abfee0c63f92">
 					<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
@@ -1348,6 +1421,7 @@ WHERE u.id_usuario = $P{idUsuario}]]>
 			</componentElement>
 		</band>
 		<band height="15">
+			<printWhenExpression><![CDATA[$P{totalGastos} > 0]]></printWhenExpression>
 			<staticText>
 				<reportElement x="0" y="0" width="70" height="12" uuid="ad39cfd9-2ad7-47d1-a6c6-7fbb07708472"/>
 				<textElement>
@@ -1357,6 +1431,7 @@ WHERE u.id_usuario = $P{idUsuario}]]>
 			</staticText>
 		</band>
 		<band height="33">
+			<printWhenExpression><![CDATA[$P{totalGastos} > 0]]></printWhenExpression>
 			<componentElement>
 				<reportElement x="0" y="0" width="210" height="30" uuid="e153c6e8-190f-4930-bb9a-cc2c5df260ec">
 					<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
@@ -1472,6 +1547,7 @@ WHERE u.id_usuario = $P{idUsuario}]]>
 			</componentElement>
 		</band>
 		<band height="14">
+			<printWhenExpression><![CDATA[$P{totalDevoluciones} > 0]]></printWhenExpression>
 			<staticText>
 				<reportElement x="0" y="0" width="70" height="12" uuid="0bab2e0a-0290-42e4-8884-fd1c86ce4df4"/>
 				<textElement>
@@ -1481,6 +1557,7 @@ WHERE u.id_usuario = $P{idUsuario}]]>
 			</staticText>
 		</band>
 		<band height="34">
+			<printWhenExpression><![CDATA[$P{totalDevoluciones} > 0]]></printWhenExpression>
 			<componentElement>
 				<reportElement x="0" y="0" width="210" height="30" uuid="8d5abb18-8067-4767-b23c-0bd93d96fa7a">
 					<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
@@ -1638,6 +1715,7 @@ WHERE u.id_usuario = $P{idUsuario}]]>
 			</componentElement>
 		</band>
 		<band height="13">
+			<printWhenExpression><![CDATA[$P{totalAvanceTaller} > 0]]></printWhenExpression>
 			<staticText>
 				<reportElement x="0" y="0" width="70" height="10" uuid="75085f9d-4729-4e2d-ad4d-fed20e346ae7"/>
 				<textElement>
@@ -1646,7 +1724,8 @@ WHERE u.id_usuario = $P{idUsuario}]]>
 				<text><![CDATA[Avance Taller]]></text>
 			</staticText>
 		</band>
-		<band height="34">
+		<band height="37">
+			<printWhenExpression><![CDATA[$P{totalAvanceTaller} > 0]]></printWhenExpression>
 			<componentElement>
 				<reportElement x="0" y="0" width="210" height="31" uuid="3d9f96d7-8def-4580-a991-f2ae1af95abd">
 					<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
@@ -1784,11 +1863,139 @@ WHERE u.id_usuario = $P{idUsuario}]]>
 		</band>
 	</detail>
 	<summary>
-		<band height="62">
+		<band height="52">
 			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.FreeLayout"/>
+			<staticText>
+				<reportElement x="0" y="0" width="30" height="10" uuid="75e57028-373b-466c-9431-2fbb2aa917d7">
+					<printWhenExpression><![CDATA[$P{totalContado}!=null]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="5" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Contado]]></text>
+			</staticText>
+			<textField textAdjust="ScaleFont">
+				<reportElement x="30" y="0" width="30" height="10" uuid="0a66bb76-8ce6-48ce-8716-e0f14d5a30e3"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{totalContado}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="60" y="0" width="20" height="10" uuid="10228f5b-48ac-4936-9abb-0d32fdc9315c">
+					<printWhenExpression><![CDATA[$P{totalCredito}!=null]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="5" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Credito]]></text>
+			</staticText>
+			<textField textAdjust="ScaleFont" isBlankWhenNull="true">
+				<reportElement x="80" y="0" width="40" height="10" uuid="cb462e74-afa3-47e6-b393-9d8ba0b71932"/>
+				<textElement verticalAlignment="Middle">
+					<font size="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{totalCredito}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="120" y="0" width="30" height="10" uuid="b97f20d2-5e28-45c7-9a26-96ed2e9904a8"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="5" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Total Venta]]></text>
+			</staticText>
+			<textField textAdjust="ScaleFont">
+				<reportElement x="150" y="0" width="60" height="10" uuid="f32786f3-7e81-47a9-a042-7a6e2c805625"/>
+				<textElement verticalAlignment="Middle">
+					<font size="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{totalContadoCredito}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="10" width="40" height="10" uuid="0686e72d-769f-4913-9e34-ec998ac2388b">
+					<printWhenExpression><![CDATA[$P{totalContadoTaller}!=null]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="5" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Contado Taller]]></text>
+			</staticText>
+			<textField textAdjust="ScaleFont">
+				<reportElement x="40" y="10" width="30" height="10" uuid="a2126a3e-e271-494a-8fde-9d027d9e0b06"/>
+				<textElement verticalAlignment="Middle">
+					<font size="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{totalContadoTaller}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="70" y="10" width="40" height="10" uuid="c1eafa83-9b5f-42e3-9e81-b48ae3b42078">
+					<printWhenExpression><![CDATA[$P{totalCreditoTaller}!=null]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="5" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Credito Taller]]></text>
+			</staticText>
+			<textField textAdjust="ScaleFont">
+				<reportElement x="110" y="10" width="30" height="10" uuid="3c07e41f-7d27-4ffe-9fd7-aa0ef71ecfd6"/>
+				<textElement verticalAlignment="Middle">
+					<font size="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{totalCreditoTaller}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="140" y="10" width="30" height="10" uuid="411dd897-c7ab-467a-82d4-1686ec36d0bf"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="5" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Total Venta]]></text>
+			</staticText>
+			<textField textAdjust="ScaleFont">
+				<reportElement x="170" y="10" width="40" height="10" uuid="d6fce936-9889-4298-b537-613fd31bc30c"/>
+				<textElement verticalAlignment="Middle">
+					<font size="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{totalContadoCreditoTaller}]]></textFieldExpression>
+			</textField>
 		</band>
 	</summary>
 	<noData>
-		<band height="62"/>
+		<band height="48">
+			<textField>
+				<reportElement x="0" y="0" width="50" height="10" uuid="5ed3a215-7e57-4ad5-9100-037b2597c524"/>
+				<textElement>
+					<font size="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{totalAbonoCxC}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="50" y="0" width="40" height="10" uuid="24873e86-0d14-49f8-accc-36f5c54ff9eb"/>
+				<textElement>
+					<font size="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{totalIngresos}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="90" y="0" width="40" height="10" uuid="bda96db8-3052-4898-b8ea-c0829aedf978"/>
+				<textElement>
+					<font size="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{totalGastos}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="130" y="0" width="52" height="10" uuid="a2f0b92f-6300-435f-b49d-a1f9300a96a2"/>
+				<textElement>
+					<font size="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{totalDevoluciones}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="10" width="51" height="10" uuid="ea031d45-8518-43ef-a394-2cb5107d5799"/>
+				<textElement>
+					<font size="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{totalAvanceTaller}]]></textFieldExpression>
+			</textField>
+		</band>
 	</noData>
 </jasperReport>

@@ -408,6 +408,51 @@ public class CuadreCajaController {
 			}
 		}
 		
+		Double totalContado = 0.0;
+		Double totalContadoTaller = 0.0;
+		Double totalCredito = 0.0;
+		Double totalCreditoTaller = 0.0;
+		
+		//Calculo de los totales
+		for (CuadreVentaContado ventaContado : ventasContado) {
+			totalContado+=ventaContado.getSubTotal();
+		}
+		for (CuadreVentaContadoTaller ventaContadoTaller : ventasContadoTaller) {
+			totalContadoTaller+=ventaContadoTaller.getSubTotal();
+		}
+		for (CuadreVentaCredito ventaCredito : ventasCredito) {
+			totalCredito+=ventaCredito.getSubTotal();
+		}
+		for (CuadreVentaCreditoTaller ventaCreditoTaller : ventasCreditoTaller) {
+			totalCreditoTaller+=ventaCreditoTaller.getSubTotal();
+		}
+		
+		Double totalAbonoCxC = 0.0;
+		Double totalIngresos = 0.0;
+		Double totalGastos = 0.0;
+		Double totalDevoluciones = 0.0;
+		Double totalAvanceTaller = 0.0;
+		
+		for (CuadreAbonoCxC cuadreAbonoCxC : cuadreAbonosCxC) {
+			totalAbonoCxC+=cuadreAbonoCxC.getMonto();
+		}
+		for (CuadreIngreso cuadreIngreso : cuadreIngresos) {
+			totalIngresos+=cuadreIngreso.getMonto();
+		}
+		for (CuadreGasto cuadreGasto : cuadreGastos) {
+			totalGastos+=cuadreGasto.getMonto();
+		}
+		for (CuadreDevolucion cuadreDevolucion : cuadreDevoluciones) {
+			totalDevoluciones+=cuadreDevolucion.getSubTotal();
+		}
+		for (CuadreAvanceTaller cuadreAvanceTaller : cuadreAvancesTaller) {
+			totalAvanceTaller+=cuadreAvanceTaller.getMonto();
+		}
+		
+		Double totalContadoCredito = totalContado+totalCredito;
+		Double totalContadoCreditoTaller = totalContadoTaller+totalCreditoTaller;
+		Double totalFacturadoContadoCredito =  totalContado+totalContadoTaller+totalCredito+totalCreditoTaller;
+		
 		JasperReport jasperReport = JasperCompileManager.compileReport(rutaJreport);
 		
 		Map<String, Object> parameters = new HashMap<String, Object>();
@@ -434,6 +479,21 @@ public class CuadreCajaController {
 		parameters.put("cuadreGastos", gastosRBean);
 		parameters.put("cuadreDevoluciones", devolucionesRBean);
 		parameters.put("cuadreAvancesTaller", avancesTallerRBean);
+		parameters.put("totalContado", totalContado);
+		parameters.put("totalContadoTaller", totalContadoTaller);
+		parameters.put("totalCredito", totalCredito);
+		parameters.put("totalCreditoTaller", totalCreditoTaller);
+		parameters.put("totalContadoCredito", totalContadoCredito);
+		parameters.put("totalContadoCreditoTaller", totalContadoCreditoTaller);
+		parameters.put("totalFacturadoContadoCredito", totalFacturadoContadoCredito);
+		parameters.put("fechaDesde", desde);
+		parameters.put("fechaHasta", hasta);
+		parameters.put("empleado", usuarios.size()==1?usuarios.get(0).getUsername():"Todos");
+		parameters.put("totalAbonoCxC", totalAbonoCxC);
+		parameters.put("totalIngresos", totalIngresos);
+		parameters.put("totalGastos", totalGastos);
+		parameters.put("totalDevoluciones", totalDevoluciones);
+		parameters.put("totalAvanceTaller", totalAvanceTaller);
 		
 		JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource.getConnection());
 		
