@@ -23,4 +23,5 @@ public interface FacturasRepository extends JpaRepository<Factura, Integer> {
 	List<Factura> findByAlmacenAndCreditoAndFechaBetweenAndUsuarioIn(Almacen almacen,
 			Integer credito, Date desde, Date hasta, List<Usuario> usuarios);
 	List<Factura> findByAlmacenAndFechaBetweenAndUsuarioIn(Almacen almacen, Date desde, Date hasta, List<Usuario> usuarios);
+	List<Factura> findByAlmacenAndFechaBetweenAndUsuarioInAndTallerIsNotNull(Almacen almacen, Date desde, Date hasta, List<Usuario> usuarios);
 }

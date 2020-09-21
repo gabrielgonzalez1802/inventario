@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.developergg.app.model.AbonoCxC;
 import com.developergg.app.model.AbonoCxCDetalle;
 import com.developergg.app.model.CuadreAbonoCxC;
+import com.developergg.app.model.CuadreAvanceTaller;
 import com.developergg.app.model.CuadreDevolucion;
 import com.developergg.app.model.CuadreGasto;
 import com.developergg.app.model.CuadreIngreso;
@@ -47,6 +48,7 @@ import com.developergg.app.model.FacturaDetalleServicio;
 import com.developergg.app.model.FacturaDetalleTaller;
 import com.developergg.app.model.Gasto;
 import com.developergg.app.model.Ingreso;
+import com.developergg.app.model.Taller;
 import com.developergg.app.model.Usuario;
 import com.developergg.app.service.IAbonosCxCDetallesService;
 import com.developergg.app.service.IAbonosCxCService;
@@ -170,6 +172,7 @@ public class CuadreCajaController {
 		List<CuadreIngreso> cuadreIngresos = new LinkedList<>();
 		List<CuadreGasto> cuadreGastos = new LinkedList<>();
 		List<CuadreDevolucion> cuadreDevoluciones = new LinkedList<>();
+		List<CuadreAvanceTaller> cuadreAvancesTaller = new LinkedList<>();
 		
 		//Venta al contado
 		List<Factura> facturasContado = serviceFacturas.buscarFacturaCuadreMultiUsuario(usuarios.get(0).getAlmacen(),
@@ -388,6 +391,23 @@ public class CuadreCajaController {
 			}
 		}
 		
+		//Avance Taller
+		List<Factura> facturasTalleres = serviceFacturas.buscarFacturaCuadreMultiUsuarioConTaller(usuarios.get(0).getAlmacen(),
+				newDesde, newHasta, usuarios);
+		for (Factura facturaTaller : facturasTalleres) {
+			Taller taller = facturaTaller.getTaller();
+			if(taller.getAvance()>0) {
+				CuadreAvanceTaller cuadreAvanceTaller = new CuadreAvanceTaller();
+				cuadreAvanceTaller.setFecha(formato.format(taller.getFecha()));
+				cuadreAvanceTaller.setId(taller.getId());
+				cuadreAvanceTaller.setMarca(taller.getMarca());
+				cuadreAvanceTaller.setModelo(taller.getModelo());
+				cuadreAvanceTaller.setMonto(taller.getAvance());
+				cuadreAvanceTaller.setTipo(taller.getTipo_reparacion());
+				cuadreAvancesTaller.add(cuadreAvanceTaller);
+			}
+		}
+		
 		JasperReport jasperReport = JasperCompileManager.compileReport(rutaJreport);
 		
 		Map<String, Object> parameters = new HashMap<String, Object>();
@@ -401,6 +421,7 @@ public class CuadreCajaController {
 		JRBeanCollectionDataSource ingresosRBean = new JRBeanCollectionDataSource(cuadreIngresos);
 		JRBeanCollectionDataSource gastosRBean = new JRBeanCollectionDataSource(cuadreGastos);
 		JRBeanCollectionDataSource devolucionesRBean = new JRBeanCollectionDataSource(cuadreDevoluciones);
+		JRBeanCollectionDataSource avancesTallerRBean = new JRBeanCollectionDataSource(cuadreAvancesTaller);
 		
 		parameters.put("idUsuario", usuarioAcct.getId());
 		parameters.put("imagen", rutaImagenes+usuarioAcct.getAlmacen().getImagen());
@@ -412,6 +433,7 @@ public class CuadreCajaController {
 		parameters.put("cuadreIngresos", ingresosRBean);
 		parameters.put("cuadreGastos", gastosRBean);
 		parameters.put("cuadreDevoluciones", devolucionesRBean);
+		parameters.put("cuadreAvancesTaller", avancesTallerRBean);
 		
 		JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource.getConnection());
 		
