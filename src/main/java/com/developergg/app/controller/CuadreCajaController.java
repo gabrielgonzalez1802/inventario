@@ -560,19 +560,19 @@ public class CuadreCajaController {
 		
 		JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource.getConnection());
 		
-		String dataDirectory = tempFolder + pathSeparator + "factura"+usuarioAcct.getId()+".pdf";
+		String dataDirectory = tempFolder + pathSeparator + "cuadreCaja"+usuarioAcct.getId()+".pdf";
 		
 		tempFolder += pathSeparator;
 
 		JasperExportManager.exportReportToPdfFile(jasperPrint,dataDirectory);
 		         
-        Path file = Paths.get(tempFolder, "factura"+usuarioAcct.getId()+".pdf");
+        Path file = Paths.get(tempFolder, "cuadreCaja"+usuarioAcct.getId()+".pdf");
         if (Files.exists(file)) 
         {
-            String mimeType = URLConnection.guessContentTypeFromName(tempFolder+"factura"+usuarioAcct.getId()+".pdf");
+            String mimeType = URLConnection.guessContentTypeFromName(tempFolder+"cuadreCaja"+usuarioAcct.getId()+".pdf");
             if (mimeType == null) mimeType = "application/octet-stream";
             response.setContentType(mimeType);
-            response.setHeader("Content-Disposition", String.format("inline; filename=\"" + "factura"+usuarioAcct.getId()+".pdf" + "\""));
+            response.setHeader("Content-Disposition", String.format("inline; filename=\"" + "cuadreCaja"+usuarioAcct.getId()+".pdf" + "\""));
             try
             {
                 Files.copy(file, response.getOutputStream());

@@ -1,19 +1,31 @@
 package com.developergg.app.controller;
 
+import java.io.IOException;
+import java.net.URLConnection;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.sql.SQLException;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.sql.DataSource;
 
 import org.apache.commons.collections4.ListUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +44,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.developergg.app.model.Almacen;
 import com.developergg.app.model.Articulo;
 import com.developergg.app.model.ArticuloAjuste;
+import com.developergg.app.model.ArticuloReporte;
 import com.developergg.app.model.ArticuloSerial;
 import com.developergg.app.model.Categoria;
 import com.developergg.app.model.Cliente;
@@ -63,6 +76,14 @@ import com.developergg.app.service.IFacturasTempService;
 import com.developergg.app.service.ISuplidoresService;
 import com.developergg.app.service.ITalleresArticulosService;
 import com.developergg.app.util.Utileria;
+
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 @Controller
 @RequestMapping(value = "/articulos")
@@ -113,15 +134,27 @@ public class ArticulosController {
 	@Autowired
 	private IAlmacenesService serviceAlmacenes;
 	
+	@Value("${inventario.ruta.reporte.articulos}")
+	private String rutaJreport;
+	
 	@PersistenceContext
 	private EntityManager em;
+	
+	@Autowired
+	private DataSource dataSource;
 	
 	@Value("${inventario.ruta.imagenes}")
 	private String ruta;
 	
+	@Value("${inventario.ruta.imagenes}")
+	private String rutaImagenes;
+	
 	private List<Articulo> lista;
 	
 	DecimalFormat df2 = new DecimalFormat("###.##");
+	
+	private String tempFolder =  System.getProperty("java.io.tmpdir");
+	private String pathSeparator = System.getProperty("file.separator");
 		
 	@GetMapping("/")
 	public String mostrarArticulos(Model model, HttpSession session) {
@@ -1499,6 +1532,235 @@ public class ArticulosController {
 		model.addAttribute("incluyeItbis", comprobanteFiscal.getIncluye_itbis());
 		model.addAttribute("valorItbis", comprobanteFiscal.getValor_itbis());
 		return "facturas/factura :: #comprobanteFiscalInfo";
+	}
+	
+	@GetMapping("/reporte")
+	public String formularioReporteArticulo(Model model, HttpSession session) {
+		Usuario usuario = (Usuario) session.getAttribute("usuario");
+		//Articulos que no esten eliminados
+		List<Articulo> articulos = serviceArticulos.buscarPorTienda(usuario.getAlmacen().getPropietario()).
+				stream().filter(a -> a.getEliminado() == 0).collect(Collectors.toList());
+		List<Categoria> categorias = serviceCategorias.buscarPorPropietario(usuario.getAlmacen().getPropietario());
+		model.addAttribute("categorias", categorias);
+		model.addAttribute("articulos", articulos);
+		return "articulos/generarReporteArticulos";
+	}
+	
+	@PostMapping("/generarReporte")
+	public void reporteArticulos(HttpSession session, HttpServletRequest request, 
+			HttpServletResponse response, @RequestParam(name = "idArticulo") Integer idArticulo, 
+			@RequestParam(name = "idCategoria") Integer idCategoria, @RequestParam(name = "tipoArticulo") Integer tipoArticulo,
+			@RequestParam(name = "gama") Integer gama, @RequestParam(name = "conItbis") Integer conItbis,
+			@RequestParam(name = "tipoPrecio") Integer tipoPrecio, @RequestParam(name = "verEliminados") Integer verEliminados,
+			@RequestParam(name = "ordenar") Integer ordenar, @RequestParam(name = "tipoOrden") Integer tipoOrden
+			) throws JRException, SQLException {
+		Usuario usuario = (Usuario) session.getAttribute("usuario");
+		SimpleDateFormat formato = new SimpleDateFormat("yyyy-MM-dd");
+		
+		List<Categoria> categorias = new LinkedList<>();
+		List<Articulo> articulos = new LinkedList<>();
+		List<ArticuloReporte> articulosReporte = new LinkedList<>();
+		
+		String tempTipoPrecio = "";
+		String categoriasIds = "";
+		String articulosIds = "";
+		String tempSerial = "";
+		String tempGama = "";
+		String tempConItbis = "";
+		String tempOrderBy = "";
+		String tempCategoria = "";
+				
+		//Validacion de orden
+		if(ordenar == 1) {
+			tempOrderBy = "nombre";
+		} else if (ordenar == 2) {
+			tempOrderBy = "codigo";
+		} else if (ordenar == 3) {
+			tempOrderBy = "nombreCategoria";
+		}
+		
+		//Validacion de con itbis
+		if (conItbis == 0) {
+			tempConItbis = "TODOS";
+		} else if (conItbis == 1) {
+			tempConItbis = "'1','SI'";
+		} else if (conItbis == 2) {
+			tempConItbis = "'0','NO'";
+		}
+			
+		//Validacion de gama
+		if (gama == 0) {
+			tempGama = "TODOS";
+		} else if (gama == 1) {
+			tempGama = "'1','ALTA'";
+		} else if (gama == 2) {
+			tempGama = "'2','MEDIA'";
+		} else {
+			tempGama = "'3','BAJA'";
+		}
+
+		//Validacion tipo de precio
+		if(tipoPrecio == 1) {
+			tempTipoPrecio = "maximo";
+		}else if(tipoPrecio == 2) {
+			tempTipoPrecio = "minimo";
+		}else {
+			tempTipoPrecio = "mayor";
+		}
+		
+		//Validacion de seriales
+		if(tipoArticulo == 0) {
+			tempSerial="TODOS";
+		}else if(tipoArticulo == 1) {
+			tempSerial="'1','SI'";
+		}else {
+			tempSerial="'0','NO'";
+		}
+		
+		//Validacion de articulos
+		if(idArticulo == 0) {
+			if(verEliminados == 1) {
+				articulos = serviceArticulos.buscarPorTienda(usuario.getAlmacen().getPropietario());
+			}else {
+				articulos = serviceArticulos.buscarPorTienda(usuario.getAlmacen().getPropietario())
+						.stream().filter(p -> p.getEliminado() == 0).collect(Collectors.toList());
+			}
+			for (Articulo articulo : articulos) {
+				articulosIds+=articulo.getId().toString()+",";
+			}
+			articulosIds = articulosIds.substring(0, articulosIds.length() - 1);
+		}else {
+			articulos.add(serviceArticulos.buscarPorId(idArticulo));
+			articulosIds+=articulos.get(0).getId();
+		}
+		
+		//Validacion de categorias
+		if(idCategoria == 0) {
+			 categorias = serviceCategorias.buscarPorPropietario(usuario.getAlmacen().getPropietario());
+			 for (Categoria categoria : categorias) {
+				 categoriasIds+=categoria.getId().toString()+",";
+			 }
+			 categoriasIds = categoriasIds.substring(0, categoriasIds.length() - 1);
+			 tempCategoria = "TODAS";
+		}else {
+			categorias.add(serviceCategorias.buscarPorId(idCategoria));
+			categoriasIds = categorias.get(0).getId().toString();
+			tempCategoria = categorias.get(0).getNombre();
+		}
+		
+		StringBuilder query = new StringBuilder("SELECT ");
+		query.append("a.id_articulo, a.codigo, a.nombre, a.costo, c.nombre AS nombreCategoria, ")
+		.append("precio_").append(tempTipoPrecio).append(", a.imei ")
+		.append("FROM articulos a ")
+		.append("INNER JOIN propietario p ON p.id_tienda = a.id_tienda ")
+		.append("INNER JOIN categorias c ON c.id_categoria = a.id_categoria ")
+		.append("WHERE ").append("a.id_tienda = ").append(usuario.getAlmacen().getPropietario().getId()).append(" ")
+		.append("AND a.id_categoria IN (").append(categoriasIds).append(") ")
+		.append("AND a.id_articulo IN (").append(articulosIds).append(") ");
+		if(!tempSerial.equals("TODOS")) { 
+			query.append("AND a.imei IN (").append(tempSerial).append(") ");
+		}
+		if(!tempGama.equals("TODOS")) { 
+			query.append("AND a.gama IN (").append(tempGama).append(") ");
+		}
+		if(!tempConItbis.equals("TODOS")) { 
+			query.append("AND a.itbis IN (").append(tempConItbis).append(") ");
+		}
+		query.append("ORDER BY ").append(tempOrderBy).append(" ")
+		.append(tipoOrden==1?"ASC":"DESC");
+
+		Query nativeQuery = em.createNativeQuery(query.toString());
+		@SuppressWarnings("unchecked")
+		List<Object[]> results = nativeQuery.getResultList();
+		
+		for (Object[] objects : results) {
+			ArticuloReporte articuloReporte = new ArticuloReporte();
+			articuloReporte.setCategoria(objects[4].toString());
+			articuloReporte.setCodigo(objects[1].toString());
+			articuloReporte.setConImei(objects[6].toString());
+			articuloReporte.setCosto(Double.parseDouble(objects[3].toString()));
+			articuloReporte.setIdArticulo(Integer.parseInt(objects[0].toString()));
+			articuloReporte.setNombre(objects[2].toString());
+			articuloReporte.setPrecio(objects[5]!=null?Double.parseDouble(objects[5].toString()):0.0);
+			//determinamos el tipo de equipo
+			if(objects[6].toString().equalsIgnoreCase("NO") || objects[6].toString().equalsIgnoreCase("0")) {
+				//Sin serial
+				StringBuilder queryInvSinSerial = new StringBuilder("SELECT existencia_disponible ");
+				queryInvSinSerial.append("FROM articulos_ajuste a ")
+				.append("WHERE ")
+				.append("id_articulo = ").append(objects[0].toString()).append(" AND ")
+				.append("id_almacen = ").append(usuario.getAlmacen().getId()).append(" ")
+				.append("ORDER BY id_ajuste DESC LIMIT 1");
+				
+				Query nativeQuery2 = em.createNativeQuery(queryInvSinSerial.toString());
+				@SuppressWarnings("unchecked")
+				List<Integer> results2 = nativeQuery2.getResultList();
+				for (Integer objects2 : results2) {
+					articuloReporte.setDisponible(objects2);
+				}
+				articulosReporte.add(articuloReporte);
+			}else {
+				//Con serial
+				StringBuilder queryInvConSerial = new StringBuilder("SELECT id_articulo, COUNT(estado) AS total, estado ");
+				queryInvConSerial.append("FROM articulos_seriales ")
+				.append("WHERE ")
+				.append("id_almacen = ").append(usuario.getAlmacen().getId()).append(" AND ")
+				.append("id_articulo = ").append(objects[0].toString()).append(" ")
+				.append("GROUP BY estado, id_articulo ")
+				.append("HAVING estado = 'Disponible'");
+				
+				Query nativeQuery2 = em.createNativeQuery(queryInvConSerial.toString());
+				@SuppressWarnings("unchecked")
+				List<Object[]> results2 = nativeQuery2.getResultList();
+				for (Object[] objects2 : results2) {
+					articuloReporte.setDisponible(Integer.parseInt(objects2[1].toString()));
+				}
+				articulosReporte.add(articuloReporte);
+			}
+		}
+		
+		//Compilamos el reporte
+		JasperReport jasperReport = JasperCompileManager.compileReport(rutaJreport);
+		
+		Map<String, Object> parameters = new HashMap<String, Object>();
+		
+		//convertimos la lista a JRBeanCollectionDataSource
+		JRBeanCollectionDataSource articulosReporteJRBean = new JRBeanCollectionDataSource(articulosReporte);
+		
+		parameters.put("idUsuario", usuario.getId());
+		parameters.put("imagen", rutaImagenes+usuario.getAlmacen().getImagen());
+		parameters.put("articulosReporte", articulosReporteJRBean);
+		parameters.put("total", articulosReporte.size());
+		parameters.put("fecha", formato.format(new Date()));
+		parameters.put("author", usuario.getUsername());
+		parameters.put("categoria", tempCategoria);
+		
+		//Objeto de impresion jr
+		JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource.getConnection());
+	
+		String dataDirectory = tempFolder + pathSeparator + "reporteArticulos"+usuario.getId()+".pdf";
+		
+		tempFolder += pathSeparator;
+		
+		JasperExportManager.exportReportToPdfFile(jasperPrint,dataDirectory);
+        
+        Path file = Paths.get(tempFolder, "reporteArticulos"+usuario.getId()+".pdf");
+        if (Files.exists(file)) 
+        {
+            String mimeType = URLConnection.guessContentTypeFromName(tempFolder+"reporteArticulos"+usuario.getId()+".pdf");
+            if (mimeType == null) mimeType = "application/octet-stream";
+            response.setContentType(mimeType);
+            response.setHeader("Content-Disposition", String.format("inline; filename=\"" + "reporteArticulos"+usuario.getId()+".pdf" + "\""));
+            try
+            {
+                Files.copy(file, response.getOutputStream());
+                response.getOutputStream().flush();
+				Files.delete(file);
+            } 
+            catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
 	}
 	
 	public double formato2d(double number) {

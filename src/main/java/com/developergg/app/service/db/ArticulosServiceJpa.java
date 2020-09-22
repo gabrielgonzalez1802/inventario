@@ -62,5 +62,4 @@ public class ArticulosServiceJpa implements IArticulosService{
 		return repo.findByTiendaAndNombreContainingOrCodigoContaining(tienda,txt,txt);
 	}
 
-
 }

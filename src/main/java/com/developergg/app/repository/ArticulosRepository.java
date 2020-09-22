@@ -16,6 +16,5 @@ public interface ArticulosRepository extends JpaRepository<Articulo, Integer>{
 	List<Articulo> BuscarPorNombreArticulo(@Param("articulo") String articulo);
 	
 	List<Articulo> findByNombreLike(String articulo);
-	
 	List<Articulo> findByTiendaAndNombreContainingOrCodigoContaining(Propietario tienda, String nombre, String nombrecodigo);
 }
