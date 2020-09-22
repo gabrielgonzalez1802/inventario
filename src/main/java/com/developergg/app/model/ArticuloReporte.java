@@ -10,6 +10,7 @@ public class ArticuloReporte {
 	private Double precio = 0.0;
 	private String conImei;
 	private Integer disponible = 0;
+	private Integer vercosto = 0;
 	
 	public Integer getIdArticulo() {
 		return idArticulo;
@@ -59,11 +60,17 @@ public class ArticuloReporte {
 	public void setDisponible(Integer disponible) {
 		this.disponible = disponible;
 	}
-	
+	public Integer getVercosto() {
+		return vercosto;
+	}
+	public void setVercosto(Integer vercosto) {
+		this.vercosto = vercosto;
+	}
 	@Override
 	public String toString() {
 		return "ArticuloReporte [idArticulo=" + idArticulo + ", codigo=" + codigo + ", nombre=" + nombre + ", costo="
 				+ costo + ", categoria=" + categoria + ", precio=" + precio + ", conImei=" + conImei + ", disponible="
-				+ disponible + "]";
+				+ disponible + ", vercosto=" + vercosto + "]";
 	}
+	
 }
