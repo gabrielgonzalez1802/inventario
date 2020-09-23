@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.developergg.app.model.Almacen;
+import com.developergg.app.model.Cliente;
 import com.developergg.app.model.Factura;
 import com.developergg.app.model.Taller;
 import com.developergg.app.model.Usuario;
@@ -97,5 +98,10 @@ public class FacturasServiceJpa implements IFacturasService {
 		return repo.findByAlmacenAndFechaBetween(almacen, desde, hasta);
 	}
 
+	@Override
+	public List<Factura> buscarFacturasAlmacenFechasCliente(Almacen almacen, Date desde, Date hasta,
+			List<Cliente> cliente) {
+		return repo.findByAlmacenAndFechaBetweenAndClienteIn(almacen, desde, hasta, cliente);
+	}
 
 }

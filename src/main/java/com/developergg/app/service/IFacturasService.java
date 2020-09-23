@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.developergg.app.model.Almacen;
+import com.developergg.app.model.Cliente;
 import com.developergg.app.model.Factura;
 import com.developergg.app.model.Taller;
 import com.developergg.app.model.Usuario;
@@ -28,4 +29,6 @@ public interface IFacturasService {
 			Date hasta, List<Usuario> usuarios);
 	List<Factura> buscarFacturaAlmacenFechas(Almacen almacen, Date desde, 
 			Date hasta);
+	List<Factura> buscarFacturasAlmacenFechasCliente(Almacen almacen, Date desde, 
+			Date hasta, List<Cliente> cliente);
 }
