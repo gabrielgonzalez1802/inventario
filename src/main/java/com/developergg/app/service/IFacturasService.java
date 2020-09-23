@@ -26,4 +26,6 @@ public interface IFacturasService {
 			Date hasta, List<Usuario> usuarios);
 	List<Factura> buscarFacturaCuadreMultiUsuarioConTaller(Almacen almacen, Date desde, 
 			Date hasta, List<Usuario> usuarios);
+	List<Factura> buscarFacturaAlmacenFechas(Almacen almacen, Date desde, 
+			Date hasta);
 }
