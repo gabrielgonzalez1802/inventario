@@ -137,6 +137,9 @@ public class ArticulosController {
 	@Value("${inventario.ruta.reporte.articulos}")
 	private String rutaJreport;
 	
+	@Value("${inventario.ruta.reporte.valorInventario}")
+	private String rutaJreportValorInventario;
+	
 	@PersistenceContext
 	private EntityManager em;
 	
@@ -1764,6 +1767,163 @@ public class ArticulosController {
                 ex.printStackTrace();
             }
         }
+	}
+	
+	@GetMapping("/reporteValorInventario")
+	public String formularioReporteValorInventario(Model model, HttpSession session) {
+		Usuario usuario = (Usuario) session.getAttribute("usuario");
+		List<Categoria> categorias = serviceCategorias.buscarPorPropietario(usuario.getAlmacen().getPropietario());
+		model.addAttribute("categorias", categorias);
+		return "articulos/generarReporteValorInventario";
+	}
+	
+	@PostMapping("/generarValorInventario")
+	public void valorInventario(HttpSession session, HttpServletRequest request, 
+			HttpServletResponse response, Integer idCategoria) throws JRException, SQLException {
+		Usuario usuario = (Usuario) session.getAttribute("usuario");
+		
+		SimpleDateFormat formato = new SimpleDateFormat("yyyy-MM-dd");
+		Categoria categoria = null;
+		List<Articulo> articulos = null;
+		List<ArticuloReporte> articulosReporte = new LinkedList<>();
+		List<ArticuloReporte> articulosReporteSeriales = new LinkedList<>();
+		if(idCategoria == 0) {
+			articulos = serviceArticulos.buscarPorTienda(usuario.getAlmacen().getPropietario()).stream()
+					.filter(a -> a.getEliminado() == 0).collect(Collectors.toList());
+		}else {
+			categoria = serviceCategorias.buscarPorId(idCategoria);
+			articulos = serviceArticulos.buscarPorCategoria(categoria).stream()
+					.filter(a -> a.getEliminado() == 0).collect(Collectors.toList());;
+		}
+		
+		for (Articulo articulo : articulos) {
+			if(articulo.getImei().equalsIgnoreCase("NO") || articulo.getImei().equalsIgnoreCase("0")) {
+				//Sin serial
+				ArticuloReporte articuloReporte = new ArticuloReporte();
+				List<ArticuloAjuste> articulosAjustes = serviceArticulosAjustes.buscarPorArticuloYAlmacen(articulo, usuario.getAlmacen());
+				if(articulosAjustes.isEmpty()) {
+					articulo.setCantidad(0);
+				}else {
+					ArticuloAjuste newArticuloAjuste = articulosAjustes.get(articulosAjustes.size()-1);
+					articulo.setCantidad(newArticuloAjuste.getDisponible());
+				}
+				articuloReporte.setCategoria(articulo.getCategoria().getNombre());
+				articuloReporte.setCodigo(articulo.getCodigo());
+				articuloReporte.setConImei("NO");
+				articuloReporte.setCosto(articulo.getCosto());
+				articuloReporte.setDisponible(articulo.getCantidad());
+				articuloReporte.setIdArticulo(articulo.getId());
+				articuloReporte.setNombre(articulo.getNombre());
+				articuloReporte.setPrecio(articulo.getPrecio_maximo());
+				articuloReporte.setTotal(articulo.getCantidad() * articulo.getCosto());
+				articulosReporte.add(articuloReporte);
+			}else {
+				int count = 0;
+				List<ArticuloSerial> articulosSeriales = serviceArticulosSeriales
+						.buscarPorArticuloAlmacen(articulo, usuario.getAlmacen()).stream()
+						.filter(s -> s.getEstado().equalsIgnoreCase("Disponible"))
+						.collect(Collectors.toList());
+				if(!articulosSeriales.isEmpty()) {
+					articulo.setCantidad(articulosSeriales.size());
+				}else {
+					articulo.setCantidad(0);
+				}
+				for (ArticuloSerial articuloSerial : articulosSeriales) {
+					if(count == 0) {
+						ArticuloReporte articuloReporte = new ArticuloReporte();
+						articuloReporte.setCategoria(articulo.getCategoria().getNombre());
+						articuloReporte.setCodigo(articulo.getCodigo());
+						articuloReporte.setConImei("SI");
+						articuloReporte.setCosto(articuloSerial.getCosto());
+						articuloReporte.setDisponible(articulo.getCantidad());
+						articuloReporte.setIdArticulo(articulo.getId());
+						articuloReporte.setNombre(articulo.getNombre());
+						articuloReporte.setPrecio(articulo.getPrecio_maximo());
+						articuloReporte.setTotal(articulo.getCantidad() * articuloSerial.getCosto());
+						articuloReporte.setSerial(articuloSerial.getSerial());
+						articulosReporteSeriales.add(articuloReporte);
+					}else {
+						int coincidencia = 0;
+						for (ArticuloReporte articuloReporteSerial : articulosReporteSeriales) {
+							//Verificamos articulos de igual nombre e igual costo
+							if (articuloReporteSerial.getCosto().doubleValue() == articuloSerial.getCosto().doubleValue()) {
+								articuloReporteSerial.setSerial(
+										articuloReporteSerial.getSerial() + "," + articuloSerial.getSerial());
+								coincidencia++;
+							}
+						}
+						
+						if(coincidencia==0 && articulosReporteSeriales.size()>1) {
+							ArticuloReporte articuloReporte = new ArticuloReporte();
+							articuloReporte.setCategoria(articulo.getCategoria().getNombre());
+							articuloReporte.setCodigo(articulo.getCodigo());
+							articuloReporte.setConImei("SI");
+							articuloReporte.setCosto(articuloSerial.getCosto());
+							articuloReporte.setDisponible(articulo.getCantidad());
+							articuloReporte.setIdArticulo(articulo.getId());
+							articuloReporte.setNombre(articulo.getNombre());
+							articuloReporte.setPrecio(articulo.getPrecio_maximo());
+							articuloReporte.setTotal(articulo.getCantidad() * articuloSerial.getCosto());
+							articuloReporte.setSerial(articuloSerial.getSerial());
+							articulosReporteSeriales.add(articuloReporte);
+						}
+					}
+					count++;
+				}
+			}
+		}
+		
+		for (ArticuloReporte articuloReporteSerial : articulosReporteSeriales) {
+			String[] tempSerials = articuloReporteSerial.getSerial().split(",");
+			articuloReporteSerial.setDisponible(tempSerials.length);
+			articuloReporteSerial.setTotal(articuloReporteSerial.getDisponible()*articuloReporteSerial.getCosto());
+			articuloReporteSerial.setNombre(articuloReporteSerial.getNombre()+" - "+articuloReporteSerial.getSerial());
+			articulosReporte.add(articuloReporteSerial);
+		}
+		
+		//Compilamos el reporte
+		JasperReport jasperReport = JasperCompileManager.compileReport(rutaJreportValorInventario);
+		
+		Map<String, Object> parameters = new HashMap<String, Object>();
+		
+		//convertimos la lista a JRBeanCollectionDataSource
+		JRBeanCollectionDataSource articulosReporteJRBean = new JRBeanCollectionDataSource(articulosReporte);
+		
+		parameters.put("idUsuario", usuario.getId());
+		parameters.put("imagen", rutaImagenes+usuario.getAlmacen().getImagen());
+		parameters.put("articulosReporte", articulosReporteJRBean);
+		parameters.put("total", articulosReporte.size());
+		parameters.put("fecha", formato.format(new Date()));
+		parameters.put("author", usuario.getUsername());
+		parameters.put("categoria", idCategoria==0?"TODAS":categoria.getNombre());
+		
+		//Objeto de impresion jr
+		JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource.getConnection());
+	
+		String dataDirectory = tempFolder + pathSeparator + "reporteValorInventario"+usuario.getId()+".pdf";
+		
+		tempFolder += pathSeparator;
+		
+		JasperExportManager.exportReportToPdfFile(jasperPrint,dataDirectory);
+        
+        Path file = Paths.get(tempFolder, "reporteValorInventario"+usuario.getId()+".pdf");
+        if (Files.exists(file)) 
+        {
+            String mimeType = URLConnection.guessContentTypeFromName(tempFolder+"reporteValorInventario"+usuario.getId()+".pdf");
+            if (mimeType == null) mimeType = "application/octet-stream";
+            response.setContentType(mimeType);
+            response.setHeader("Content-Disposition", String.format("inline; filename=\"" + "reporteValorInventario"+usuario.getId()+".pdf" + "\""));
+            try
+            {
+                Files.copy(file, response.getOutputStream());
+                response.getOutputStream().flush();
+				Files.delete(file);
+            } 
+            catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+		
 	}
 	
 	public double formato2d(double number) {

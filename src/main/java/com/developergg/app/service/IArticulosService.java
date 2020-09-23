@@ -3,6 +3,7 @@ package com.developergg.app.service;
 import java.util.List;
 
 import com.developergg.app.model.Articulo;
+import com.developergg.app.model.Categoria;
 import com.developergg.app.model.Propietario;
 
 public interface IArticulosService {
@@ -11,6 +12,7 @@ public interface IArticulosService {
 	void guardar(Articulo articulo);
 	void eliminar(Integer idArticulo);
 	List<Articulo> buscarPorTienda(Propietario tienda);
+	List<Articulo> buscarPorCategoria(Categoria categoria);
 	void save(Articulo articulo);
 	List<Articulo> buscarPorNombreOrCodigo(String txt, Propietario tienda);
 }

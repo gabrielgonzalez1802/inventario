@@ -11,6 +11,8 @@ public class ArticuloReporte {
 	private String conImei;
 	private Integer disponible = 0;
 	private Integer vercosto = 0;
+	private Double total = 0.0;
+	private String serial;
 	
 	public Integer getIdArticulo() {
 		return idArticulo;
@@ -66,11 +68,22 @@ public class ArticuloReporte {
 	public void setVercosto(Integer vercosto) {
 		this.vercosto = vercosto;
 	}
+	public Double getTotal() {
+		return total;
+	}
+	public void setTotal(Double total) {
+		this.total = total;
+	}
+	public String getSerial() {
+		return serial;
+	}
+	public void setSerial(String serial) {
+		this.serial = serial;
+	}
 	@Override
 	public String toString() {
 		return "ArticuloReporte [idArticulo=" + idArticulo + ", codigo=" + codigo + ", nombre=" + nombre + ", costo="
 				+ costo + ", categoria=" + categoria + ", precio=" + precio + ", conImei=" + conImei + ", disponible="
-				+ disponible + ", vercosto=" + vercosto + "]";
+				+ disponible + ", vercosto=" + vercosto + ", total=" + total + ", serial=" + serial + "]";
 	}
-	
 }

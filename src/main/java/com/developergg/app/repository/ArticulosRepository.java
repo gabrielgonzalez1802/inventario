@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.developergg.app.model.Articulo;
+import com.developergg.app.model.Categoria;
 import com.developergg.app.model.Propietario;
 
 public interface ArticulosRepository extends JpaRepository<Articulo, Integer>{
@@ -14,7 +15,7 @@ public interface ArticulosRepository extends JpaRepository<Articulo, Integer>{
 	
 	@Query("FROM Articulo WHERE nombre LIKE '%:articulo%' AND eliminado = 0")
 	List<Articulo> BuscarPorNombreArticulo(@Param("articulo") String articulo);
-	
+	List<Articulo> findByCategoria(Categoria categoria);
 	List<Articulo> findByNombreLike(String articulo);
 	List<Articulo> findByTiendaAndNombreContainingOrCodigoContaining(Propietario tienda, String nombre, String nombrecodigo);
 }

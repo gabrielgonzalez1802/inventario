@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 import com.developergg.app.model.Articulo;
+import com.developergg.app.model.Categoria;
 import com.developergg.app.model.Propietario;
 import com.developergg.app.repository.ArticulosRepository;
 import com.developergg.app.service.IArticulosService;
@@ -60,6 +61,11 @@ public class ArticulosServiceJpa implements IArticulosService{
 	public List<Articulo> buscarPorNombreOrCodigo(String txt, Propietario tienda) {
 		System.out.println("tienda: "+tienda);
 		return repo.findByTiendaAndNombreContainingOrCodigoContaining(tienda,txt,txt);
+	}
+
+	@Override
+	public List<Articulo> buscarPorCategoria(Categoria categoria) {
+		return repo.findByCategoria(categoria);
 	}
 
 }
