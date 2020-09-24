@@ -8,6 +8,7 @@ import com.developergg.app.model.Cliente;
 import com.developergg.app.model.Factura;
 import com.developergg.app.model.Taller;
 import com.developergg.app.model.Usuario;
+import com.developergg.app.model.Vendedor;
 
 public interface IFacturasService {
 	Factura buscarPorId(Integer id);
@@ -31,4 +32,8 @@ public interface IFacturasService {
 			Date hasta);
 	List<Factura> buscarFacturasAlmacenFechasCliente(Almacen almacen, Date desde, 
 			Date hasta, List<Cliente> cliente);
+	List<Factura> buscarFacturasAlmacenFechasVendedor(Almacen almacen, Date desde, 
+			Date hasta, List<Vendedor> vendedor);
+	List<Factura> buscarFacturaAlmacenFechasTallerIsNotNull(Almacen almacen, Date desde, 
+			Date hasta);
 }

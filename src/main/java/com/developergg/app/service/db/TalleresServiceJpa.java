@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import com.developergg.app.model.Almacen;
 import com.developergg.app.model.FacturaTemp;
 import com.developergg.app.model.Taller;
+import com.developergg.app.model.Usuario;
 import com.developergg.app.repository.TalleresRepository;
 import com.developergg.app.service.ITalleresService;
 
@@ -53,6 +54,11 @@ public class TalleresServiceJpa implements ITalleresService {
 	@Override
 	public void eliminar(Taller taller) {
 		repo.delete(taller);
+	}
+
+	@Override
+	public List<Taller> buscarPorAlmacenUsuario(Almacen almacen, List<Usuario> usuario) {
+		return repo.findByAlmacenAndUsuarioIn(almacen, usuario);
 	}
 
 }

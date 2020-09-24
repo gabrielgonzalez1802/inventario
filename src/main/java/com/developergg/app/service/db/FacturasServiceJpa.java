@@ -12,6 +12,7 @@ import com.developergg.app.model.Cliente;
 import com.developergg.app.model.Factura;
 import com.developergg.app.model.Taller;
 import com.developergg.app.model.Usuario;
+import com.developergg.app.model.Vendedor;
 import com.developergg.app.repository.FacturasRepository;
 import com.developergg.app.service.IFacturasService;
 
@@ -104,4 +105,14 @@ public class FacturasServiceJpa implements IFacturasService {
 		return repo.findByAlmacenAndFechaBetweenAndClienteIn(almacen, desde, hasta, cliente);
 	}
 
+	@Override
+	public List<Factura> buscarFacturasAlmacenFechasVendedor(Almacen almacen, Date desde, Date hasta,
+			List<Vendedor> vendedor) {
+		return repo.findByAlmacenAndFechaBetweenAndVendedorIn(almacen, desde, hasta, vendedor);
+	}
+
+	@Override
+	public List<Factura> buscarFacturaAlmacenFechasTallerIsNotNull(Almacen almacen, Date desde, Date hasta) {
+		return repo.findByAlmacenAndFechaBetweenAndTallerIsNotNull(almacen, desde, hasta);
+	}
 }
