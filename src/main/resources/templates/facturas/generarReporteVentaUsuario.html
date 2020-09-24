@@ -35,18 +35,18 @@
 	<div class="container">
 		<div class="card all">
 			<div class="card-body" style="margin-top: 0px;">
-			   <h4 class="card-header"><strong style="color: #fff;">Reporte Venta por Cliente</strong><a th:href="@{/}" style="float: right;" class="btn btn-md btn-primary">Regresar</a></h4>              
+			   <h4 class="card-header"><strong style="color: #fff;">Reporte Venta por Usuario</strong><a th:href="@{/}" style="float: right;" class="btn btn-md btn-primary">Regresar</a></h4>              
 				<br>
 
-		<form method="post" th:action="@{/facturas/reporteVentaXCliente}" target="_blank">        
+		<form method="post" th:action="@{/facturas/reporteVentaXUsuario}" target="_blank">        
               <div class="row">
                  <div class="col-md-4"> 
                   <div class="form-group">
-                    <label for="direccion">Clientes</label>
-                    <select class="form-control" name="idCliente">
+                    <label for="direccion">Usuarios</label>
+                    <select class="form-control" name="idUsuario">
                     	<option value="0">Todos</option>
-                    	<option th:each="cliente : ${clientes}"
-                    			th:value="${cliente.id}" th:text="${cliente.nombre}"></option>
+                    	<option th:each="usuario : ${usuarios}"
+                    			th:value="${usuario.id}" th:text="${usuario.username}"></option>
                     </select>
                   </div>
                 </div>
