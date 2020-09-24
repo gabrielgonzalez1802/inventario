@@ -62,6 +62,7 @@ import com.developergg.app.model.FacturaTemp;
 import com.developergg.app.model.FormaPago;
 import com.developergg.app.model.Perfil;
 import com.developergg.app.model.ReporteVenta;
+import com.developergg.app.model.ReporteVentaComprobante;
 import com.developergg.app.model.Taller;
 import com.developergg.app.model.TallerArticulo;
 import com.developergg.app.model.TallerDetalle;
@@ -226,6 +227,8 @@ public class FacturasController {
 	@Value("${inventario.ruta.reporte.ventaTecnico}")
 	private String rutaJreportVentaTecnico;
 	
+	@Value("${inventario.ruta.reporte.ventaComprobante}")
+	private String rutaJreportVentaComprobante;
 
 	private String tempFolder =  System.getProperty("java.io.tmpdir");
 	private String pathSeparator = System.getProperty("file.separator");
@@ -1674,6 +1677,15 @@ public class FacturasController {
 		}
 	}
 	
+	@GetMapping("/formularioReporteVentaComprobante")
+	public String formularioReporteVentaComprobante(Model model, HttpSession session) {
+		Usuario usuario = (Usuario) session.getAttribute("usuario");
+		List<ComprobanteFiscal> comprobantes = serviceComprobantesFiscales.buscarPorTienda(usuario.getAlmacen().getPropietario());
+		model.addAttribute("comprobantes", comprobantes);
+		model.addAttribute("dateAcct", new Date());
+		return "facturas/generarReporteVentaComprobante";
+	}
+	
 	@GetMapping("/formularioReporteVentaTecnico")
 	public String formularioReporteVentaTecnico(Model model, HttpSession session) {
 		Usuario usuario = (Usuario) session.getAttribute("usuario");
@@ -1687,6 +1699,82 @@ public class FacturasController {
 		model.addAttribute("tecnicos", usuarios);
 		model.addAttribute("dateAcct", new Date());
 		return "facturas/generarReporteVentaTecnico";
+	}
+	
+	@PostMapping("/reporteVentaComprobante")
+	public void reporteVentaComprobante(HttpSession session, HttpServletRequest request, 
+				HttpServletResponse response, Integer idComprobante, String desde, String hasta) throws JRException, SQLException, ParseException {
+		SimpleDateFormat formato = new SimpleDateFormat("yyyy-MM-dd");
+		Usuario usuario = (Usuario) session.getAttribute("usuario");
+		List<ReporteVentaComprobante> reporteVentas = new LinkedList<>();
+		List<ComprobanteFiscal> comprobantesFiscales = new LinkedList<>();
+		
+		if(idComprobante == 0) {
+			comprobantesFiscales = serviceComprobantesFiscales.buscarPorTienda(usuario.getAlmacen().getPropietario());
+		}else {
+			comprobantesFiscales.add(serviceComprobantesFiscales.buscarPorId(idComprobante));
+		}
+		
+		List<Factura> facturas = serviceFacturas.buscarFacturaAlmacenFechasComprobanteFiscales(usuario.getAlmacen(), 
+				formato.parse(desde), formato.parse(hasta), comprobantesFiscales);
+		
+		for (Factura factura : facturas) {
+			ReporteVentaComprobante reporteVenta = new ReporteVentaComprobante();
+			reporteVenta.setCliente(factura.getNombre_cliente());
+			reporteVenta.setFactura(factura.getCodigo().toString());
+			reporteVenta.setId(factura.getId());
+			reporteVenta.setItbis(factura.getTotal_itbis());
+			reporteVenta.setSubtotal(factura.getTotal_precio());
+			reporteVenta.setTotal(factura.getTotal_venta());
+			reporteVenta.setNcf(factura.getNcf());
+			reporteVenta.setRnc(factura.getRnc_cliente());
+			reporteVentas.add(reporteVenta);
+		}
+		
+		//Compilamos el reporte
+		JasperReport jasperReport = JasperCompileManager.compileReport(rutaJreportVentaComprobante);
+
+		Map<String, Object> parameters = new HashMap<String, Object>();
+
+		// convertimos la lista a JRBeanCollectionDataSource
+		JRBeanCollectionDataSource comprobantesReporteJRBean = new JRBeanCollectionDataSource(reporteVentas);
+
+		parameters.put("idUsuario", usuario.getId());
+		parameters.put("imagen", rutaImagenes + usuario.getAlmacen().getImagen());
+		parameters.put("total", reporteVentas.size());
+		parameters.put("fechaDesde", desde);
+		parameters.put("fechaHasta", hasta);
+		parameters.put("author", usuario.getUsername());
+		parameters.put("comprobante", idComprobante== 0 ? "TODOS" : comprobantesFiscales.get(0).getNombre());
+		parameters.put("reporteVentas", comprobantesReporteJRBean);
+
+		// Objeto de impresion jr
+		JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource.getConnection());
+
+		String dataDirectory = tempFolder + pathSeparator + "reporteVentasComprobante" + usuario.getId() + ".pdf";
+
+		tempFolder += pathSeparator;
+
+		JasperExportManager.exportReportToPdfFile(jasperPrint, dataDirectory);
+
+		Path file = Paths.get(tempFolder, "reporteVentasComprobante" + usuario.getId() + ".pdf");
+		if (Files.exists(file)) {
+			String mimeType = URLConnection
+					.guessContentTypeFromName(tempFolder + "reporteVentasComprobante" + usuario.getId() + ".pdf");
+			if (mimeType == null)
+				mimeType = "application/octet-stream";
+			response.setContentType(mimeType);
+			response.setHeader("Content-Disposition",
+					String.format("inline; filename=\"" + "reporteVentasComprobante" + usuario.getId() + ".pdf" + "\""));
+			try {
+				Files.copy(file, response.getOutputStream());
+				response.getOutputStream().flush();
+				Files.delete(file);
+			} catch (IOException ex) {
+				ex.printStackTrace();
+			}
+		}
+		
 	}
 	
 	@PostMapping("/reporteVentaTecnico") 
@@ -1745,48 +1833,48 @@ public class FacturasController {
 		}
 		
 		//Compilamos el reporte
-				JasperReport jasperReport = JasperCompileManager.compileReport(rutaJreportVentaTecnico);
+		JasperReport jasperReport = JasperCompileManager.compileReport(rutaJreportVentaTecnico);
 
-				Map<String, Object> parameters = new HashMap<String, Object>();
+		Map<String, Object> parameters = new HashMap<String, Object>();
 
-				// convertimos la lista a JRBeanCollectionDataSource
-				JRBeanCollectionDataSource articulosReporteJRBean = new JRBeanCollectionDataSource(reporteVentas);
+		// convertimos la lista a JRBeanCollectionDataSource
+		JRBeanCollectionDataSource articulosReporteJRBean = new JRBeanCollectionDataSource(reporteVentas);
 
-				parameters.put("idUsuario", usuario.getId());
-				parameters.put("imagen", rutaImagenes + usuario.getAlmacen().getImagen());
-				parameters.put("total", reporteVentas.size());
-				parameters.put("fechaDesde", desde);
-				parameters.put("fechaHasta", hasta);
-				parameters.put("author", usuario.getUsername());
-				parameters.put("tecnico", idTecnico == 0 ? "TODOS" : usuarios.get(0).getNombre());
-				parameters.put("reporteVentas", articulosReporteJRBean);
+		parameters.put("idUsuario", usuario.getId());
+		parameters.put("imagen", rutaImagenes + usuario.getAlmacen().getImagen());
+		parameters.put("total", reporteVentas.size());
+		parameters.put("fechaDesde", desde);
+		parameters.put("fechaHasta", hasta);
+		parameters.put("author", usuario.getUsername());
+		parameters.put("tecnico", idTecnico == 0 ? "TODOS" : usuarios.get(0).getNombre());
+		parameters.put("reporteVentas", articulosReporteJRBean);
 
-				// Objeto de impresion jr
-				JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource.getConnection());
+		// Objeto de impresion jr
+		JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource.getConnection());
 
-				String dataDirectory = tempFolder + pathSeparator + "reporteVentasTecnico" + usuario.getId() + ".pdf";
+		String dataDirectory = tempFolder + pathSeparator + "reporteVentasTecnico" + usuario.getId() + ".pdf";
 
-				tempFolder += pathSeparator;
+		tempFolder += pathSeparator;
 
-				JasperExportManager.exportReportToPdfFile(jasperPrint, dataDirectory);
+		JasperExportManager.exportReportToPdfFile(jasperPrint, dataDirectory);
 
-				Path file = Paths.get(tempFolder, "reporteVentasTecnico" + usuario.getId() + ".pdf");
-				if (Files.exists(file)) {
-					String mimeType = URLConnection
-							.guessContentTypeFromName(tempFolder + "reporteVentasTecnico" + usuario.getId() + ".pdf");
-					if (mimeType == null)
-						mimeType = "application/octet-stream";
-					response.setContentType(mimeType);
-					response.setHeader("Content-Disposition",
-							String.format("inline; filename=\"" + "reporteVentasTecnico" + usuario.getId() + ".pdf" + "\""));
-					try {
-						Files.copy(file, response.getOutputStream());
-						response.getOutputStream().flush();
-						Files.delete(file);
-					} catch (IOException ex) {
-						ex.printStackTrace();
-					}
-				}
+		Path file = Paths.get(tempFolder, "reporteVentasTecnico" + usuario.getId() + ".pdf");
+		if (Files.exists(file)) {
+			String mimeType = URLConnection
+					.guessContentTypeFromName(tempFolder + "reporteVentasTecnico" + usuario.getId() + ".pdf");
+			if (mimeType == null)
+				mimeType = "application/octet-stream";
+			response.setContentType(mimeType);
+			response.setHeader("Content-Disposition",
+					String.format("inline; filename=\"" + "reporteVentasTecnico" + usuario.getId() + ".pdf" + "\""));
+			try {
+				Files.copy(file, response.getOutputStream());
+				response.getOutputStream().flush();
+				Files.delete(file);
+			} catch (IOException ex) {
+				ex.printStackTrace();
+			}
+		}
 		
 	}
 

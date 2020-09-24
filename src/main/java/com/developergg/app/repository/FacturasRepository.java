@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.developergg.app.model.Almacen;
 import com.developergg.app.model.Cliente;
+import com.developergg.app.model.ComprobanteFiscal;
 import com.developergg.app.model.Factura;
 import com.developergg.app.model.Taller;
 import com.developergg.app.model.Usuario;
@@ -30,4 +31,6 @@ public interface FacturasRepository extends JpaRepository<Factura, Integer> {
 	List<Factura> findByAlmacenAndFechaBetweenAndClienteIn(Almacen almacen, Date desde, Date hasta, List<Cliente> cliente);
 	List<Factura> findByAlmacenAndFechaBetweenAndVendedorIn(Almacen almacen, Date desde, Date hasta, List<Vendedor> vendedor);
 	List<Factura> findByAlmacenAndFechaBetweenAndTallerIsNotNull(Almacen almacen, Date desde, Date hasta);
+	List<Factura> findByAlmacenAndFechaBetweenAndComprobanteFiscalIn(Almacen almacen, Date desde,
+			Date hasta, List<ComprobanteFiscal> comprobanteFiscal);
 }

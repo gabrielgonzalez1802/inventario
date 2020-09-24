@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.developergg.app.model.Almacen;
 import com.developergg.app.model.Cliente;
+import com.developergg.app.model.ComprobanteFiscal;
 import com.developergg.app.model.Factura;
 import com.developergg.app.model.Taller;
 import com.developergg.app.model.Usuario;
@@ -114,5 +115,11 @@ public class FacturasServiceJpa implements IFacturasService {
 	@Override
 	public List<Factura> buscarFacturaAlmacenFechasTallerIsNotNull(Almacen almacen, Date desde, Date hasta) {
 		return repo.findByAlmacenAndFechaBetweenAndTallerIsNotNull(almacen, desde, hasta);
+	}
+
+	@Override
+	public List<Factura> buscarFacturaAlmacenFechasComprobanteFiscales(Almacen almacen, Date desde, Date hasta,
+			List<ComprobanteFiscal> comprobanteFiscal) {
+		return repo.findByAlmacenAndFechaBetweenAndComprobanteFiscalIn(almacen, desde, hasta, comprobanteFiscal);
 	}
 }

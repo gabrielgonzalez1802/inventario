@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.developergg.app.model.Almacen;
 import com.developergg.app.model.Cliente;
+import com.developergg.app.model.ComprobanteFiscal;
 import com.developergg.app.model.Factura;
 import com.developergg.app.model.Taller;
 import com.developergg.app.model.Usuario;
@@ -36,4 +37,6 @@ public interface IFacturasService {
 			Date hasta, List<Vendedor> vendedor);
 	List<Factura> buscarFacturaAlmacenFechasTallerIsNotNull(Almacen almacen, Date desde, 
 			Date hasta);
+	List<Factura> buscarFacturaAlmacenFechasComprobanteFiscales(Almacen almacen, Date desde,
+			Date hasta, List<ComprobanteFiscal> comprobanteFiscal);
 }
