@@ -42,6 +42,7 @@ import com.developergg.app.model.Articulo;
 import com.developergg.app.model.ArticuloAjuste;
 import com.developergg.app.model.ArticuloReporte;
 import com.developergg.app.model.ArticuloSerial;
+import com.developergg.app.model.Categoria;
 import com.developergg.app.model.Compra;
 import com.developergg.app.model.CompraDetalle;
 import com.developergg.app.model.CompraDetalleSerial;
@@ -54,12 +55,14 @@ import com.developergg.app.service.IAbonosCxPService;
 import com.developergg.app.service.IArticulosAjustesService;
 import com.developergg.app.service.IArticulosSeriales;
 import com.developergg.app.service.IArticulosService;
+import com.developergg.app.service.ICategoriasService;
 import com.developergg.app.service.IComprasDetallesSerialesService;
 import com.developergg.app.service.IComprasDetallesService;
 import com.developergg.app.service.IComprasService;
 import com.developergg.app.service.IComprobantesFiscalesService;
 import com.developergg.app.service.ICondicionesPagoService;
 import com.developergg.app.service.ISuplidoresService;
+import com.developergg.app.service.IUsuariosService;
 import com.developergg.app.service.db.SuplidoresServiceJpa;
 
 import net.sf.jasperreports.engine.JRException;
@@ -104,6 +107,12 @@ public class ComprasController {
 	@Autowired
 	private IAbonosCxPService serviceAbonosCxP;
 	
+	@Autowired
+	private ICategoriasService serviceCategorias;
+	
+	@Autowired
+	private IUsuariosService serviceUsuarios;
+	
 	private String tempFolder =  System.getProperty("java.io.tmpdir");
 	private String pathSeparator = System.getProperty("file.separator");
 	
@@ -117,6 +126,16 @@ public class ComprasController {
 	
 	@Value("${inventario.ruta.reporte.compraArticulo}")
 	private String rutaJreportCompraArticulo;
+	
+	@Value("${inventario.ruta.reporte.compraSuplidor}")
+	private String rutaJreportCompraSuplidor;
+	
+	@Value("${inventario.ruta.reporte.compraUsuario}")
+	private String rutaJreportCompraUsuario;
+	
+	@Value("${inventario.ruta.reporte.compraCategoria}")
+	private String rutaJreportCompraCategoria;
+
 
 	@GetMapping("/")
 	public String mostrarCompras(Model model, HttpSession session) {
@@ -568,22 +587,13 @@ public class ComprasController {
 		return "compras/compra :: #responseAddItem";
 	}
 	
-	@GetMapping("/formularioReporteCompraArticulo")
-	public String formularioReporteCompraArticulo(Model model, HttpSession session) {
-		Usuario usuario = (Usuario) session.getAttribute("usuario");
-		List<Articulo> articulos = serviceArticulos.buscarPorTienda(usuario.getAlmacen().getPropietario());
-		model.addAttribute("articulos", articulos);
-		model.addAttribute("dateAcct", new Date());
-		return "compras/generarReporteCompraArticulo";
-	}
-	
 	@GetMapping("/formularioReporteCompraSuplidor")
 	public String formularioReporteCompraSuplidor(Model model, HttpSession session) {
 		Usuario usuario = (Usuario) session.getAttribute("usuario");
 		List<Suplidor> suplidores = serviceSuplidores.buscarPorAlmacenDisponible(usuario.getAlmacen());
 		model.addAttribute("suplidores", suplidores);
 		model.addAttribute("dateAcct", new Date());
-		return "compras/generarReporteCompraArticulo";
+		return "compras/generarReporteCompraSuplidor";
 	}
 	
 	@PostMapping("/reporteCompraXSuplidor")
@@ -591,6 +601,8 @@ public class ComprasController {
 			HttpServletResponse response, Integer idSuplidor, String desde, String hasta) throws JRException, SQLException, ParseException {
 		SimpleDateFormat formato = new SimpleDateFormat("yyyy-MM-dd");
 		Usuario usuario = (Usuario) session.getAttribute("usuario");
+		List<ReporteCompra> reporteCompras = new LinkedList<>();
+		List<ReporteCompra> reporteCompraSeriales = new LinkedList<>();
 		List<Suplidor> suplidores = new LinkedList<>();
 		
 		if(idSuplidor == 0) {
@@ -604,9 +616,154 @@ public class ComprasController {
 				formato.parse(desde),  formato.parse(hasta)).
 				stream().filter(c -> c.getEn_proceso() == 0).collect(Collectors.toList());
 		
+		for (Compra compra : compras) {
+			// detalles
+			List<CompraDetalle> compraDetalles = serviceComprasDetalles.buscarPorCompra(compra);
+			for (CompraDetalle compraDetalle : compraDetalles) {
+				ReporteCompra reporteCompra = new ReporteCompra();
+				reporteCompra.setCantidad(compraDetalle.getCantidad());
+				reporteCompra.setFactura(compraDetalle.getCompra().getNo_factura());
+				// verificamos si el articulo tiene serial
+				if (compraDetalle.getCon_imei() == 0) {
+					// Sin serial
+					reporteCompra.setArticulo(compraDetalle.getArticulo().getNombre());
+					reporteCompra.setCosto(compraDetalle.getCosto());
+					reporteCompra.setId(compra.getId());
+//					reporteCompra.setPrecio((compraDetalle.getCantidad()*compraDetalle.getCosto())+compra.getItBis());
+					reporteCompra.setTabla("compras");
+					reporteCompra.setTotal((compraDetalle.getCantidad() * compraDetalle.getCosto()) + compra.getItBis());
+
+					if (idSuplidor == 0) {
+						reporteCompras.add(reporteCompra);
+					} else {
+						if (compra.getSuplidor().getId() == idSuplidor) {
+							reporteCompras.add(reporteCompra);
+						}
+					}
+				} else {
+					// Con serial
+					List<CompraDetalleSerial> compraDetalleSeriales = serviceComprasDetallesSeriales
+							.buscarPorCompraDetalle(compraDetalle);
+					int count = 0;
+					for (CompraDetalleSerial compraDetalleSerial : compraDetalleSeriales) {
+						if (count == 0) {
+							ReporteCompra reporteCompraSerial = new ReporteCompra();
+							reporteCompraSerial.setArticulo(compraDetalleSerial.getArticulo().getNombre());
+							reporteCompraSerial.setCantidad(1);
+							reporteCompraSerial.setCosto(compraDetalleSerial.getCosto());
+							reporteCompraSerial.setFactura(compraDetalleSerial.getCompra().getNo_factura());
+							reporteCompraSerial.setId(compra.getId());
+							reporteCompraSerial.setSerial(compraDetalleSerial.getSerial());
+//							reporteCompraSerial.setPrecio(precio);
+							reporteCompraSerial.setTabla("compras");
+							reporteCompraSerial.setTotal(compraDetalleSerial.getCosto());
+
+							if (idSuplidor == 0) {
+								reporteCompraSeriales.add(reporteCompraSerial);
+							} else {
+								if (compra.getSuplidor().getId() == idSuplidor) {
+									reporteCompraSeriales.add(reporteCompraSerial);
+								}
+							}
+						} else {
+							int coincidencia = 0;
+							for (ReporteCompra compraSerial : reporteCompraSeriales) {
+								// Verificamos articulos de igual nombre e igual costo
+								if (compraSerial.getCosto().doubleValue() == compraSerial.getCosto().doubleValue()) {
+									compraSerial.setSerial(
+											compraSerial.getSerial() + "," + compraDetalleSerial.getSerial());
+									coincidencia++;
+								}
+							}
+
+							if (coincidencia == 0 && reporteCompraSeriales.size() > 1) {
+								ReporteCompra reporteCompraSerial = new ReporteCompra();
+								reporteCompraSerial.setArticulo(compraDetalleSerial.getArticulo().getNombre());
+								reporteCompraSerial.setCantidad(1);
+								reporteCompraSerial.setId(compra.getId());
+								reporteCompraSerial.setCosto(compraDetalleSerial.getCosto());
+								reporteCompraSerial.setFactura(compraDetalleSerial.getCompra().getNo_factura());
+//								reporteCompraSerial.setPrecio(compraDetalleSerial.getPrecio_maximo());
+								reporteCompraSerial.setTotal(compraDetalleSerial.getCosto());
+								reporteCompraSerial.setSerial(compraDetalleSerial.getSerial());
+
+								if (idSuplidor == 0) {
+									reporteCompraSeriales.add(reporteCompraSerial);
+								} else {
+									if (compra.getSuplidor().getId() == idSuplidor) {
+										reporteCompraSeriales.add(reporteCompraSerial);
+									}
+								}
+							}
+						}
+						count++;
+					}
+				}
+			}
+		}
 		
+		for (ReporteCompra compraSerial : reporteCompraSeriales) {
+			String[] tempSerials = compraSerial.getSerial().split(",");
+			compraSerial.setCantidad(tempSerials.length);
+			compraSerial.setTotal(compraSerial.getCantidad() * compraSerial.getCosto());
+			compraSerial.setArticulo(compraSerial.getArticulo() + " - " + compraSerial.getSerial());
+			reporteCompras.add(compraSerial);
+		}
 		
-	}	
+		//Compilamos el reporte
+		JasperReport jasperReport = JasperCompileManager.compileReport(rutaJreportCompraSuplidor);
+
+		Map<String, Object> parameters = new HashMap<String, Object>();
+
+		// convertimos la lista a JRBeanCollectionDataSource
+		JRBeanCollectionDataSource articulosReporteJRBean = new JRBeanCollectionDataSource(reporteCompras);
+
+		parameters.put("idUsuario", usuario.getId());
+		parameters.put("imagen", rutaImagenes + usuario.getAlmacen().getImagen());
+		parameters.put("total", reporteCompras.size());
+		parameters.put("fechaDesde", desde);
+		parameters.put("fechaHasta", hasta);
+		parameters.put("author", usuario.getUsername());
+		parameters.put("suplidor", idSuplidor == 0 ? "TODOS" : suplidores.get(0).getNombre());
+		parameters.put("reporteCompras", articulosReporteJRBean);
+
+		// Objeto de impresion jr
+		JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource.getConnection());
+
+		String dataDirectory = tempFolder + pathSeparator + "reporteComprasSuplidor" + usuario.getId() + ".pdf";
+
+		tempFolder += pathSeparator;
+
+		JasperExportManager.exportReportToPdfFile(jasperPrint, dataDirectory);
+
+		Path file = Paths.get(tempFolder, "reporteComprasSuplidor" + usuario.getId() + ".pdf");
+		if (Files.exists(file)) {
+			String mimeType = URLConnection
+					.guessContentTypeFromName(tempFolder + "reporteComprasSuplidor" + usuario.getId() + ".pdf");
+			if (mimeType == null)
+				mimeType = "application/octet-stream";
+			response.setContentType(mimeType);
+			response.setHeader("Content-Disposition",
+					String.format("inline; filename=\"" + "reporteComprasSuplidor" + usuario.getId() + ".pdf" + "\""));
+			try {
+				Files.copy(file, response.getOutputStream());
+				response.getOutputStream().flush();
+				Files.delete(file);
+			} catch (IOException ex) {
+				ex.printStackTrace();
+			}
+		}
+		
+	}
+	
+	@GetMapping("/formularioReporteCompraArticulo")
+	public String formularioReporteCompraArticulo(Model model, HttpSession session) {
+		Usuario usuario = (Usuario) session.getAttribute("usuario");
+		List<Articulo> articulos = serviceArticulos.buscarPorTienda(usuario.getAlmacen().getPropietario());
+		model.addAttribute("articulos", articulos);
+		model.addAttribute("dateAcct", new Date());
+		return "compras/generarReporteCompraArticulo";
+	}
 	
 	@PostMapping("/reporteCompraXArticulo")
 	public void reporteCompraXArticulo(HttpSession session, HttpServletRequest request, 
@@ -641,7 +798,8 @@ public class ComprasController {
 					reporteCompra.setArticulo(compraDetalle.getArticulo().getNombre());
 					reporteCompra.setCosto(compraDetalle.getCosto());
 //					reporteCompra.setPrecio((compraDetalle.getCantidad()*compraDetalle.getCosto())+compra.getItBis());
-					reporteCompra.setTabla("compras_detalle");
+					reporteCompra.setId(compra.getId());
+					reporteCompra.setTabla("compras");
 					reporteCompra.setTotal((compraDetalle.getCantidad()*compraDetalle.getCosto())+compra.getItBis());
 					
 					if(idArticulo == 0) {
@@ -662,10 +820,10 @@ public class ComprasController {
 							reporteCompraSerial.setCantidad(1);
 							reporteCompraSerial.setCosto(compraDetalleSerial.getCosto());
 							reporteCompraSerial.setFactura(compraDetalleSerial.getCompra().getNo_factura());
-							reporteCompraSerial.setId(compraDetalleSerial.getId());
+							reporteCompraSerial.setId(compra.getId());
 							reporteCompraSerial.setSerial(compraDetalleSerial.getSerial());
 //							reporteCompraSerial.setPrecio(precio);
-							reporteCompraSerial.setTabla("compras_detalle_serial");
+							reporteCompraSerial.setTabla("compras");
 							reporteCompraSerial.setTotal(compraDetalleSerial.getCosto());
 							
 							if(idArticulo == 0) {
@@ -690,6 +848,8 @@ public class ComprasController {
 								ReporteCompra reporteCompraSerial = new ReporteCompra();
 								reporteCompraSerial.setArticulo(compraDetalleSerial.getArticulo().getNombre());
 								reporteCompraSerial.setCantidad(1);
+								reporteCompraSerial.setId(compra.getId());
+								reporteCompraSerial.setTabla("compras");
 								reporteCompraSerial.setCosto(compraDetalleSerial.getCosto());
 								reporteCompraSerial.setFactura(compraDetalleSerial.getCompra().getNo_factura());
 //								reporteCompraSerial.setPrecio(compraDetalleSerial.getPrecio_maximo());
@@ -762,7 +922,346 @@ public class ComprasController {
 				ex.printStackTrace();
 			}
 		}
-	}	
+	}
+	
+	@GetMapping("/formularioReporteCompraUsuario")
+	public String formularioReporteCompraUsuario(Model model, HttpSession session) {
+		Usuario usuarioAcct = (Usuario) session.getAttribute("usuario");
+		List<Usuario> usuarios = serviceUsuarios.buscarPorAlmacen(usuarioAcct.getAlmacen());
+		model.addAttribute("usuarios", usuarios);
+		model.addAttribute("dateAcct", new Date());
+		return "compras/generarReporteCompraUsuario";
+	}
+	
+	@PostMapping("/reporteCompraXUsuario")
+	public void reporteCompraXUsuario(HttpSession session, HttpServletRequest request, HttpServletResponse response,
+			Integer idUsuario, String desde, String hasta) throws JRException, SQLException, ParseException {
+		SimpleDateFormat formato = new SimpleDateFormat("yyyy-MM-dd");
+		Usuario usuarioAcct = (Usuario) session.getAttribute("usuario");
+		List<ReporteCompra> reporteCompras = new LinkedList<>();
+		List<ReporteCompra> reporteCompraSeriales = new LinkedList<>();
+		List<Usuario> usuarios = new LinkedList<>();
+
+		if (idUsuario == 0) {
+			usuarios = serviceUsuarios.buscarPorAlmacen(usuarioAcct.getAlmacen());
+		} else {
+			usuarios.add(serviceUsuarios.buscarPorId(idUsuario));
+		}
+
+		// Compras finalizadas
+		List<Compra> compras = serviceCompras.buscarPorAlmacenFechas(usuarioAcct.getAlmacen(), 
+				formato.parse(desde), formato.parse(hasta))
+				.stream().filter(c -> c.getEn_proceso() == 0).collect(Collectors.toList());
+		
+		for (Compra compra : compras) {
+			// detalles
+			List<CompraDetalle> compraDetalles = serviceComprasDetalles.buscarPorCompra(compra);
+			for (CompraDetalle compraDetalle : compraDetalles) {
+				ReporteCompra reporteCompra = new ReporteCompra();
+				reporteCompra.setCantidad(compraDetalle.getCantidad());
+				reporteCompra.setFactura(compraDetalle.getCompra().getNo_factura());
+				// verificamos si el articulo tiene serial
+				if (compraDetalle.getCon_imei() == 0) {
+					// Sin serial
+					reporteCompra.setArticulo(compraDetalle.getArticulo().getNombre());
+					reporteCompra.setCosto(compraDetalle.getCosto());
+//					reporteCompra.setPrecio((compraDetalle.getCantidad()*compraDetalle.getCosto())+compra.getItBis());
+					reporteCompra.setId(compra.getId());
+					reporteCompra.setTabla("compras");
+					reporteCompra.setTotal((compraDetalle.getCantidad() * compraDetalle.getCosto()) + compra.getItBis());
+
+					if (idUsuario == 0) {
+						reporteCompras.add(reporteCompra);
+					} else {
+						if (compra.getUsuario().getId() == idUsuario) {
+							reporteCompras.add(reporteCompra);
+						}
+					}
+				} else {
+					// Con serial
+					List<CompraDetalleSerial> compraDetalleSeriales = serviceComprasDetallesSeriales.buscarPorCompraDetalle(compraDetalle);
+					int count = 0;
+					for (CompraDetalleSerial compraDetalleSerial : compraDetalleSeriales) {
+						if (count == 0) {
+							ReporteCompra reporteCompraSerial = new ReporteCompra();
+							reporteCompraSerial.setArticulo(compraDetalleSerial.getArticulo().getNombre());
+							reporteCompraSerial.setCantidad(1);
+							reporteCompraSerial.setCosto(compraDetalleSerial.getCosto());
+							reporteCompraSerial.setFactura(compraDetalleSerial.getCompra().getNo_factura());
+							reporteCompraSerial.setId(compra.getId());
+							reporteCompraSerial.setSerial(compraDetalleSerial.getSerial());
+//							reporteCompraSerial.setPrecio(precio);
+							reporteCompraSerial.setTabla("compras");
+							reporteCompraSerial.setTotal(compraDetalleSerial.getCosto());
+
+							if (idUsuario == 0) {
+								reporteCompraSeriales.add(reporteCompraSerial);
+							} else {
+								if (compra.getUsuario().getId() == idUsuario) {
+									reporteCompraSeriales.add(reporteCompraSerial);
+								}
+							}
+						} else {
+							int coincidencia = 0;
+							for (ReporteCompra compraSerial : reporteCompraSeriales) {
+								// Verificamos articulos de igual nombre e igual costo
+								if (compraSerial.getCosto().doubleValue() == compraSerial.getCosto().doubleValue()) {
+									compraSerial.setSerial(compraSerial.getSerial() + "," + compraDetalleSerial.getSerial());
+									coincidencia++;
+								}
+							}
+
+							if (coincidencia == 0 && reporteCompraSeriales.size() > 1) {
+								ReporteCompra reporteCompraSerial = new ReporteCompra();
+								reporteCompraSerial.setArticulo(compraDetalleSerial.getArticulo().getNombre());
+								reporteCompraSerial.setCantidad(1);
+								reporteCompraSerial.setId(compra.getId());
+								reporteCompraSerial.setTabla("compras");
+								reporteCompraSerial.setCosto(compraDetalleSerial.getCosto());
+								reporteCompraSerial.setFactura(compraDetalleSerial.getCompra().getNo_factura());
+//								reporteCompraSerial.setPrecio(compraDetalleSerial.getPrecio_maximo());
+								reporteCompraSerial.setTotal(compraDetalleSerial.getCosto());
+								reporteCompraSerial.setSerial(compraDetalleSerial.getSerial());
+
+								if (idUsuario == 0) {
+									reporteCompraSeriales.add(reporteCompraSerial);
+								} else {
+									if (compra.getUsuario().getId() == idUsuario) {
+										reporteCompraSeriales.add(reporteCompraSerial);
+									}
+								}
+							}
+						}
+						count++;
+					}
+				}
+			}
+		}
+		
+		for (ReporteCompra compraSerial : reporteCompraSeriales) {
+			String[] tempSerials = compraSerial.getSerial().split(",");
+			compraSerial.setCantidad(tempSerials.length);
+			compraSerial.setTotal(compraSerial.getCantidad()*compraSerial.getCosto());
+			compraSerial.setArticulo(compraSerial.getArticulo()+" - "+compraSerial.getSerial());
+			reporteCompras.add(compraSerial);
+		}
+		
+		//Compilamos el reporte
+		JasperReport jasperReport = JasperCompileManager.compileReport(rutaJreportCompraUsuario);
+
+		Map<String, Object> parameters = new HashMap<String, Object>();
+
+		// convertimos la lista a JRBeanCollectionDataSource
+		JRBeanCollectionDataSource articulosReporteJRBean = new JRBeanCollectionDataSource(reporteCompras);
+
+		parameters.put("idUsuario", usuarioAcct.getId());
+		parameters.put("imagen", rutaImagenes + usuarioAcct.getAlmacen().getImagen());
+		parameters.put("total", reporteCompras.size());
+		parameters.put("fechaDesde", desde);
+		parameters.put("fechaHasta", hasta);
+		parameters.put("author", usuarioAcct.getUsername());
+		parameters.put("usuario", idUsuario == 0 ? "TODOS" : usuarios.get(0).getNombre());
+		parameters.put("reporteCompras", articulosReporteJRBean);
+
+		// Objeto de impresion jr
+		JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource.getConnection());
+
+		String dataDirectory = tempFolder + pathSeparator + "reporteComprasUsuario" + usuarioAcct.getId() + ".pdf";
+
+		tempFolder += pathSeparator;
+
+		JasperExportManager.exportReportToPdfFile(jasperPrint, dataDirectory);
+
+		Path file = Paths.get(tempFolder, "reporteComprasUsuario" + usuarioAcct.getId() + ".pdf");
+		if (Files.exists(file)) {
+			String mimeType = URLConnection
+					.guessContentTypeFromName(tempFolder + "reporteComprasUsuario" + usuarioAcct.getId() + ".pdf");
+			if (mimeType == null)
+				mimeType = "application/octet-stream";
+			response.setContentType(mimeType);
+			response.setHeader("Content-Disposition",
+					String.format("inline; filename=\"" + "reporteComprasUsuario" + usuarioAcct.getId() + ".pdf" + "\""));
+			try {
+				Files.copy(file, response.getOutputStream());
+				response.getOutputStream().flush();
+				Files.delete(file);
+			} catch (IOException ex) {
+				ex.printStackTrace();
+			}
+		}
+
+	}
+	
+	@GetMapping("/formularioReporteCompraCategoria")
+	public String formularioReporteCompraCategoria(Model model, HttpSession session) {
+		Usuario usuario = (Usuario) session.getAttribute("usuario");
+		List<Categoria> categorias = serviceCategorias.buscarPorPropietario(usuario.getAlmacen().getPropietario());
+		model.addAttribute("categorias", categorias);
+		model.addAttribute("dateAcct", new Date());
+		return "compras/generarReporteCompraCategoria";
+	}
+	
+	@PostMapping("/reporteCompraXCategoria")
+	public void reporteCompraXCategoria(HttpSession session, HttpServletRequest request, HttpServletResponse response,
+			Integer idCategoria, String desde, String hasta) throws JRException, SQLException, ParseException {
+		SimpleDateFormat formato = new SimpleDateFormat("yyyy-MM-dd");
+		Usuario usuario = (Usuario) session.getAttribute("usuario");
+		List<ReporteCompra> reporteCompras = new LinkedList<>();
+		List<ReporteCompra> reporteCompraSeriales = new LinkedList<>();
+		List<Categoria> categorias = new LinkedList<>();
+
+		if (idCategoria == 0) {
+			categorias = serviceCategorias.buscarPorPropietario(usuario.getAlmacen().getPropietario());
+		} else {
+			categorias.add(serviceCategorias.buscarPorId(idCategoria));
+		}
+		
+		//Compras finalizadas
+		List<Compra> compras = serviceCompras.buscarPorAlmacenFechas(usuario.getAlmacen(), 
+		formato.parse(desde),  formato.parse(hasta)).
+		stream().filter(c -> c.getEn_proceso() == 0).collect(Collectors.toList());
+		
+		for (Compra compra : compras) {
+			//detalles
+			List<CompraDetalle> compraDetalles = serviceComprasDetalles.buscarPorCompra(compra);
+			for (CompraDetalle compraDetalle : compraDetalles) {
+				ReporteCompra reporteCompra = new ReporteCompra();
+				reporteCompra.setCantidad(compraDetalle.getCantidad());
+				reporteCompra.setFactura(compraDetalle.getCompra().getNo_factura());
+				//verificamos si el articulo tiene serial
+				if(compraDetalle.getCon_imei()==0) {
+					//Sin serial
+					reporteCompra.setArticulo(compraDetalle.getArticulo().getNombre());
+					reporteCompra.setCosto(compraDetalle.getCosto());
+//					reporteCompra.setPrecio((compraDetalle.getCantidad()*compraDetalle.getCosto())+compra.getItBis());
+					reporteCompra.setId(compra.getId());
+					reporteCompra.setTabla("compras");
+					reporteCompra.setTotal((compraDetalle.getCantidad()*compraDetalle.getCosto())+compra.getItBis());
+					
+					if(idCategoria==0) {
+						reporteCompras.add(reporteCompra);
+					}else {
+						if (compraDetalle.getArticulo().getCategoria().getId() == idCategoria) {
+							reporteCompras.add(reporteCompra);
+						}
+					}
+					
+				}else{
+					//Con serial
+					List<CompraDetalleSerial> compraDetalleSeriales = serviceComprasDetallesSeriales.buscarPorCompraDetalle(compraDetalle);
+					int count = 0;
+					for (CompraDetalleSerial compraDetalleSerial : compraDetalleSeriales) {
+						if(count == 0) {
+							ReporteCompra reporteCompraSerial = new ReporteCompra();
+							reporteCompraSerial.setArticulo(compraDetalleSerial.getArticulo().getNombre());
+							reporteCompraSerial.setCantidad(1);
+							reporteCompraSerial.setCosto(compraDetalleSerial.getCosto());
+							reporteCompraSerial.setFactura(compraDetalleSerial.getCompra().getNo_factura());
+							reporteCompraSerial.setId(compra.getId());
+							reporteCompraSerial.setSerial(compraDetalleSerial.getSerial());
+//							reporteCompraSerial.setPrecio(precio);
+							reporteCompraSerial.setTabla("compras");
+							reporteCompraSerial.setTotal(compraDetalleSerial.getCosto());
+							
+							if(idCategoria==0) {
+								reporteCompraSeriales.add(reporteCompraSerial);
+							}else {
+								if (compraDetalle.getArticulo().getCategoria().getId() == idCategoria) {
+									reporteCompraSeriales.add(reporteCompraSerial);
+								}
+							}
+						}else {
+							int coincidencia = 0;
+							for (ReporteCompra compraSerial : reporteCompraSeriales) {
+								//Verificamos articulos de igual nombre e igual costo
+								if (compraSerial.getCosto().doubleValue() == compraSerial.getCosto().doubleValue()) {
+									compraSerial.setSerial(
+											compraSerial.getSerial() + "," + compraDetalleSerial.getSerial());
+									coincidencia++;
+								}
+							}
+							
+							if(coincidencia==0 && reporteCompraSeriales.size()>1) {
+								ReporteCompra reporteCompraSerial = new ReporteCompra();
+								reporteCompraSerial.setArticulo(compraDetalleSerial.getArticulo().getNombre());
+								reporteCompraSerial.setCantidad(1);
+								reporteCompraSerial.setId(compra.getId());
+								reporteCompraSerial.setTabla("compras");
+								reporteCompraSerial.setCosto(compraDetalleSerial.getCosto());
+								reporteCompraSerial.setFactura(compraDetalleSerial.getCompra().getNo_factura());
+//								reporteCompraSerial.setPrecio(compraDetalleSerial.getPrecio_maximo());
+								reporteCompraSerial.setTotal(compraDetalleSerial.getCosto());
+								reporteCompraSerial.setSerial(compraDetalleSerial.getSerial());
+								
+								if(idCategoria==0) {
+									reporteCompraSeriales.add(reporteCompraSerial);
+								}else {
+									if (compraDetalle.getArticulo().getCategoria().getId() == idCategoria) {
+										reporteCompraSeriales.add(reporteCompraSerial);
+									}
+								}
+							}
+						}
+						count++;
+					}
+				}
+			}
+		}
+
+		for (ReporteCompra compraSerial : reporteCompraSeriales) {
+			String[] tempSerials = compraSerial.getSerial().split(",");
+			compraSerial.setCantidad(tempSerials.length);
+			compraSerial.setTotal(compraSerial.getCantidad() * compraSerial.getCosto());
+			compraSerial.setArticulo(compraSerial.getArticulo() + " - " + compraSerial.getSerial());
+			reporteCompras.add(compraSerial);
+		}
+		
+		//Compilamos el reporte
+		JasperReport jasperReport = JasperCompileManager.compileReport(rutaJreportCompraCategoria);
+
+		Map<String, Object> parameters = new HashMap<String, Object>();
+
+		// convertimos la lista a JRBeanCollectionDataSource
+		JRBeanCollectionDataSource articulosReporteJRBean = new JRBeanCollectionDataSource(reporteCompras);
+
+		parameters.put("idUsuario", usuario.getId());
+		parameters.put("imagen", rutaImagenes + usuario.getAlmacen().getImagen());
+		parameters.put("total", reporteCompras.size());
+		parameters.put("fechaDesde", desde);
+		parameters.put("fechaHasta", hasta);
+		parameters.put("author", usuario.getUsername());
+		parameters.put("categoria", idCategoria == 0 ? "TODAS" : categorias.get(0).getNombre());
+		parameters.put("reporteCompras", articulosReporteJRBean);
+
+		// Objeto de impresion jr
+		JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource.getConnection());
+
+		String dataDirectory = tempFolder + pathSeparator + "reporteComprasCategoria" + usuario.getId() + ".pdf";
+
+		tempFolder += pathSeparator;
+
+		JasperExportManager.exportReportToPdfFile(jasperPrint, dataDirectory);
+
+		Path file = Paths.get(tempFolder, "reporteComprasCategoria" + usuario.getId() + ".pdf");
+		if (Files.exists(file)) {
+			String mimeType = URLConnection
+					.guessContentTypeFromName(tempFolder + "reporteComprasCategoria" + usuario.getId() + ".pdf");
+			if (mimeType == null)
+				mimeType = "application/octet-stream";
+			response.setContentType(mimeType);
+			response.setHeader("Content-Disposition",
+					String.format("inline; filename=\"" + "reporteComprasCategoria" + usuario.getId() + ".pdf" + "\""));
+			try {
+				Files.copy(file, response.getOutputStream());
+				response.getOutputStream().flush();
+				Files.delete(file);
+			} catch (IOException ex) {
+				ex.printStackTrace();
+			}
+		}
+		
+	
+	}
 
 	@InitBinder
 	public void initBinder(WebDataBinder webDataBinder) {

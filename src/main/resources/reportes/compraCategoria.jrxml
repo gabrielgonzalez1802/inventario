@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.14.0.final using JasperReports Library version 6.14.0-2ab0d8625be255bf609c78e1181801213e51db8f  -->
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="compraArticulo" pageWidth="226" pageHeight="425" columnWidth="210" leftMargin="8" rightMargin="8" topMargin="8" bottomMargin="5" uuid="b28f9afc-8445-4a17-b9b5-a1560997f2ae">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="compraCategoria" pageWidth="226" pageHeight="425" columnWidth="210" leftMargin="8" rightMargin="8" topMargin="8" bottomMargin="5" uuid="b28f9afc-8445-4a17-b9b5-a1560997f2ae">
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="DataAdapter.xml"/>
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 	<property name="com.jaspersoft.studio.unit." value="pixel"/>
@@ -12,6 +12,7 @@
 	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<property name="net.sf.jasperreports.print.create.bookmarks" value="false"/>
 	<style name="Table 2_TH" mode="Opaque" backcolor="#F0F8FF">
 		<box>
 			<topPen lineWidth="0.5" lineColor="#000000"/>
@@ -193,7 +194,7 @@
 	<parameter name="total" class="java.lang.Integer"/>
 	<parameter name="fechaDesde" class="java.lang.String"/>
 	<parameter name="fechaHasta" class="java.lang.String"/>
-	<parameter name="articulo" class="java.lang.String"/>
+	<parameter name="categoria" class="java.lang.String"/>
 	<queryString>
 		<![CDATA[SELECT a.nombre, a.direccion, a.telefono FROM usuarios AS u 
 INNER JOIN almacenes a ON a.id_almacen = u.id_almacen
@@ -257,7 +258,7 @@ WHERE u.id_usuario = $P{idUsuario}]]>
 				<textElement>
 					<font size="6" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Reporte de compras por articulo]]></text>
+				<text><![CDATA[Reporte de compras por categoria]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="80" y="20" width="20" height="10" uuid="eb0b1393-eaac-4d4d-bb1b-6e22aebe0c2a"/>
@@ -485,7 +486,7 @@ WHERE u.id_usuario = $P{idUsuario}]]>
 		</band>
 	</detail>
 	<summary>
-		<band height="45">
+		<band height="58">
 			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.FreeLayout"/>
 			<staticText>
 				<reportElement x="0" y="0" width="20" height="12" uuid="06dced63-1cda-45ab-9ca9-7c13eadc1e89"/>
@@ -506,14 +507,14 @@ WHERE u.id_usuario = $P{idUsuario}]]>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font size="6" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Articulo]]></text>
+				<text><![CDATA[Categoria]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="30" y="12" width="170" height="12" uuid="3ae9f923-cc48-498b-8620-2d4a4ecb7232"/>
-				<textElement textAlignment="Left" verticalAlignment="Middle">
+				<reportElement x="30" y="12" width="168" height="12" uuid="c918799c-a352-472e-9847-86045e197d11"/>
+				<textElement verticalAlignment="Middle">
 					<font size="6"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$P{articulo}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{categoria}]]></textFieldExpression>
 			</textField>
 		</band>
 	</summary>

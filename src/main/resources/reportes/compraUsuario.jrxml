@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.14.0.final using JasperReports Library version 6.14.0-2ab0d8625be255bf609c78e1181801213e51db8f  -->
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="compraArticulo" pageWidth="226" pageHeight="425" columnWidth="210" leftMargin="8" rightMargin="8" topMargin="8" bottomMargin="5" uuid="b28f9afc-8445-4a17-b9b5-a1560997f2ae">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="compraUsuario" pageWidth="226" pageHeight="425" columnWidth="210" leftMargin="8" rightMargin="8" topMargin="8" bottomMargin="5" uuid="b28f9afc-8445-4a17-b9b5-a1560997f2ae">
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="DataAdapter.xml"/>
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 	<property name="com.jaspersoft.studio.unit." value="pixel"/>
@@ -193,7 +193,7 @@
 	<parameter name="total" class="java.lang.Integer"/>
 	<parameter name="fechaDesde" class="java.lang.String"/>
 	<parameter name="fechaHasta" class="java.lang.String"/>
-	<parameter name="articulo" class="java.lang.String"/>
+	<parameter name="usuario" class="java.lang.String"/>
 	<queryString>
 		<![CDATA[SELECT a.nombre, a.direccion, a.telefono FROM usuarios AS u 
 INNER JOIN almacenes a ON a.id_almacen = u.id_almacen
@@ -257,7 +257,7 @@ WHERE u.id_usuario = $P{idUsuario}]]>
 				<textElement>
 					<font size="6" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Reporte de compras por articulo]]></text>
+				<text><![CDATA[Reporte de compras por usuario]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="80" y="20" width="20" height="10" uuid="eb0b1393-eaac-4d4d-bb1b-6e22aebe0c2a"/>
@@ -321,11 +321,11 @@ WHERE u.id_usuario = $P{idUsuario}]]>
 					<datasetRun subDataset="Dataset1" uuid="7dc43ed3-e422-413d-b5df-efaa13536754">
 						<dataSourceExpression><![CDATA[$P{reporteCompras}]]></dataSourceExpression>
 					</datasetRun>
-					<jr:column width="30" uuid="5b9bac34-d796-4299-a1ee-204f90ab2a96">
+					<jr:column width="30" uuid="f50b7724-81db-4f59-853a-2c15d19abe2b">
 						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column1"/>
 						<jr:columnHeader style="Table_CH" height="10" rowSpan="1">
 							<staticText>
-								<reportElement x="0" y="0" width="30" height="10" uuid="eec99de9-8ca1-44bc-985c-e693529dc46c"/>
+								<reportElement x="0" y="0" width="30" height="10" uuid="cb81d3a9-428f-41e7-9887-8934336dbbf2"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font size="6" isBold="false"/>
 								</textElement>
@@ -335,7 +335,7 @@ WHERE u.id_usuario = $P{idUsuario}]]>
 						<jr:columnFooter style="Table_CH" height="10" rowSpan="1"/>
 						<jr:detailCell style="Table 6_TD" height="10">
 							<textField>
-								<reportElement x="0" y="0" width="30" height="10" uuid="68ed94fb-e255-4119-98f1-2afa16a267aa"/>
+								<reportElement x="0" y="0" width="30" height="10" uuid="e63974ea-49ef-4415-8360-e36aa88736bf"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font size="6"/>
 								</textElement>
@@ -485,7 +485,7 @@ WHERE u.id_usuario = $P{idUsuario}]]>
 		</band>
 	</detail>
 	<summary>
-		<band height="45">
+		<band height="48">
 			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.FreeLayout"/>
 			<staticText>
 				<reportElement x="0" y="0" width="20" height="12" uuid="06dced63-1cda-45ab-9ca9-7c13eadc1e89"/>
@@ -506,14 +506,14 @@ WHERE u.id_usuario = $P{idUsuario}]]>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font size="6" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Articulo]]></text>
+				<text><![CDATA[Usuario]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="30" y="12" width="170" height="12" uuid="3ae9f923-cc48-498b-8620-2d4a4ecb7232"/>
-				<textElement textAlignment="Left" verticalAlignment="Middle">
+				<reportElement x="30" y="12" width="168" height="12" uuid="a07120de-e66d-48fb-8cdb-ec516c24bd51"/>
+				<textElement verticalAlignment="Middle">
 					<font size="6"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$P{articulo}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{usuario}]]></textFieldExpression>
 			</textField>
 		</band>
 	</summary>
