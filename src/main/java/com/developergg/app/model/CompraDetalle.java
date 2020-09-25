@@ -35,9 +35,9 @@ public class CompraDetalle {
 	
 	private Integer con_imei = 0;
 	
-	private Double precio_maximo;
-	private Double precio_minimo;
-	private Double precio_mayor;
+	private Double precio_maximo = 0.0;
+	private Double precio_minimo = 0.0;
+	private Double precio_mayor = 0.0;
 
 	public Integer getId() {
 		return id;

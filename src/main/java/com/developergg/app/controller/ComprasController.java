@@ -1,17 +1,31 @@
 package com.developergg.app.controller;
 
+import java.io.IOException;
+import java.net.URLConnection;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.sql.SQLException;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.stream.Collectors;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -26,12 +40,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.developergg.app.model.AbonoCxP;
 import com.developergg.app.model.Articulo;
 import com.developergg.app.model.ArticuloAjuste;
+import com.developergg.app.model.ArticuloReporte;
 import com.developergg.app.model.ArticuloSerial;
 import com.developergg.app.model.Compra;
 import com.developergg.app.model.CompraDetalle;
 import com.developergg.app.model.CompraDetalleSerial;
 import com.developergg.app.model.ComprobanteFiscal;
 import com.developergg.app.model.CondicionPago;
+import com.developergg.app.model.ReporteCompra;
 import com.developergg.app.model.Suplidor;
 import com.developergg.app.model.Usuario;
 import com.developergg.app.service.IAbonosCxPService;
@@ -44,6 +60,15 @@ import com.developergg.app.service.IComprasService;
 import com.developergg.app.service.IComprobantesFiscalesService;
 import com.developergg.app.service.ICondicionesPagoService;
 import com.developergg.app.service.ISuplidoresService;
+import com.developergg.app.service.db.SuplidoresServiceJpa;
+
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 @Controller
 @RequestMapping("/compras")
@@ -78,6 +103,20 @@ public class ComprasController {
 	
 	@Autowired
 	private IAbonosCxPService serviceAbonosCxP;
+	
+	private String tempFolder =  System.getProperty("java.io.tmpdir");
+	private String pathSeparator = System.getProperty("file.separator");
+	
+	DecimalFormat df2 = new DecimalFormat("###.##");
+	
+	@Autowired
+	private DataSource dataSource;
+	
+	@Value("${inventario.ruta.imagenes}")
+	private String rutaImagenes;
+	
+	@Value("${inventario.ruta.reporte.compraArticulo}")
+	private String rutaJreportCompraArticulo;
 
 	@GetMapping("/")
 	public String mostrarCompras(Model model, HttpSession session) {
@@ -529,6 +568,202 @@ public class ComprasController {
 		return "compras/compra :: #responseAddItem";
 	}
 	
+	@GetMapping("/formularioReporteCompraArticulo")
+	public String formularioReporteCompraArticulo(Model model, HttpSession session) {
+		Usuario usuario = (Usuario) session.getAttribute("usuario");
+		List<Articulo> articulos = serviceArticulos.buscarPorTienda(usuario.getAlmacen().getPropietario());
+		model.addAttribute("articulos", articulos);
+		model.addAttribute("dateAcct", new Date());
+		return "compras/generarReporteCompraArticulo";
+	}
+	
+	@GetMapping("/formularioReporteCompraSuplidor")
+	public String formularioReporteCompraSuplidor(Model model, HttpSession session) {
+		Usuario usuario = (Usuario) session.getAttribute("usuario");
+		List<Suplidor> suplidores = serviceSuplidores.buscarPorAlmacenDisponible(usuario.getAlmacen());
+		model.addAttribute("suplidores", suplidores);
+		model.addAttribute("dateAcct", new Date());
+		return "compras/generarReporteCompraArticulo";
+	}
+	
+	@PostMapping("/reporteCompraXSuplidor")
+	public void reporteCompraXSuplidor(HttpSession session, HttpServletRequest request, 
+			HttpServletResponse response, Integer idSuplidor, String desde, String hasta) throws JRException, SQLException, ParseException {
+		SimpleDateFormat formato = new SimpleDateFormat("yyyy-MM-dd");
+		Usuario usuario = (Usuario) session.getAttribute("usuario");
+		List<Suplidor> suplidores = new LinkedList<>();
+		
+		if(idSuplidor == 0) {
+			suplidores = serviceSuplidores.buscarPorAlmacenDisponible(usuario.getAlmacen());
+		}else {
+			suplidores.add(serviceSuplidores.buscarPorId(idSuplidor));
+		}
+		
+		//Compras finalizadas
+		List<Compra> compras = serviceCompras.buscarPorAlmacenFechas(usuario.getAlmacen(), 
+				formato.parse(desde),  formato.parse(hasta)).
+				stream().filter(c -> c.getEn_proceso() == 0).collect(Collectors.toList());
+		
+		
+		
+	}	
+	
+	@PostMapping("/reporteCompraXArticulo")
+	public void reporteCompraXArticulo(HttpSession session, HttpServletRequest request, 
+			HttpServletResponse response, Integer idArticulo, String desde, String hasta) throws JRException, SQLException, ParseException {
+		SimpleDateFormat formato = new SimpleDateFormat("yyyy-MM-dd");
+		Usuario usuario = (Usuario) session.getAttribute("usuario");
+		List<ReporteCompra> reporteCompras = new LinkedList<>();
+		List<ReporteCompra> reporteCompraSeriales = new LinkedList<>();
+		List<Articulo> articulos = new LinkedList<>();
+		
+		if(idArticulo == 0) {
+			articulos = serviceArticulos.buscarPorTienda(usuario.getAlmacen().getPropietario());
+		}else {
+			articulos.add(serviceArticulos.buscarPorId(idArticulo));
+		}
+		
+		//Compras finalizadas
+		List<Compra> compras = serviceCompras.buscarPorAlmacenFechas(usuario.getAlmacen(), 
+				formato.parse(desde),  formato.parse(hasta)).
+				stream().filter(c -> c.getEn_proceso() == 0).collect(Collectors.toList());
+		
+		for (Compra compra : compras) {
+			//detalles
+			List<CompraDetalle> compraDetalles = serviceComprasDetalles.buscarPorCompra(compra);
+			for (CompraDetalle compraDetalle : compraDetalles) {
+				ReporteCompra reporteCompra = new ReporteCompra();
+				reporteCompra.setCantidad(compraDetalle.getCantidad());
+				reporteCompra.setFactura(compraDetalle.getCompra().getNo_factura());
+				//verificamos si el articulo tiene serial
+				if(compraDetalle.getCon_imei()==0) {
+					//Sin serial
+					reporteCompra.setArticulo(compraDetalle.getArticulo().getNombre());
+					reporteCompra.setCosto(compraDetalle.getCosto());
+//					reporteCompra.setPrecio((compraDetalle.getCantidad()*compraDetalle.getCosto())+compra.getItBis());
+					reporteCompra.setTabla("compras_detalle");
+					reporteCompra.setTotal((compraDetalle.getCantidad()*compraDetalle.getCosto())+compra.getItBis());
+					
+					if(idArticulo == 0) {
+						reporteCompras.add(reporteCompra);
+					}else {
+						if(compraDetalle.getArticulo().getId() == idArticulo) {
+							reporteCompras.add(reporteCompra);
+						}
+					}
+				}else{
+					//Con serial
+					List<CompraDetalleSerial> compraDetalleSeriales = serviceComprasDetallesSeriales.buscarPorCompraDetalle(compraDetalle);
+					int count = 0;
+					for (CompraDetalleSerial compraDetalleSerial : compraDetalleSeriales) {
+						if(count == 0) {
+							ReporteCompra reporteCompraSerial = new ReporteCompra();
+							reporteCompraSerial.setArticulo(compraDetalleSerial.getArticulo().getNombre());
+							reporteCompraSerial.setCantidad(1);
+							reporteCompraSerial.setCosto(compraDetalleSerial.getCosto());
+							reporteCompraSerial.setFactura(compraDetalleSerial.getCompra().getNo_factura());
+							reporteCompraSerial.setId(compraDetalleSerial.getId());
+							reporteCompraSerial.setSerial(compraDetalleSerial.getSerial());
+//							reporteCompraSerial.setPrecio(precio);
+							reporteCompraSerial.setTabla("compras_detalle_serial");
+							reporteCompraSerial.setTotal(compraDetalleSerial.getCosto());
+							
+							if(idArticulo == 0) {
+								reporteCompraSeriales.add(reporteCompraSerial);
+							}else {
+								if(compraDetalle.getArticulo().getId() == idArticulo) {
+									reporteCompraSeriales.add(reporteCompraSerial);
+								}
+							}
+						}else {
+							int coincidencia = 0;
+							for (ReporteCompra compraSerial : reporteCompraSeriales) {
+								//Verificamos articulos de igual nombre e igual costo
+								if (compraSerial.getCosto().doubleValue() == compraSerial.getCosto().doubleValue()) {
+									compraSerial.setSerial(
+											compraSerial.getSerial() + "," + compraDetalleSerial.getSerial());
+									coincidencia++;
+								}
+							}
+							
+							if(coincidencia==0 && reporteCompraSeriales.size()>1) {
+								ReporteCompra reporteCompraSerial = new ReporteCompra();
+								reporteCompraSerial.setArticulo(compraDetalleSerial.getArticulo().getNombre());
+								reporteCompraSerial.setCantidad(1);
+								reporteCompraSerial.setCosto(compraDetalleSerial.getCosto());
+								reporteCompraSerial.setFactura(compraDetalleSerial.getCompra().getNo_factura());
+//								reporteCompraSerial.setPrecio(compraDetalleSerial.getPrecio_maximo());
+								reporteCompraSerial.setTotal(compraDetalleSerial.getCosto());
+								reporteCompraSerial.setSerial(compraDetalleSerial.getSerial());
+								
+								if(idArticulo == 0) {
+									reporteCompraSeriales.add(reporteCompraSerial);
+								}else {
+									if(compraDetalle.getArticulo().getId() == idArticulo) {
+										reporteCompraSeriales.add(reporteCompraSerial);
+									}
+								}
+							}
+						}
+						count++;
+					}
+				}
+			}
+		}
+		
+		for (ReporteCompra compraSerial : reporteCompraSeriales) {
+			String[] tempSerials = compraSerial.getSerial().split(",");
+			compraSerial.setCantidad(tempSerials.length);
+			compraSerial.setTotal(compraSerial.getCantidad()*compraSerial.getCosto());
+			compraSerial.setArticulo(compraSerial.getArticulo()+" - "+compraSerial.getSerial());
+			reporteCompras.add(compraSerial);
+		}
+		
+		//Compilamos el reporte
+		JasperReport jasperReport = JasperCompileManager.compileReport(rutaJreportCompraArticulo);
+
+		Map<String, Object> parameters = new HashMap<String, Object>();
+
+		// convertimos la lista a JRBeanCollectionDataSource
+		JRBeanCollectionDataSource articulosReporteJRBean = new JRBeanCollectionDataSource(reporteCompras);
+
+		parameters.put("idUsuario", usuario.getId());
+		parameters.put("imagen", rutaImagenes + usuario.getAlmacen().getImagen());
+		parameters.put("total", reporteCompras.size());
+		parameters.put("fechaDesde", desde);
+		parameters.put("fechaHasta", hasta);
+		parameters.put("author", usuario.getUsername());
+		parameters.put("articulo", idArticulo == 0 ? "TODOS" : articulos.get(0).getNombre());
+		parameters.put("reporteCompras", articulosReporteJRBean);
+
+		// Objeto de impresion jr
+		JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource.getConnection());
+
+		String dataDirectory = tempFolder + pathSeparator + "reporteComprasArticulo" + usuario.getId() + ".pdf";
+
+		tempFolder += pathSeparator;
+
+		JasperExportManager.exportReportToPdfFile(jasperPrint, dataDirectory);
+
+		Path file = Paths.get(tempFolder, "reporteComprasArticulo" + usuario.getId() + ".pdf");
+		if (Files.exists(file)) {
+			String mimeType = URLConnection
+					.guessContentTypeFromName(tempFolder + "reporteComprasArticulo" + usuario.getId() + ".pdf");
+			if (mimeType == null)
+				mimeType = "application/octet-stream";
+			response.setContentType(mimeType);
+			response.setHeader("Content-Disposition",
+					String.format("inline; filename=\"" + "reporteComprasArticulo" + usuario.getId() + ".pdf" + "\""));
+			try {
+				Files.copy(file, response.getOutputStream());
+				response.getOutputStream().flush();
+				Files.delete(file);
+			} catch (IOException ex) {
+				ex.printStackTrace();
+			}
+		}
+	}	
+
 	@InitBinder
 	public void initBinder(WebDataBinder webDataBinder) {
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");

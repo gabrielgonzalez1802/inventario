@@ -1,5 +1,6 @@
 package com.developergg.app.service.db;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -44,4 +45,8 @@ public class ComprasServiceJpa implements IComprasService{
 		}
 	}
 
+	@Override
+	public List<Compra> buscarPorAlmacenFechas(Almacen almacen, Date desde, Date hasta) {
+		return repo.findByAlmacenAndFechaBetween(almacen, desde, hasta);
+	}
 }
