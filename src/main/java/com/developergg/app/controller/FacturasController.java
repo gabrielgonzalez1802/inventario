@@ -229,6 +229,10 @@ public class FacturasController {
 	
 	@Value("${inventario.ruta.reporte.ventaComprobante}")
 	private String rutaJreportVentaComprobante;
+	
+	@Value("${inventario.ruta.reporte.ventaArticulo}")
+	private String rutaJreportVentaArticulo;
+	
 
 	private String tempFolder =  System.getProperty("java.io.tmpdir");
 	private String pathSeparator = System.getProperty("file.separator");
@@ -1093,6 +1097,157 @@ public class FacturasController {
 		model.addAttribute("total", formato2d(total));
 		return "facturas/factura :: #responseConversion";
 	}
+	
+	@GetMapping("/formularioReporteVentaArticulo")
+	public String formularioReporteVentaArticulo(Model model, HttpSession session) {
+		Usuario usuario = (Usuario) session.getAttribute("usuario");
+		List<Articulo> articulos = serviceArticulos.buscarPorTienda(usuario.getAlmacen().getPropietario());
+		model.addAttribute("articulos", articulos);
+		model.addAttribute("dateAcct", new Date());
+		return "facturas/generarReporteVentaArticulo";
+	}
+	
+	@PostMapping("/reporteVentaXArticulo")
+	public void reporteVentaXArticulo(HttpSession session, HttpServletRequest request, 
+			HttpServletResponse response, Integer idArticulo, String desde, String hasta) throws JRException, SQLException, ParseException {
+		SimpleDateFormat formato = new SimpleDateFormat("yyyy-MM-dd");
+		Usuario usuario = (Usuario) session.getAttribute("usuario");
+		List<ReporteVenta> reporteVentas = new LinkedList<>();
+		List<Articulo> articulos = new LinkedList<>();
+		
+		if(idArticulo == 0) {
+			articulos = serviceArticulos.buscarPorTienda(usuario.getAlmacen().getPropietario());
+		}else {
+			articulos.add(serviceArticulos.buscarPorId(idArticulo));
+		}
+		
+		List<Factura> facturas = serviceFacturas.buscarFacturaAlmacenFechas(usuario.getAlmacen(),
+				formato.parse(desde), formato.parse(hasta));
+		
+		for (Factura factura : facturas) {
+			//Detalles
+			List<FacturaDetalle> facturaDetalles = serviceFacturasDetalles.buscarPorFactura(factura);
+			for (FacturaDetalle facturaDetalle : facturaDetalles) {
+				if(facturaDetalle.getImei().equals("NO") || facturaDetalle.getImei().equals("0")) {
+					ReporteVenta reporteVenta = new ReporteVenta();
+					reporteVenta.setArticulo(facturaDetalle.getArticulo().getNombre());
+					reporteVenta.setCantidad(facturaDetalle.getCantidad());
+					reporteVenta.setCosto(facturaDetalle.getCosto());
+					reporteVenta.setFactura(factura.getCodigo().toString());
+					reporteVenta.setId(facturaDetalle.getId());
+					reporteVenta.setTabla("facturas_detalle");
+					reporteVenta.setPrecio(facturaDetalle.getPrecio()+facturaDetalle.getItbis());
+					reporteVenta.setTotal(facturaDetalle.getSubtotal());
+					if(idArticulo == 0) {
+						//Todas los articulos
+						reporteVentas.add(reporteVenta);
+					}else {
+						//articulo especifico
+						if(facturaDetalle.getArticulo().getId() == idArticulo) {
+							reporteVentas.add(reporteVenta);
+						}
+					}
+				}else {
+					//Tiene serial
+					ReporteVenta reporteVenta = new ReporteVenta();
+					reporteVenta.setCantidad(facturaDetalle.getCantidad());
+					reporteVenta.setCosto(facturaDetalle.getCosto());
+					reporteVenta.setFactura(factura.getCodigo().toString());
+					reporteVenta.setId(facturaDetalle.getId());
+					reporteVenta.setTabla("facturas_detalle");
+					reporteVenta.setPrecio(facturaDetalle.getPrecio()+facturaDetalle.getItbis());
+					reporteVenta.setTotal(facturaDetalle.getSubtotal());
+					List<FacturaDetalleSerial> facturaDetalleSeriales = serviceFacturasDetallesSeriales.buscarPorDetalle(facturaDetalle);
+					String nombreTemp = facturaDetalle.getArticulo().getNombre()+" - ";
+					for (FacturaDetalleSerial facturaDetalleSerial : facturaDetalleSeriales) {
+						nombreTemp+=facturaDetalleSerial.getSerial()+",";
+					}
+					nombreTemp=nombreTemp.substring(0, nombreTemp.length()-1);
+					reporteVenta.setArticulo(nombreTemp);
+					if(idArticulo == 0) {
+						//Todas las categorias
+						reporteVentas.add(reporteVenta);
+					}else {
+						//categoria especifica
+						if(facturaDetalle.getArticulo().getId() == idArticulo) {
+							reporteVentas.add(reporteVenta);
+						}
+					}
+				}
+			}
+			//talleres
+			List<FacturaDetalleTaller> facturaDetalleTalleres = serviceFacturasDetallesTaller.buscarPorFactura(factura);
+			for (FacturaDetalleTaller facturaDetalleTaller : facturaDetalleTalleres) {
+				if(facturaDetalleTaller.getArticulo()!=null) {
+					ReporteVenta reporteVenta = new ReporteVenta();
+					reporteVenta.setCantidad(facturaDetalleTaller.getCantidad());
+					reporteVenta.setCosto(facturaDetalleTaller.getArticulo().getCosto());
+					reporteVenta.setFactura(factura.getCodigo().toString());
+					reporteVenta.setId(facturaDetalleTaller.getId());
+					reporteVenta.setTabla("facturas_detalle_talleres");
+					reporteVenta.setPrecio(facturaDetalleTaller.getPrecio()+facturaDetalleTaller.getItbis());
+					reporteVenta.setTotal(facturaDetalleTaller.getSubtotal());
+					reporteVenta.setArticulo(facturaDetalleTaller.getArticulo().getNombre());
+				
+					if(idArticulo == 0) {
+						//Todas las categorias
+						reporteVentas.add(reporteVenta);
+					}else {
+						//categoria especifica
+						if(facturaDetalleTaller.getArticulo().getId() == idArticulo) {
+							reporteVentas.add(reporteVenta);
+						}
+					}
+				}
+			}
+		}
+		
+		//Compilamos el reporte
+		JasperReport jasperReport = JasperCompileManager.compileReport(rutaJreportVentaArticulo);
+
+		Map<String, Object> parameters = new HashMap<String, Object>();
+
+		// convertimos la lista a JRBeanCollectionDataSource
+		JRBeanCollectionDataSource articulosReporteJRBean = new JRBeanCollectionDataSource(reporteVentas);
+
+		parameters.put("idUsuario", usuario.getId());
+		parameters.put("imagen", rutaImagenes + usuario.getAlmacen().getImagen());
+		parameters.put("total", reporteVentas.size());
+		parameters.put("fechaDesde", desde);
+		parameters.put("fechaHasta", hasta);
+		parameters.put("author", usuario.getUsername());
+		parameters.put("articulo", idArticulo == 0 ? "TODOS" : articulos.get(0).getNombre());
+		parameters.put("reporteVentas", articulosReporteJRBean);
+
+		// Objeto de impresion jr
+		JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource.getConnection());
+
+		String dataDirectory = tempFolder + pathSeparator + "reporteVentasArticulos" + usuario.getId() + ".pdf";
+
+		tempFolder += pathSeparator;
+
+		JasperExportManager.exportReportToPdfFile(jasperPrint, dataDirectory);
+
+		Path file = Paths.get(tempFolder, "reporteVentasArticulos" + usuario.getId() + ".pdf");
+		if (Files.exists(file)) {
+			String mimeType = URLConnection
+					.guessContentTypeFromName(tempFolder + "reporteVentasArticulos" + usuario.getId() + ".pdf");
+			if (mimeType == null)
+				mimeType = "application/octet-stream";
+			response.setContentType(mimeType);
+			response.setHeader("Content-Disposition",
+					String.format("inline; filename=\"" + "reporteVentasArticulos" + usuario.getId() + ".pdf" + "\""));
+			try {
+				Files.copy(file, response.getOutputStream());
+				response.getOutputStream().flush();
+				Files.delete(file);
+			} catch (IOException ex) {
+				ex.printStackTrace();
+			}
+		}
+		
+	}
+	
 	
 	@GetMapping("/formularioReporteVentaCategoria")
 	public String formularioReporteVentaCategoria(Model model, HttpSession session) {
