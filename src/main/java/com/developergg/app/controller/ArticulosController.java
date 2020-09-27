@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -55,6 +56,7 @@ import com.developergg.app.model.FacturaSerialTemp;
 import com.developergg.app.model.FacturaServicioTemp;
 import com.developergg.app.model.FacturaTallerTemp;
 import com.developergg.app.model.FacturaTemp;
+import com.developergg.app.model.InventarioArticulo;
 import com.developergg.app.model.Propietario;
 import com.developergg.app.model.SerialTemporal;
 import com.developergg.app.model.Suplidor;
@@ -140,6 +142,9 @@ public class ArticulosController {
 	@Value("${inventario.ruta.reporte.valorInventario}")
 	private String rutaJreportValorInventario;
 	
+	@Value("${inventario.ruta.reporte.movimientoArticulo}")
+	private String rutaJreportMovimientoArticulos;
+	
 	@PersistenceContext
 	private EntityManager em;
 	
@@ -198,6 +203,106 @@ public class ArticulosController {
 			});
 		model.addAttribute("articulos", lista);
 		return "articulos/listaArticulos";
+	}
+	
+	@GetMapping("/formularioReporteMovimientoArticulos")
+	public String formularioReporteMovimientoArticulos(Model model, HttpSession session) {
+		Usuario usuario = (Usuario) session.getAttribute("usuario");
+		List<Articulo> articulos = serviceArticulos.buscarPorTienda(usuario.getAlmacen().getPropietario());
+		model.addAttribute("articulos", articulos);
+		model.addAttribute("dateAcct", new Date());
+		return "articulos/generarReporteMovimientoArticulo";
+	}
+	
+	@PostMapping("/reporteMovimientoArticulo")
+	public void reporteMovimientoArticulo(HttpSession session, HttpServletRequest request, 
+			HttpServletResponse response, Integer idArticulo, Integer movimiento, String desde, String hasta) throws JRException, SQLException, ParseException {
+		SimpleDateFormat formato = new SimpleDateFormat("yyyy-MM-dd");
+		Usuario usuario = (Usuario) session.getAttribute("usuario");
+		List<Articulo> articulos = new LinkedList<>();
+		List<ArticuloAjuste> articulosAjuste = new LinkedList<>();
+		List<InventarioArticulo> inventarioArticulos = new LinkedList<>();
+		String tempMovimiento = "";
+		
+		if(idArticulo == 0) {
+			articulos = serviceArticulos.buscarPorTienda(usuario.getAlmacen().getPropietario()).
+					stream().filter(a -> a.getEliminado() == 0).collect(Collectors.toList());
+		}else {
+			articulos.add(serviceArticulos.buscarPorId(idArticulo));
+		}
+				
+		if(movimiento == 0) {
+			//Todos
+			articulosAjuste = serviceArticulosAjustes.buscarPorAlmacenFechas(usuario.getAlmacen(),
+					formato.parse(desde), formato.parse(hasta));
+			tempMovimiento="TODOS";
+		}else if(movimiento == 1) {
+			tempMovimiento="Entrada";
+			articulosAjuste = serviceArticulosAjustes.buscarPorAlmacenTipoMovimientoArticulosFechas(usuario.getAlmacen(),
+					"entrada", articulos, formato.parse(desde), formato.parse(hasta));
+		}else if(movimiento == 2) {
+			tempMovimiento="Salida";
+			articulosAjuste = serviceArticulosAjustes.buscarPorAlmacenTipoMovimientoArticulosFechas(usuario.getAlmacen(),
+					"salida", articulos, formato.parse(desde), formato.parse(hasta));
+		}
+		
+		for (ArticuloAjuste articuloAjuste : articulosAjuste) {
+			InventarioArticulo inventarioArticulo = new InventarioArticulo();
+			inventarioArticulo.setCantidad(articuloAjuste.getCantidad());
+			inventarioArticulo.setFecha(formato.format(articuloAjuste.getFecha()));
+			inventarioArticulo.setId(articuloAjuste.getId());
+			inventarioArticulo.setMovimiento(articuloAjuste.getTipoMovimiento());
+			inventarioArticulo.setTabla("articulos_ajuste");
+			inventarioArticulo.setProcedencia(articuloAjuste.getProcedencia());
+			inventarioArticulo.setArticulo(articuloAjuste.getArticulo().getNombre());
+			inventarioArticulos.add(inventarioArticulo);
+		}
+		
+		//Compilamos el reporte
+		JasperReport jasperReport = JasperCompileManager.compileReport(rutaJreportMovimientoArticulos);
+
+		Map<String, Object> parameters = new HashMap<String, Object>();
+
+		// convertimos la lista a JRBeanCollectionDataSource
+		JRBeanCollectionDataSource movimientoArticuloReporteJRBean = new JRBeanCollectionDataSource(inventarioArticulos);
+
+		parameters.put("idUsuario", usuario.getId());
+		parameters.put("imagen", rutaImagenes + usuario.getAlmacen().getImagen());
+		parameters.put("total", inventarioArticulos.size());
+		parameters.put("fechaDesde", desde);
+		parameters.put("fechaHasta", hasta);
+		parameters.put("author", usuario.getUsername());
+		parameters.put("articulo", idArticulo == 0 ? "TODOS" : articulos.get(0).getNombre());
+		parameters.put("movimiento", tempMovimiento);
+		parameters.put("reporteMovimientoArticulo", movimientoArticuloReporteJRBean);
+
+		// Objeto de impresion jr
+		JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource.getConnection());
+
+		String dataDirectory = tempFolder + pathSeparator + "movimientoArticulo" + usuario.getId() + ".pdf";
+
+		tempFolder += pathSeparator;
+
+		JasperExportManager.exportReportToPdfFile(jasperPrint, dataDirectory);
+
+		Path file = Paths.get(tempFolder, "movimientoArticulo" + usuario.getId() + ".pdf");
+		if (Files.exists(file)) {
+			String mimeType = URLConnection
+					.guessContentTypeFromName(tempFolder + "movimientoArticulo" + usuario.getId() + ".pdf");
+			if (mimeType == null)
+				mimeType = "application/octet-stream";
+			response.setContentType(mimeType);
+			response.setHeader("Content-Disposition",
+					String.format("inline; filename=\"" + "movimientoArticulo" + usuario.getId() + ".pdf" + "\""));
+			try {
+				Files.copy(file, response.getOutputStream());
+				response.getOutputStream().flush();
+				Files.delete(file);
+			} catch (IOException ex) {
+				ex.printStackTrace();
+			}
+		}
+		
 	}
 	
 	@GetMapping("/create")
@@ -329,6 +434,7 @@ public class ArticulosController {
 					articuloAjuste.setFecha(new Date());
 					articuloAjuste.setAlmacen(usuario.getAlmacen());
 					articuloAjuste.setUsuario(usuario);
+					articuloAjuste.setProcedencia("inventario");
 					serviceArticulosAjustes.guardar(articuloAjuste);
 					if(articuloAjuste.getId()!=null) {
 						attributes.addFlashAttribute("msg", "Registro creado");
@@ -358,6 +464,7 @@ public class ArticulosController {
 						articuloAjuste.setFecha(new Date());
 						articuloAjuste.setAlmacen(usuario.getAlmacen());
 						articuloAjuste.setUsuario(usuario);
+						articuloAjuste.setProcedencia("inventario");
 						serviceArticulosAjustes.guardar(articuloAjuste);
 						if(articuloAjuste.getId()!=null) {
 							attributes.addFlashAttribute("msg", "Registro creado");
@@ -381,6 +488,7 @@ public class ArticulosController {
 				newArticuloAjusteDefinitive.setArticulo(articulo);
 				newArticuloAjusteDefinitive.setSuplidor(articuloAjuste.getSuplidor());
 				newArticuloAjusteDefinitive.setNo_factura(articuloAjuste.getNo_factura());
+				newArticuloAjusteDefinitive.setProcedencia("inventario");
 				
 				//verificamos si el tipo de movimiento es salida y la cantidad a retirar es mayor al inventario
 				if (newArticuloAjusteDefinitive.getTipoMovimiento().equalsIgnoreCase("salida")) {

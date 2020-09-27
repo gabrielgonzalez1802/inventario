@@ -83,6 +83,7 @@ public class TallerArticulosController {
 					articuloAjuste.setAlmacen(usuario.getAlmacen());
 					articuloAjuste.setArticulo(tallerArticulo.getArticulo());
 					articuloAjuste.setCantidad(tallerArticulo.getCantidad());
+					articuloAjuste.setProcedencia("inventario");
 					articuloAjuste.setCosto(tallerArticulo.getCosto());
 					
 					// verificar si el registro tiene inventario
@@ -102,7 +103,8 @@ public class TallerArticulosController {
 						newArticuloAjusteDefinitive.setCosto(tallerArticulo.getArticulo().getCosto());
 						newArticuloAjusteDefinitive.setFecha(new Date());
 						newArticuloAjusteDefinitive.setUsuario(usuario);
-						newArticuloAjusteDefinitive.setTipoMovimiento("Entrada");
+						newArticuloAjusteDefinitive.setTipoMovimiento("entrada");
+						newArticuloAjusteDefinitive.setProcedencia("inventario");
 						newArticuloAjusteDefinitive.setCantidad(tallerArticulo.getCantidad());
 						newArticuloAjusteDefinitive.setExistencia(newArticuloAjuste.getDisponible());
 						newArticuloAjusteDefinitive.setDisponible(newArticuloAjusteDefinitive.getExistencia()+newArticuloAjusteDefinitive.getCantidad());	

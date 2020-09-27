@@ -345,9 +345,10 @@ public class DevolucionesFacturasController {
 						newArticuloAjusteDefinitive.setAlmacen(usuario.getAlmacen());
 						newArticuloAjusteDefinitive.setFecha(new Date());
 						newArticuloAjusteDefinitive.setUsuario(usuario);
-						newArticuloAjusteDefinitive.setTipoMovimiento("Entrada");
+						newArticuloAjusteDefinitive.setTipoMovimiento("entrada");
 						newArticuloAjusteDefinitive.setCantidad(facturaDetalle.getTemp_devolver());
 						newArticuloAjusteDefinitive.setCosto(facturaDetalle.getCosto());
+						newArticuloAjusteDefinitive.setProcedencia("devolucion");
 						newArticuloAjusteDefinitive.setExistencia(newArticuloAjuste.getDisponible());
 						newArticuloAjusteDefinitive.setArticulo(facturaDetalle.getArticulo());
 						newArticuloAjusteDefinitive.setNo_factura(facturaDetalle.getFactura().getCodigo().toString());
@@ -434,7 +435,7 @@ public class DevolucionesFacturasController {
 					newArticuloAjusteDefinitive.setAlmacen(usuario.getAlmacen());
 					newArticuloAjusteDefinitive.setFecha(new Date());
 					newArticuloAjusteDefinitive.setUsuario(usuario);
-					newArticuloAjusteDefinitive.setTipoMovimiento("Entrada");
+					newArticuloAjusteDefinitive.setTipoMovimiento("entrada");
 					newArticuloAjusteDefinitive.setCantidad(facturaDetalleTaller.getTemp_devolver());
 					newArticuloAjusteDefinitive.setCosto(facturaDetalleTaller.getArticulo().getCosto());
 					newArticuloAjusteDefinitive.setExistencia(newArticuloAjuste.getDisponible());

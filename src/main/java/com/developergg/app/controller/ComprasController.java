@@ -446,13 +446,14 @@ public class ComprasController {
 				newArticuloAjusteDefinitive.setAlmacen(usuario.getAlmacen());
 				newArticuloAjusteDefinitive.setFecha(new Date());
 				newArticuloAjusteDefinitive.setUsuario(usuario);
-				newArticuloAjusteDefinitive.setTipoMovimiento("Entrada");
+				newArticuloAjusteDefinitive.setTipoMovimiento("entrada");
 				newArticuloAjusteDefinitive.setCantidad(detalle.getCantidad());
 				newArticuloAjusteDefinitive.setCosto(detalle.getCosto());
 				newArticuloAjusteDefinitive.setExistencia(newArticuloAjuste.getDisponible());
 				newArticuloAjusteDefinitive.setArticulo(detalle.getArticulo());
 				newArticuloAjusteDefinitive.setSuplidor(compra.getSuplidor());
 				newArticuloAjusteDefinitive.setNo_factura(compra.getNo_factura());
+				newArticuloAjusteDefinitive.setProcedencia("compras");
 				newArticuloAjusteDefinitive.setUsuario(usuario);
 				newArticuloAjusteDefinitive.setDisponible(newArticuloAjusteDefinitive.getExistencia()+newArticuloAjusteDefinitive.getCantidad());
 				serviceArticulosAjustes.guardar(newArticuloAjusteDefinitive);

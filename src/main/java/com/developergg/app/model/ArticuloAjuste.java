@@ -42,7 +42,9 @@ public class ArticuloAjuste {
 	@Column(name = "tipo_movimiento")
 	private String tipoMovimiento;
 	
-	private Double costo;
+	private Double costo = 0.0;
+	
+	private String procedencia;
 	
 	@OneToOne
 	@JoinColumn(name = "id_usuario")
@@ -146,11 +148,19 @@ public class ArticuloAjuste {
 		this.disponible = disponible;
 	}
 
+	public String getProcedencia() {
+		return procedencia;
+	}
+
+	public void setProcedencia(String procedencia) {
+		this.procedencia = procedencia;
+	}
+
 	@Override
 	public String toString() {
 		return "ArticuloAjuste [id=" + id + ", articulo=" + articulo + ", almacen=" + almacen + ", suplidor=" + suplidor
 				+ ", existencia=" + existencia + ", disponible=" + disponible + ", no_factura=" + no_factura
-				+ ", cantidad=" + cantidad + ", tipoMovimiento=" + tipoMovimiento + ", costo=" + costo + ", usuario="
-				+ usuario + ", fecha=" + fecha + "]";
+				+ ", cantidad=" + cantidad + ", tipoMovimiento=" + tipoMovimiento + ", costo=" + costo
+				+ ", procedencia=" + procedencia + ", usuario=" + usuario + ", fecha=" + fecha + "]";
 	}
 }

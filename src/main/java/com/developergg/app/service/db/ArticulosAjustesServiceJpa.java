@@ -1,5 +1,6 @@
 package com.developergg.app.service.db;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,6 +41,28 @@ public class ArticulosAjustesServiceJpa implements IArticulosAjustesService{
 	@Override
 	public List<ArticuloAjuste> buscarPorArticuloYAlmacen(Articulo articulo, Almacen almacen) {
 		return repo.findByArticuloAndAlmacen(articulo, almacen);
+	}
+
+	@Override
+	public List<ArticuloAjuste> buscarPorAlmacen(Almacen almacen) {
+		return repo.findByAlmacen(almacen);
+	}
+
+	@Override
+	public List<ArticuloAjuste> buscarPorAlmacenTipoMovimientoArticulos(Almacen almacen, String movimiento,
+			List<Articulo> articulos) {
+		return null;
+	}
+
+	@Override
+	public List<ArticuloAjuste> buscarPorAlmacenTipoMovimientoArticulosFechas(Almacen almacen, String movimiento,
+			List<Articulo> articulos, Date desde, Date hasta) {
+		return repo.findByAlmacenAndTipoMovimientoAndArticuloInAndFechaBetween(almacen, movimiento, articulos, desde, hasta);
+	}
+
+	@Override
+	public List<ArticuloAjuste> buscarPorAlmacenFechas(Almacen almacen, Date desde, Date hasta) {
+		return repo.findByAlmacenAndFechaBetween(almacen, desde, hasta);
 	} 
 
 }

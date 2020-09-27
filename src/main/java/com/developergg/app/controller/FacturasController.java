@@ -567,6 +567,7 @@ public class FacturasController {
 				newArticuloAjusteDefinitive.setFecha(new Date());
 				newArticuloAjusteDefinitive.setUsuario(usuario);
 				newArticuloAjusteDefinitive.setTipoMovimiento("salida");
+				newArticuloAjusteDefinitive.setProcedencia("ventas");
 				newArticuloAjusteDefinitive.setCantidad(facturaDetalleTemp.getCantidad());
 				newArticuloAjusteDefinitive.setCosto(facturaDetalleTemp.getArticulo().getCosto());
 				newArticuloAjusteDefinitive.setExistencia(newArticuloAjuste.getDisponible());
