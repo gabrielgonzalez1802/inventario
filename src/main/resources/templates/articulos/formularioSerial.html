@@ -67,7 +67,7 @@
                  <div class="col-md-4"> 
                   <div class="form-group">
                     <label for="valorImei">IMEI | Serial</label>
-                    <input type="text" class="form-control" th:field="*{serial}" id="valorImei" placeholder="IMEI" required="required">
+                    <input type="number" class="form-control" th:field="*{serial}" id="valorImei" placeholder="IMEI" required="required">
                   </div>  
                 </div>
                 <div class="col-md-4"> 
@@ -210,34 +210,45 @@
 		$("#addSerial").click(function(e) {
 			 e.preventDefault();
 				var costo = $("#costo").val();
-   				var precio_mayor = $("#precioMayor").val();
-   				precio_mayor = parseFloat(precio_mayor);
-   				var precio_maximo = $("#precioMaximo").val();
-   				precio_maximo = parseFloat(precio_maximo);
-   				var precio_minimo = $("#precioMinimo").val();
-   				precio_minimo = parseFloat(precio_minimo);
-			 //verificamos que los precios sean mayor al costo
-			 if(costo>precio_mayor || costo>precio_maximo || costo>precio_minimo){
-				 Swal.fire({
-					 title: 'Alerta!',
-					 text: 'El costo no puede ser mayor a ningun precio de venta',
-					 icon: 'warning',
-					 confirmButtonText: 'Entendido'
-				})
-			 }else{
-				 var $form = $("#articuloSerial");
-				 $('#infoListaSeriales').load("/articulosSeriales/ajax/serialTemp", $form.serialize(),function(data){
-					 if($("#existe").val() == 1){
-						 Swal.fire({
-							 title: 'Alerta!',
-							 text: 'El serial ya existe',
-							 icon: 'warning',
-							 confirmButtonText: 'Entendido'
-						})
-					 }
-					 limpiar();
-				 });
-			 }
+				var serial = $("#valorImei").val();
+				
+		     if(serial!="" && parseFloat(serial)>0){
+					var precio_mayor = $("#precioMayor").val();
+	   				precio_mayor = parseFloat(precio_mayor);
+	   				var precio_maximo = $("#precioMaximo").val();
+	   				precio_maximo = parseFloat(precio_maximo);
+	   				var precio_minimo = $("#precioMinimo").val();
+	   				precio_minimo = parseFloat(precio_minimo);
+				 //verificamos que los precios sean mayor al costo
+				 if(costo>precio_mayor || costo>precio_maximo || costo>precio_minimo){
+					 Swal.fire({
+						 title: 'Alerta!',
+						 text: 'El costo no puede ser mayor a ningun precio de venta',
+						 icon: 'warning',
+						 confirmButtonText: 'Entendido'
+					})
+				 }else{
+					 var $form = $("#articuloSerial");
+					 $('#infoListaSeriales').load("/articulosSeriales/ajax/serialTemp", $form.serialize(),function(data){
+						 if($("#existe").val() == 1){
+							 Swal.fire({
+								 title: 'Alerta!',
+								 text: 'El serial ya existe',
+								 icon: 'warning',
+								 confirmButtonText: 'Entendido'
+							})
+						 }
+						 limpiar();
+					 });
+				 }
+			  }else{
+				  Swal.fire({
+						 title: 'Alerta!',
+						 text: 'Ingrese un serial',
+						 icon: 'warning',
+						 confirmButtonText: 'Entendido'
+					})
+			  }
 		});
 
 		function eliminarSerialTemp(){

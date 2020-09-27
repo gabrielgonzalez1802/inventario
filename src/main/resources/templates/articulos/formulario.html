@@ -209,7 +209,7 @@
 					</div>
 					<div class="modal-footer">
 						<button type="button" class="btn btn-secondary"
-							data-dismiss="modal" id="closeCategoryModal">Close</button>
+							data-dismiss="modal" id="closeCategoryModal">Cerrar</button>
 						<button type="button" id="guardarCategoria" class="btn btn-primary">Guardar</button>
 					</div>
 				</div>
@@ -381,19 +381,23 @@
 			//Validacion before submit
    		   $("#formAddProduct").submit(function() {
    			//Vaidacion: el costo no puede ser mayor a ningún precio de venta
-   				var costo = $("#costo").val();
-   				var precio_mayor = $("#precio_mayor").val();
-   				var precio_maximo = $("#precio_maximo").val();
-   				var precio_minimo = $("#precio_minimo").val();
-   				   				
-   				if((costo>precio_mayor || costo>precio_maximo || costo>precio_minimo) && $("#imei").val()!="SI"){
-   					Swal.fire({
-   						  title: 'Alerta!',
-   						  text: 'El costo no puede ser mayor a ningun precio de venta',
-   						  icon: 'warning',
-   						  confirmButtonText: 'Entendido'
-   						})
-   					return false;	
+   				var costo = parseFloat($("#costo").val());
+   				
+   				if($("#imei").val()=="NO"){
+   	   				var precio_mayor = parseFloat($("#precio_mayor").val());
+   	   				var precio_maximo = parseFloat($("#precio_maximo").val());
+   	   				var precio_minimo = parseFloat($("#precio_minimo").val());
+   	   	   			if(costo>precio_mayor || costo>precio_maximo || costo>precio_minimo){
+   	   	   				Swal.fire({
+   	   	   					  title: 'Alerta!',
+   	   	   					  text: 'El costo no puede ser mayor a ningun precio de venta',
+   	   	   					  icon: 'warning',
+   	   	   					  confirmButtonText: 'Entendido'
+   	   	   					})
+   	   	   				return false;	
+   	   	   			}else{
+   	   	   				return true;
+   	   	   			}	
    				}else{
    					return true;
    				}
