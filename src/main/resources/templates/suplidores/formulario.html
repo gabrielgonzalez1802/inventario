@@ -34,8 +34,8 @@
 	<div class="container">
 		<div class="card all">
 			<div class="card-body" style="margin-top: 0px;">
-			   <h4 class="card-header"><strong style="color: #fff;">Datos del Suplidor</strong></h4>              
-				<br>
+			<h4 class="card-header"><strong style="color: #fff;">Datos del Suplidor</strong><a th:href="@{/suplidores/}" style="float: right;" class="btn btn-md btn-primary">Regresar</a></h4>
+			<br>
 
 		<form method="post" th:object="${suplidor}" th:action="@{/suplidores/save}" id="formSuplidor" enctype="multipart/form-data">       
               <input type="hidden" th:field="*{id}">   

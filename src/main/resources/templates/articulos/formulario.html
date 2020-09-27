@@ -27,7 +27,7 @@
 			   <h4 class="card-header"><strong style="color: #fff;">Datos del Art&iacute;culo</strong><a th:href="@{/articulos/}" style="float: right;" class="btn btn-md btn-primary">Regresar</a></h4>              
 				<br>
 
-		<form method="post" th:object="${articulo}" th:action="@{/articulos/save}" id="formAddProduct" enctype="multipart/form-data">       
+		<form method="post" th:object="${articulo}" th:action="@{/articulos/save}" id="formAddProduct" enctype="multipart/form-data" autocomplete="off">       
              <input type="hidden" th:field="*{imagen}">
               <div class="row">
                 <div class="col-md-5"> 

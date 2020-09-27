@@ -33,18 +33,18 @@
 	<div class="container">
 		<div class="card all">
 			<div class="card-body" style="margin-top: 0px;">
-			   <h4 class="card-header"><strong style="color: #fff;">Entrada de seriales</strong></h4>    <!-- th:action="@{/articulos/inventario/serial/save}"  -->     
+			  <h4 class="card-header"><strong style="color: #fff;">Entrada de Seriales</strong><a th:href="@{/articulos/}" style="float: right;" class="btn btn-md btn-primary">Regresar</a></h4>              
 				<br>
 		<div id="ajaxLoadedContent">
 			
 		</div>
-		<form method="post" th:fragment="results" th:object="${articuloSerial}" id="articuloSerial">       
+		<form method="post" th:fragment="results" th:object="${articuloSerial}" id="articuloSerial" autocomplete="off">       
              <input type="hidden" th:field="*{id}">
               <div class="row">
                 <div class="col-md-6"> 
                   <div class="form-group">
                     <label for="nombre">Articulo</label>
-                    <input type="hidden" th:field="*{articulo.id}" th:value="${articulo.id}">
+                    <input type="hidden" th:field="*{articulo.id}" th:value="${articulo.id}" id="idArticulo">
                     <input type="text" th:field="${articulo.nombre}" disabled="disabled" class="form-control" id="nombre" required="required" placeholder="Nombre">
                   </div>
                 </div>
@@ -108,18 +108,24 @@
               <div class="row">
               	<div class="col-md-5">
                   <div class="form-group">
-                    <label for="ultimosImei">Ultimos IMEI</label> 
-					<select class="form-control"  id="ultimosImei" style="font-size: 18px;" multiple>
-                   		 <option th:fragment="listaUltimosSeriales" 
-                   		 th:each="cat : ${listaUltimosSeriales}" 
-                   		 th:value="${cat.id}" 
-                   		 th:text="${cat.serial}" />
-                    </select><!-- th:field="*{categoria.id}" -->
+	                  <div id="infoListaSeriales">
+	                  	<input type="hidden" id="existe" th:value="${existe}">
+	              		  <label for="ultimosImei">Ultimos IMEI</label> 
+							<select class="form-control"  id="ultimosImei" style="font-size: 18px;" onchange="javascript:eliminarSerialTemp()" multiple>
+		                   	<option th:each="cat : ${listaUltimosSeriales}" 
+		                   		 th:value="${cat.id}" 
+		                   		 th:text="${cat.serial}" />
+               			    </select>
+	                  </div>
                   </div>
                 </div>
+                <div class="col-md-1">
+                	<input type="button" id="addSerial" style="margin-top: 30px;" class="btn btn-md btn-success" value="Agregar"> 
+                </div>
               </div> 
-              
-              <input type="submit" class="btn btn-lg btn-primary" value="Guardar"> 
+              <hr>
+              <input type="button" class="btn btn-lg btn-danger" id="btnCancelar" value="Cancelar">
+              <input type="button" class="btn btn-lg btn-primary" id="btnGuardar" value="Guardar"> 
             </form>	
             </div>
 			<a class="card-link" href="#"></a>
@@ -150,9 +156,58 @@
 		</script>
 	</span>
 	<script type="text/javascript">
-		$('#ultimosImei').load("/articulosSeriales/ajax/getLast");
-		//clic en el formulario
-		$("#articuloSerial").submit(function(e) {
+		var idArticulo = $("#idArticulo").val();
+		$('#infoListaSeriales').load("/articulosSeriales/ajax/getLastTemp/"+idArticulo);
+			
+		$("#btnGuardar").click(function(e) {
+			e.preventDefault();
+			var count = document.getElementById("ultimosImei").length;
+			if(count > 0){
+				$.post("/articulosSeriales/guardarSeriales/"+idArticulo,function(r){
+					Swal.fire({
+						  title: 'Muy bien!',
+						  text: 'Registro guardado',
+						  icon: 'success',
+						  confirmButtonText: 'Cool'
+						})
+						setTimeout(function() {
+							location.href = '/articulos/';
+						}, 1000);
+				});
+			}else{
+				 Swal.fire({
+					 title: 'Alerta!',
+					 text: 'Debe agregar al menos 1 serial',
+					 icon: 'warning',
+					 confirmButtonText: 'Entendido'
+				})
+			}
+		});
+		
+		$("#btnCancelar").click(function(e) {
+		 	e.preventDefault();
+		     Swal.fire({
+		    	  title: 'Esta seguro?',
+		    	  text: "Desea eliminar los seriales?",
+		    	  icon: 'warning',
+		    	  showCancelButton: true,
+		    	  confirmButtonColor: '#3085d6',
+		    	  cancelButtonColor: '#d33',
+		    	  confirmButtonText: 'Si, Puede borrarlo!'
+		    	}).then((result) => {
+		    	  if (result.value) {
+		 		    $('#infoListaSeriales').load("/articulosSeriales/ajax/allSerialTempDelete/"+idArticulo);
+		 		   limpiar();
+		    	    Swal.fire(
+		    	      'Borrado!',
+		    	      'Seriales borrados.',
+		    	      'success'
+		    	    )
+		    	  }
+		    	})
+		});
+		
+		$("#addSerial").click(function(e) {
 			 e.preventDefault();
 				var costo = $("#costo").val();
    				var precio_mayor = $("#precioMayor").val();
@@ -171,15 +226,22 @@
 				})
 			 }else{
 				 var $form = $("#articuloSerial");
-				 $('#ultimosImei').load("/articulosSeriales/ajax/serial", $form.serialize(),function(){
+				 $('#infoListaSeriales').load("/articulosSeriales/ajax/serialTemp", $form.serialize(),function(data){
+					 if($("#existe").val() == 1){
+						 Swal.fire({
+							 title: 'Alerta!',
+							 text: 'El serial ya existe',
+							 icon: 'warning',
+							 confirmButtonText: 'Entendido'
+						})
+					 }
 					 limpiar();
 				 });
 			 }
 		});
-	</script>
-	<script type="text/javascript">
-		$("select#ultimosImei").change(function(){
-		     var seleccion = $('#ultimosImei').val();
+
+		function eliminarSerialTemp(){
+			 var seleccion = $('#ultimosImei').val();
 		     Swal.fire({
 		    	  title: 'Esta seguro?',
 		    	  text: "Desea eliminar el serial?",
@@ -190,7 +252,7 @@
 		    	  confirmButtonText: 'Si, Puede borrarlo!'
 		    	}).then((result) => {
 		    	  if (result.value) {
-		 		    $('#ultimosImei').load("/articulosSeriales/ajax/serialDelete/"+seleccion);
+		 		    $('#infoListaSeriales').load("/articulosSeriales/ajax/serialTempDelete/"+seleccion);
 		 		   limpiar();
 		    	    Swal.fire(
 		    	      'Borrado!',
@@ -199,14 +261,11 @@
 		    	    )
 		    	  }
 		    	})
-		});
+		}
 	</script>
 	<script type="text/javascript">
 		function limpiar(){
 			$("#valorImei").val("");
-			$("#precioMayor").val("");
-			$("#precioMaximo").val("");
-			$("#precioMinimo").val("");
 		}
 	</script>
 	 <span th:insert="fragments/footer :: footer"></span>  

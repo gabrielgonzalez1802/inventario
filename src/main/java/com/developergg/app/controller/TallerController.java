@@ -26,7 +26,6 @@ import com.developergg.app.model.TallerArticulo;
 import com.developergg.app.model.TallerDetalle;
 import com.developergg.app.model.TipoEquipo;
 import com.developergg.app.model.Usuario;
-import com.developergg.app.model.Vendedor;
 import com.developergg.app.service.IArticulosService;
 import com.developergg.app.service.IPerfilesService;
 import com.developergg.app.service.ITalleresArticulosService;

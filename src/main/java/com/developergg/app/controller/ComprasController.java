@@ -40,7 +40,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.developergg.app.model.AbonoCxP;
 import com.developergg.app.model.Articulo;
 import com.developergg.app.model.ArticuloAjuste;
-import com.developergg.app.model.ArticuloReporte;
 import com.developergg.app.model.ArticuloSerial;
 import com.developergg.app.model.Categoria;
 import com.developergg.app.model.Compra;
@@ -63,7 +62,6 @@ import com.developergg.app.service.IComprobantesFiscalesService;
 import com.developergg.app.service.ICondicionesPagoService;
 import com.developergg.app.service.ISuplidoresService;
 import com.developergg.app.service.IUsuariosService;
-import com.developergg.app.service.db.SuplidoresServiceJpa;
 
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperCompileManager;

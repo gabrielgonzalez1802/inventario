@@ -204,11 +204,15 @@ public class ArticulosController {
 	public String crear(Model model, HttpSession session) {
 		Usuario usuario = (Usuario) session.getAttribute("usuario");
 		List<Categoria> categorias = serviceCategorias.buscarPorPropietario(usuario.getAlmacen().getPropietario());
+		lista = serviceArticulos.buscarPorTienda(usuario.getAlmacen().getPropietario())
+				.stream().filter(p -> p.getEliminado() == 0).collect(Collectors.toList());
 		if(lista.isEmpty()) {
 			lista = new LinkedList<>();
+			Articulo newArticulo = new Articulo();
+			newArticulo.setCodigo("1");
 			model.addAttribute("categorias",categorias);
 			model.addAttribute("articulos", lista);
-			model.addAttribute("articulo", new Articulo());
+			model.addAttribute("articulo", newArticulo);
 		}else {
 			Articulo articuloTemp = lista.get(lista.size()-1);
 			Integer codigo = Integer.parseInt(articuloTemp.getCodigo());
