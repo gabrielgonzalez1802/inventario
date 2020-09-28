@@ -1667,9 +1667,9 @@ public class ArticulosController {
 			@RequestParam(name = "idCategoria") Integer idCategoria, @RequestParam(name = "tipoArticulo") Integer tipoArticulo,
 			@RequestParam(name = "gama") Integer gama, @RequestParam(name = "conItbis") Integer conItbis,
 			@RequestParam(name = "tipoPrecio") Integer tipoPrecio, @RequestParam(name = "verEliminados") Integer verEliminados,
-			@RequestParam(name = "ordenar") Integer ordenar, @RequestParam(name = "tipoOrden") Integer tipoOrden,
-			@RequestParam(name = "verCosto") Integer verCosto, @RequestParam(name = "verPrecio") Integer verPrecio,
-			@RequestParam(name = "verExistencia") Integer verExistencia
+			@RequestParam(name = "ordenar") Integer ordenar, @RequestParam(name = "tipoOrden") Integer tipoOrden
+//			,@RequestParam(name = "verCosto") Integer verCosto, @RequestParam(name = "verPrecio") Integer verPrecio,
+//			@RequestParam(name = "verExistencia") Integer verExistencia
 			) throws JRException, SQLException {
 		Usuario usuario = (Usuario) session.getAttribute("usuario");
 		SimpleDateFormat formato = new SimpleDateFormat("yyyy-MM-dd");
@@ -1677,6 +1677,8 @@ public class ArticulosController {
 		List<Categoria> categorias = new LinkedList<>();
 		List<Articulo> articulos = new LinkedList<>();
 		List<ArticuloReporte> articulosReporte = new LinkedList<>();
+		
+		Integer verCosto = 1;
 		
 		String tempTipoPrecio = "";
 		String categoriasIds = "";

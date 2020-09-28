@@ -123,6 +123,14 @@ public class ArticulosSerialesController {
 			serviceArticulosSeriales.guardar(articuloSerial);
 		}
 		
+		//Actualizamos los precios de los articulos tomando el ultimo registro como referencia
+		ArticuloSerialTemp last = lista.get(lista.size()-1);
+		articulo.setPrecio_maximo(last.getPrecio_maximo());
+		articulo.setPrecio_mayor(last.getPrecio_mayor());
+		articulo.setPrecio_minimo(last.getPrecio_minimo());
+		articulo.setCosto(last.getCosto());
+		serviceArticulos.guardar(articulo);
+		
 		//Borramos los registros temporales
 		serviceArticulosSerialesTemp.eliminar(lista);
 		return "articulos/formularioSerial ::  #responseAddSerials";

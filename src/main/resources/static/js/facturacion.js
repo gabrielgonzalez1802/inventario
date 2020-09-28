@@ -16,6 +16,20 @@ if($("#idClienteInfo").val()){
 	$("#responseInfoCliente").hide();
 }
 
+//Debe existir en el almacen al menos 1 comprobante fiscal
+if(document.getElementById("selectComprobanteFiscal").length == 0){
+	Swal.fire({
+		  title: 'Advertencia!',
+		  text: 'Debe crear al menos un comprobante fiscal',
+		  position: 'top',
+		  icon: 'warning',
+		  confirmButtonText: 'Cool'
+	})
+	setTimeout(function() {
+		location.href = '/comprobantesFiscales/create/';
+	}, 4000);
+}
+
 //al principio tomara el foco
 focusSelectArticuloNew();
 //verificamos si la factura tiene un cliente asociado
