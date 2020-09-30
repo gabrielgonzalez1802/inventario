@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <title>Sistema Celulares</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" sizes="64x64" th:href="@{/img/icon.png}">
+    <link rel="stylesheet" type="text/css" th:href="@{/bootstrap/css/bootstrap.min.css}">
+	<link rel="stylesheet" type="text/css" th:href="@{/css/sticky-dark-top-nav.css}">
+    <!-- Font-icon css-->
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+ 	<link rel="stylesheet" type="text/css" th:href="@{/css/sticky-dark-top-nav.css}">
+ 	<link rel="stylesheet" type="text/css" th:href="@{/css/Minimal-tabs.css}">
+ 	<link rel="stylesheet" type="text/css" th:href="@{/css/dashboard.css}">
+ 	<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css">
+ 	<link rel="stylesheet" type="text/css" th:href="@{/fontawesom/css/all.min.css}">
+ 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+ 	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap" rel="stylesheet">
+ 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+ 	<link rel="stylesheet" type="text/css" th:href="@{/css/swal.css}">
+ 	<style>
+.table-primary, .table-primary>th, .table-primary>td {
+	background-color: #25396d;
+	color: #ffff;
+}
+
+.table-primary th, .table-primary td, .table-primary thead th,
+	.table-primary tbody+tbody {
+	border-color: #25396d;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.current,
+	.dataTables_wrapper .dataTables_paginate .paginate_button.current:hover
+{
+	  background-image: linear-gradient(#54b4eb, #2FA4E7 60%, #1d9ce5);
+}
+.dataTables_wrapper .dataTables_paginate .paginate_button.current, .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+    color: #fffdfd !important;
+    border-color: #2FA4E7;
+}
+</style>
+  </head>
+  <body>
+     <span th:insert="fragments/topMenu :: menu-principal"></span> 
+     <br>
+	<div class="container text-white">
+	
+<!-- Modal agregar ingreso -->
+ <div class="modal" id="vendedorModal">
+    <div class="modal-dialog modal-md" data-backdrop="static">
+      <div class="modal-content all">
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h4 class="modal-title"><span style="color:#fff;">Agregar vendedor</span></h4>
+        </div>
+        
+        <!-- Modal body -->
+        <div class="modal-body">
+          	<form>
+				<div id="vendedores">
+					<input type="hidden" id="vendedorGuardado">
+					<div class="row">
+						<div class="col col-md-12">
+							<div class="form-group">
+								<label>Nombre</label>
+								<input class="form-control" type="text" placeholder="Nombre" id="nombreVendedor">
+							</div>
+						</div>
+					</div>
+					
+					<div class="row">
+						<div class="col col-md-6">
+							<div class="form-group">
+								<label>Telefono</label>
+	                       		<input class="form-control" type="text" placeholder="Telefono" id="telefonoVendedor">
+							</div>
+						</div>
+						<div class="col col-md-6">
+							<div class="form-group">
+								<label>Celular</label>
+								<input class="form-control" type="text" placeholder="Celular" id="celularVendedor">
+							</div>
+						</div>
+					</div>
+					
+					<div class="row">
+						<div class="col col-md-6">
+							<div class="form-group">
+								<label>Cedula</label>
+	                       		<input class="form-control" type="text" placeholder="Cedula" id="cedulaVendedor">
+							</div>
+						</div>
+						<div class="col col-md-6">
+							<div class="form-group">
+								<label>Email</label>
+								<input class="form-control" type="text" placeholder="Email" id="emailVendedor">
+							</div>
+						</div>
+					</div>
+					
+					<div class="row">
+						<div class="col col-md-12">
+							<div class="form-group">
+								<label>Direccion</label>
+	                       		<textarea class="form-control" id="direccionVendedor"></textarea>
+							</div>
+						</div>
+					</div>
+				</div>	
+           </form>
+        </div>
+        
+        <!-- Modal footer -->
+        <div class="modal-footer">
+            <button type="button" class="btn btn-warning" data-dismiss="modal">Regresar</button>
+            <button type="button" class="btn btn-primary" id="guardarVendedor">Guardar</button>
+        </div>
+        
+      </div>
+    </div>
+ </div>		
+ 
+ <!-- Modal modificar ingreso -->
+ <div class="modal" id="ingresoEditModal">
+    <div class="modal-dialog modal-md" data-backdrop="static">
+      <div class="modal-content all">
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h4 class="modal-title"><span style="color:#fff;">Modificar Ingreso</span></h4>
+        </div>
+        
+        <!-- Modal body -->
+        <div class="modal-body">
+          	<form>
+				<div id="modificarVendedor">
+					<div class="row">
+						<div class="col col-md-12">
+							<div class="form-group">
+								<input type="hidden" th:field="${vendedor.id}" id="idVendedor">
+								<label>Nombre</label>
+								<input class="form-control" th:field="${vendedor.nombre}" type="text" placeholder="Nombre" id="nombreEdit">
+							</div>
+						</div>
+					</div>
+					
+					<div class="row">
+						<div class="col col-md-6">
+							<div class="form-group">
+								<label>Telefono</label>
+	                       		<input class="form-control" th:field="${vendedor.telefono}" type="text" placeholder="Telefono" id="telefonoEdit">
+							</div>
+						</div>
+						<div class="col col-md-6">
+							<div class="form-group">
+								<label>Celular</label>
+								<input class="form-control" th:field="${vendedor.celular}" type="text" placeholder="Celular" id="celularEdit">
+							</div>
+						</div>
+					</div>
+					
+					<div class="row">
+						<div class="col col-md-6">
+							<div class="form-group">
+								<label>Cedula</label>
+	                       		<input class="form-control" th:field="${vendedor.cedula}" type="text" placeholder="Cedula" id="cedulaEdit">
+							</div>
+						</div>
+						<div class="col col-md-6">
+							<div class="form-group">
+								<label>Email</label>
+								<input class="form-control" th:field="${vendedor.email}" type="email" placeholder="Email" id="emailEdit">
+							</div>
+						</div>
+					</div>
+					
+					<div class="row">
+						<div class="col col-md-12">
+							<div class="form-group">
+								<label>Direccion</label>
+	                       		<textarea th:field="${vendedor.direccion}" class="form-control" id="direccionEdit"></textarea>
+							</div>
+						</div>
+					</div>
+				</div>	
+           </form>
+        </div>
+        
+        <!-- Modal footer -->
+        <div class="modal-footer">
+            <button type="button" class="btn btn-warning" data-dismiss="modal">Regresar</button>
+            <button type="button" class="btn btn-primary" id="btnModificarVendedor">Guardar</button>
+        </div>
+        
+      </div>
+    </div>
+ </div>			
+	
+		<div class="card text-primary border rounded">
+			<div class="card-body" style="margin-top: 0px;">
+				<h1 class="card-title" style="font-size: 16px;">Lista de Vendedores
+					<a class="btn btn-primary" style="float: right;" href="#" id="agregarVendedor">Agregar</a>
+				</h1>
+				<br>
+					<table class="table table-striped" id="tabla">
+							<thead>
+								<tr class="table-primary">
+									<th>Nombre</th>
+									<th>Telefono</th>
+									<th>Celular</th>
+									<th>Email</th>
+									<th></th>
+								</tr>
+							</thead>
+							<tbody>
+								 <tr th:each="vendedor:${vendedores}">
+				                  <td th:text="${vendedor.nombre}"></td> 
+				                   <td th:text="${vendedor.telefono}"></td> 
+				                   <td th:text="${vendedor.celular}"></td> 
+				                   <td th:text="${vendedor.email}"></td> 
+				                  <td>
+				                    <a href="#" th:onclick="'modalModificarVendedor(\'' + ${vendedor.id} + '\');'" class="btn btn-primary btn-sm" role="button" title="Editar el registro."><i class="fa fa-edit" aria-hidden="true"></i></a>
+				                 	<a th:href="@{/vendedores/delete/{id} (id=${vendedor.id})}" onclick="return confirm('¿Estas seguro de eliminar el registro?')" class="btn btn-danger btn-sm" role="button" title="Eliminar el registro."><i class="fa fa-trash" aria-hidden="true"></i></a>
+				                  </td>
+				                </tr>
+							</tbody>
+						</table>
+			</div>
+			<a class="card-link" href="#"></a>
+		</div>
+	</div>
+	<script th:src="@{/js/jquery.min.js}"></script>
+    <script th:src="@{/bootstrap/js/bootstrap.min.js}"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+	<script type="text/javascript">
+	$(document).ready(function() {
+		$('#tabla').DataTable({
+			"scrollY": "400px",
+			    "language": {
+			        "sProcessing":    "Procesando...",
+			        "sLengthMenu":    "Mostrar _MENU_ registros",
+			        "sZeroRecords":   "No se encontraron resultados",
+			        "sEmptyTable":    "Ningún dato disponible en esta tabla",
+			        "sInfo":          "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+			        "sInfoEmpty":     "Mostrando registros del 0 al 0 de un total de 0 registros",
+			        "sInfoFiltered":  "(filtrado de un total de _MAX_ registros)",
+			        "sInfoPostFix":   "",
+			        "sSearch":        "Buscar:",
+			        "sUrl":           "",
+			        "sInfoThousands":  ",",
+			        "sLoadingRecords": "Cargando...",
+			        "oPaginate": {
+			            "sFirst":    "Primero",
+			            "sLast":    "Último",
+			            "sNext":    "Siguiente",
+			            "sPrevious": "Anterior"
+			        },
+			        "oAria": {
+			            "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+			        }
+			    }
+		});
+	});
+	
+	function modalModificarVendedor(idVendedor){
+		 $.get("/vendedores/ajax/getVendedor/"+idVendedor,function(data){
+			 $('#modificarVendedor').replaceWith(data);
+			 $("#ingresoEditModal").modal({backdrop: 'static', keyboard: false})
+			 $("#ingresoEditModal").modal("show");
+		 });	 
+		 return false;
+	}
+	
+	$("#agregarVendedor").click(function(e){
+		e.preventDefault();
+		$("#vendedorModal").modal({backdrop: 'static', keyboard: false})
+		$("#vendedorModal").modal("show");
+		return false;
+	});
+	
+	$("#guardarVendedor").on('click', function(e){
+		e.preventDefault();
+		var nombreVendedor = $("#nombreVendedor").val();
+		var telefonoVendedor = $("#telefonoVendedor").val(); 
+		var celularVendedor = $("#celularVendedor").val();
+		var direccionVendedor = $("#direccionVendedor").val();
+		var cedulaVendedor = $("#cedulaVendedor").val();
+		var emailVendedor = $("#emailVendedor").val();
+		if(!nombreVendedor || !cedulaVendedor){
+			Swal.fire({
+				  title: 'Alerta!',
+				  position: 'top',
+				  text: 'El nombre y la cedula no pueden estar vacios',
+				  icon: 'warning',
+				  confirmButtonText: 'Cool'
+			})
+		}else{
+			 $.post("/vendedores/ajax/agregarVendedor/", {
+				 'nombreVendedor' : nombreVendedor,
+				 'telefonoVendedor' : telefonoVendedor,
+				 'celularVendedor' : celularVendedor,
+				 'direccionVendedor' : direccionVendedor,
+				 'cedulaVendedor' : cedulaVendedor,
+				 'emailVendedor' : emailVendedor
+			 },function(data){
+					Swal.fire({
+						  title: 'Muy bien!',
+						  text: 'Registro creado',
+						  position: 'top',
+						  icon: 'success',
+						  confirmButtonText: 'Cool'
+					})
+					setTimeout(function() {
+						location.reload();
+					}, 2000);
+			 });
+		}
+	});
+	
+	$("#btnModificarVendedor").on('click',function(e){
+		e.preventDefault();
+		var id = $("#idVendedor").val();
+		var nombre = $("#nombreEdit").val();
+		var telefono = $("#telefonoEdit").val(); 
+		var celular = $("#celularEdit").val();
+		var direccion = $("#direccionEdit").val();
+		var cedula = $("#cedulaEdit").val();
+		var email = $("#emailEdit").val();
+				
+		if(!nombre || !cedula){
+			Swal.fire({
+				  title: 'Alerta!',
+				  position: 'top',
+				  text: 'El nombre y la cedula no pueden estar vacios',
+				  icon: 'warning',
+				  confirmButtonText: 'Cool'
+			})
+		}else{
+			 $.post("/vendedores/ajax/modificarVendedor/", {
+				 'id' : id,
+				 'nombre' : nombre,
+				 'telefono' : telefono,
+				 'celular' : celular,
+				 'direccion' : direccion,
+				 'cedula' : cedula,
+				 'email' : email
+			 },function(data){
+					Swal.fire({
+						  title: 'Muy bien!',
+						  text: 'Registro modificado',
+						  position: 'top',
+						  icon: 'success',
+						  confirmButtonText: 'Cool'
+					})
+					setTimeout(function() {
+						location.reload();
+					}, 2000);
+			 });
+		}
+	});
+	
+	</script>
+	 <span th:insert="fragments/footer :: footer"></span>  
+</body>
+</html>
