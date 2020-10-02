@@ -38,6 +38,9 @@ public class CompraDetalle {
 	private Double precio_maximo = 0.0;
 	private Double precio_minimo = 0.0;
 	private Double precio_mayor = 0.0;
+	
+	private Integer cantidad_devuelta = 0;
+	private Integer temp_devolver = 0;
 
 	public Integer getId() {
 		return id;
@@ -127,11 +130,27 @@ public class CompraDetalle {
 		this.precio_mayor = precio_mayor;
 	}
 
+	public Integer getTemp_devolver() {
+		return temp_devolver;
+	}
+
+	public void setTemp_devolver(Integer temp_devolver) {
+		this.temp_devolver = temp_devolver;
+	}
+
+	public Integer getCantidad_devuelta() {
+		return cantidad_devuelta;
+	}
+
+	public void setCantidad_devuelta(Integer cantidad_devuelta) {
+		this.cantidad_devuelta = cantidad_devuelta;
+	}
+
 	@Override
 	public String toString() {
 		return "CompraDetalle [id=" + id + ", compra=" + compra + ", articulo=" + articulo + ", cantidad=" + cantidad
 				+ ", costo=" + costo + ", itbis=" + itbis + ", subTotal=" + subTotal + ", con_imei=" + con_imei
 				+ ", precio_maximo=" + precio_maximo + ", precio_minimo=" + precio_minimo + ", precio_mayor="
-				+ precio_mayor + "]";
+				+ precio_mayor + ", cantidad_devuelta=" + cantidad_devuelta + ", temp_devolver=" + temp_devolver + "]";
 	}
 }

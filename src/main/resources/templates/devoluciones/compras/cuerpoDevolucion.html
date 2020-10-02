@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
+<head>
+</head>
+
+<body>
+	<div th:fragment="cuerpoDevolucion">
+		<table class="table table-hover">
+			<thead>
+				<tr style="background-color: #17a2b8; color: #fff">
+					<th class="text-center">C&oacute;digo</th>
+					<th class="text-center">Descripci&oacute;n</th>
+					<th>Cantidad</th>
+					<th>Devolver</th>
+					<th class="text-center">Costo</th>
+<!-- 					<th class="text-right">Itbis</th> -->
+					<th class="text-right">SubTotal</th>
+					<th class="text-right"></th>
+				</tr>
+			</thead>
+			<tbody class="items">
+				<!-- detalles  -->
+				<tr th:each="detalle:${detalles}">
+					<td th:text="${detalle.articulo.codigo}" class="text-center">C&oacute;digo</td>
+					<td th:if="${detalle.articulo.imei == 'SI'}"
+						style="cursor: pointer;" class="text-center"
+						th:onclick="'modalSerialesDetalleCompra(\'' + ${detalle.id} + '\');'"
+						th:text="${detalle.articulo.nombre}">Descripcion del
+						articulo</td>
+					<td th:unless="${detalle.articulo.imei == 'SI'}"
+						class="text-center" th:text="${detalle.articulo.nombre}">Descripcion
+						del articulo</td>
+					<td th:text="${detalle.cantidad}">Cantidad de articulo</td>
+					<td th:text="${detalle.temp_devolver}">temp_devolver</td>
+					<td th:text="${detalle.costo}" class="text-center">Costo</td>
+<!-- 					<td th:text="${detalle.itbis}" class="text-right">Itbis</td> -->
+					<td th:text="${detalle.subTotal}" class="text-right">Subtotal</td>
+					<td class='text-right'><a
+						href="#" th:onclick="'devolverArticulo(\'' + ${detalle.id} + '\');'">
+							<i class="icono fa fa-plus text-primary"></i>
+					</a></td>
+<!-- 					<td class='text-right' th:if="${detalles.articulo != null && detalles.cantidad - detalles.cantidad_devuelta == 0}">&nbsp;</td> -->
+<!-- 					<td th:if="${detalles.articulo == null}" class='text-right'>&nbsp;</td> -->
+				</tr>
+				<!--  Fin detalles -->
+			</tbody>
+		</table>
+	</div>
+</body>
+</html>

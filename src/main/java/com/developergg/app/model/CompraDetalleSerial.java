@@ -36,6 +36,9 @@ public class CompraDetalleSerial {
 	private Double precio_maximo;
 	private Double precio_minimo;
 	private Double precio_mayor;
+	
+	private Integer devuelto = 0;
+	private Integer tempDevuelto = 0;
 
 	public String getSerial() {
 		return serial;
@@ -109,10 +112,27 @@ public class CompraDetalleSerial {
 		this.precio_mayor = precio_mayor;
 	}
 
+	public Integer getTempDevuelto() {
+		return tempDevuelto;
+	}
+
+	public void setTempDevuelto(Integer tempDevuelto) {
+		this.tempDevuelto = tempDevuelto;
+	}
+
+	public Integer getDevuelto() {
+		return devuelto;
+	}
+
+	public void setDevuelto(Integer devuelto) {
+		this.devuelto = devuelto;
+	}
+
 	@Override
 	public String toString() {
 		return "CompraDetalleSerial [id=" + id + ", compra=" + compra + ", compraDetalle=" + compraDetalle
 				+ ", articulo=" + articulo + ", serial=" + serial + ", costo=" + costo + ", precio_maximo="
-				+ precio_maximo + ", precio_minimo=" + precio_minimo + ", precio_mayor=" + precio_mayor + "]";
+				+ precio_maximo + ", precio_minimo=" + precio_minimo + ", precio_mayor=" + precio_mayor + ", devuelto="
+				+ devuelto + ", tempDevuelto=" + tempDevuelto + "]";
 	}
 }

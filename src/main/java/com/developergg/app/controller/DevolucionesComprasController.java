@@ -21,6 +21,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.developergg.app.model.ArticuloAjuste;
 import com.developergg.app.model.ArticuloSerial;
+import com.developergg.app.model.Compra;
+import com.developergg.app.model.CompraDetalle;
+import com.developergg.app.model.CompraDetalleSerial;
 import com.developergg.app.model.DevolucionCompra;
 import com.developergg.app.model.DevolucionFactura;
 import com.developergg.app.model.DevolucionFacturaDetalle;
@@ -28,18 +31,19 @@ import com.developergg.app.model.DevolucionFacturaSerial;
 import com.developergg.app.model.Factura;
 import com.developergg.app.model.FacturaDetalle;
 import com.developergg.app.model.FacturaDetalleSerial;
-import com.developergg.app.model.FacturaDetalleServicio;
 import com.developergg.app.model.FacturaDetalleTaller;
 import com.developergg.app.model.Usuario;
 import com.developergg.app.service.IArticulosAjustesService;
 import com.developergg.app.service.IArticulosSeriales;
+import com.developergg.app.service.IComprasDetallesSerialesService;
+import com.developergg.app.service.IComprasDetallesService;
+import com.developergg.app.service.IComprasService;
 import com.developergg.app.service.IDevolucionesComprasService;
 import com.developergg.app.service.IDevolucionesFacturasDetallesService;
 import com.developergg.app.service.IDevolucionesFacturasSerialesService;
 import com.developergg.app.service.IDevolucionesFacturasService;
 import com.developergg.app.service.IFacturasDetallesSerialesService;
 import com.developergg.app.service.IFacturasDetallesService;
-import com.developergg.app.service.IFacturasDetallesServiciosService;
 import com.developergg.app.service.IFacturasDetallesTallerService;
 import com.developergg.app.service.IFacturasService;
 
@@ -63,9 +67,6 @@ public class DevolucionesComprasController {
 	private IFacturasDetallesTallerService serviceFacturasTaller;
 	
 	@Autowired
-	private IFacturasDetallesServiciosService serviceFacturasDetallesServicios;
-	
-	@Autowired
 	private IFacturasDetallesSerialesService serviceFacturasDetallesSeriales;
 	
 	@Autowired
@@ -83,6 +84,15 @@ public class DevolucionesComprasController {
 	@Autowired
 	private IDevolucionesComprasService serviceDevolucionesCompras;
 	
+	@Autowired
+	private IComprasService serviceCompras;
+	
+	@Autowired
+	private IComprasDetallesSerialesService serviceComprasDetallesSeriales;
+	
+	@Autowired
+	private IComprasDetallesService serviceComprasDetalles;
+	
 	@GetMapping("/")
 	public String listaDevoluciones(Model model, HttpSession session) {
 		Usuario usuario = (Usuario) session.getAttribute("usuario");
@@ -91,61 +101,48 @@ public class DevolucionesComprasController {
 		return "devoluciones/compras/listaDevoluciones";
 	}
 	
-	@GetMapping("/devolucionFactura")
-	public String devolucionFactura(Model model, HttpSession session) {
+	@GetMapping("/devolucionCompra")
+	public String devolucionCompra(Model model, HttpSession session) {
 		Usuario usuario = (Usuario) session.getAttribute("usuario");
-		List<Factura> facturas = serviceFacturas.buscarPorAlmacen(usuario.getAlmacen());
-		List<Factura> listaFacturas = new LinkedList<>();
-		for (Factura factura : facturas) {
+		List<Compra> compras = serviceCompras.buscarPorAlmacen(usuario.getAlmacen());
+		List<Compra> listaCompras = new LinkedList<>();
+		for (Compra compra : compras) {
 			int cargarDatos = 0;
 			//verificamos el detalle de la factura articulos sin serial
-			List<FacturaDetalle> detalles = serviceFacturasDetalles.buscarPorFactura(factura);
+			List<CompraDetalle> detalles = serviceComprasDetalles.buscarPorCompra(compra);
 			if(!detalles.isEmpty()) {
 				cargarDatos = 1;
-			}else {
-				List<FacturaDetalleTaller> talleres = serviceFacturasTaller.buscarPorFactura(factura);
-				for (FacturaDetalleTaller taller : talleres) {
-					if(taller.getArticulo()!=null) {
-						cargarDatos = 1;
-						continue;
-					}
-				}
 			}
+			
 			if(cargarDatos == 1) {
-				listaFacturas.add(factura);
+				listaCompras.add(compra);
 			}
 		}
-		model.addAttribute("facturas", listaFacturas);
-		return "devoluciones/facturas/listaFacturas";
+		model.addAttribute("compras", listaCompras);
+		return "devoluciones/compras/listaCompras";
 	}
 	
 	@GetMapping("/devolver/{id}")
 	public String hacerDevolucion(Model model, @PathVariable("id") Integer id) {
-		Factura factura = serviceFacturas.buscarPorId(id);
-		List<FacturaDetalle> detalles = serviceFacturasDetalles.buscarPorFactura(factura);
-		List<FacturaDetalleTaller> talleres = serviceFacturasTaller.buscarPorFactura(factura);
-		List<FacturaDetalleServicio> servicios = serviceFacturasDetallesServicios.buscarPorFactura(factura);
-		model.addAttribute("factura", factura);
-		model.addAttribute("facturaServicios",servicios);
-		model.addAttribute("facturaDetalles", detalles);
-		model.addAttribute("facturaTalleres", talleres);
-		return "devoluciones/facturas/devolucion";
+		Compra compra = serviceCompras.buscarPorId(id);
+		List<CompraDetalle> detalles = serviceComprasDetalles.buscarPorCompra(compra);
+		model.addAttribute("compra", compra);
+		model.addAttribute("compraDetalles", detalles);
+		return "devoluciones/compras/devolucion";
 	}
 	
 	@GetMapping("/cuerpoDevolucion/{id}")
 	public String cargarCuerpoDevolucion(Model model, @PathVariable("id") Integer id) {
-		Factura factura = serviceFacturas.buscarPorId(id);
-		List<FacturaDetalle> detalles = serviceFacturasDetalles.buscarPorFactura(factura);
-		List<FacturaDetalleTaller> talleres = serviceFacturasTaller.buscarPorFactura(factura);
-		List<FacturaDetalleServicio> servicios = serviceFacturasDetallesServicios.buscarPorFactura(factura);
+		Compra compra = serviceCompras.buscarPorId(id);
+		List<CompraDetalle> detalles = serviceComprasDetalles.buscarPorCompra(compra);
 		
 		//verificamos si el detalle tiene una devolucion temporal
-		for (FacturaDetalle detalle : detalles) {
+		for (CompraDetalle detalle : detalles) {
 			//buscamos la lista de seriales
-			List<FacturaDetalleSerial> seriales = serviceFacturasDetallesSeriales.buscarPorDetalle(detalle);
+			List<CompraDetalleSerial> seriales = serviceComprasDetallesSeriales.buscarPorCompraDetalle(detalle);
 			if(!seriales.isEmpty()) {
 				int cantTempDevlover = 0;
-				for (FacturaDetalleSerial serial : seriales) {
+				for (CompraDetalleSerial serial : seriales) {
 					if(serial.getTempDevuelto() == 1) {
 						cantTempDevlover++;
 					}
@@ -154,119 +151,112 @@ public class DevolucionesComprasController {
 			}
 		}
 		
-		model.addAttribute("facturaServicios",servicios);
-		model.addAttribute("facturaDetalles", detalles);
-		model.addAttribute("facturaTalleres", talleres);
-		return "devoluciones/facturas/cuerpoDevolucion :: cuerpoDevolucion";
+		model.addAttribute("detalles", detalles);
+		return "devoluciones/compras/cuerpoDevolucion :: cuerpoDevolucion";
 	}
 	
 	@GetMapping("/verificarTipoArticulo/{id}")
 	public String verificarTipoArticulo(Model model, @PathVariable("id") Integer id) {
 		int conSerial = 0;
-		FacturaDetalle detalle = serviceFacturasDetalles.buscarPorId(id);
+		CompraDetalle detalle = serviceComprasDetalles.buscarPorId(id);
 		if(detalle.getArticulo().getImei().equals("SI") || detalle.getArticulo().getImei().equals("1")) {
 			conSerial = 1;
 		}
 		model.addAttribute("idArticulo", detalle.getArticulo().getId());
 		model.addAttribute("conSerial", conSerial);
 		model.addAttribute("nombreArticulo", detalle.getArticulo().getNombre());
-		model.addAttribute("precioArticulo", detalle.getPrecio());
+		model.addAttribute("costoArticulo", detalle.getCosto());
 		model.addAttribute("cantidadArticulo", detalle.getCantidad());
 		model.addAttribute("cantidadDevuelta", detalle.getCantidad_devuelta());
-		return "devoluciones/facturas/devolucion :: #tipoArticulo";
+		return "devoluciones/compras/devolucion :: #tipoArticulo";
 	}
 	
 	@GetMapping("/ajax/obtenerSeriales/{id}")
-	public String obtenerSeriales(Model model, @PathVariable("id") Integer idFacturaDetalle) {
-		FacturaDetalle facturaDetalle = serviceFacturasDetalles.buscarPorId(idFacturaDetalle);
-		List<FacturaDetalleSerial> seriales = new LinkedList<>();
-		if(facturaDetalle.getImei().equals("SI") || facturaDetalle.getImei().equals("1")){
-			seriales = serviceFacturasDetallesSeriales.buscarPorDetalle(facturaDetalle);
+	public String obtenerSeriales(Model model, @PathVariable("id") Integer IdcompraDetalle) {
+		CompraDetalle compraDetalle = serviceComprasDetalles.buscarPorId(IdcompraDetalle);
+		List<CompraDetalleSerial> seriales = new LinkedList<>();
+		if(compraDetalle.getCon_imei() == 1){
+			seriales = serviceComprasDetallesSeriales.buscarPorCompraDetalle(compraDetalle);
 		}
 		model.addAttribute("listaSeriales", seriales);
-		model.addAttribute("idDetalleArticulo", facturaDetalle.getId());
-		model.addAttribute("detalleArticulo", facturaDetalle.getArticulo().getNombre());
-		return "devoluciones/facturas/devolucion :: infoSeriales";
+		model.addAttribute("idDetalleArticulo", compraDetalle.getId());
+		model.addAttribute("detalleArticulo", compraDetalle.getArticulo().getNombre());
+		return "devoluciones/compras/devolucion :: infoSeriales";
 	}
 	
 	@GetMapping("/ajax/infoSerialesADevolver/{id}")
-	public String infoSerialesADevolver(Model model, @PathVariable("id") Integer idFacturaDetalle) {
-		FacturaDetalle facturaDetalle = serviceFacturasDetalles.buscarPorId(idFacturaDetalle);
-		List<FacturaDetalleSerial> seriales = new LinkedList<>();
-		if(facturaDetalle.getImei().equals("SI") || facturaDetalle.getImei().equals("1")){
+	public String infoSerialesADevolver(Model model, @PathVariable("id") Integer idCompraDetalle) {
+		CompraDetalle compraDetalle = serviceComprasDetalles.buscarPorId(idCompraDetalle);
+		List<CompraDetalleSerial> seriales = new LinkedList<>();
+		if(compraDetalle.getCon_imei() == 1){
 			//Seriales que no esten devueltos
-			seriales = serviceFacturasDetallesSeriales.buscarPorDetalle(facturaDetalle).
+			seriales = serviceComprasDetallesSeriales.buscarPorCompraDetalle(compraDetalle).
 					stream().filter(s -> s.getDevuelto() == 0).collect(Collectors.toList());
 		}
 		model.addAttribute("listaSeriales", seriales);
-		model.addAttribute("idDetalleArticulo", facturaDetalle.getId());
-		model.addAttribute("detalleArticulo", facturaDetalle.getArticulo().getNombre());
-		model.addAttribute("itbisArticuloConSerial", facturaDetalle.getFactura().getComprobanteFiscal().getValor_itbis());
-		return "devoluciones/facturas/devolucion :: #serialesADevolver";
+		model.addAttribute("idDetalleArticulo", compraDetalle.getArticulo().getId());
+		model.addAttribute("detalleArticulo", compraDetalle.getArticulo().getNombre());
+		model.addAttribute("itbisArticuloConSerial", 0);
+		return "devoluciones/compras/devolucion :: #serialesADevolver";
 	}
 	
-	@GetMapping("/ajax/obtenerPrecios/{id}/{seriales}")
-	public String obtenerPrecios(Model model, @PathVariable("id") Integer idFacturaDetalle,
+	@GetMapping("/ajax/obtenerCostos/{id}/{seriales}")
+	public String obtenerCostos(Model model, @PathVariable("id") Integer idCompraDetalle,
 			@PathVariable("seriales") String idSeriales) {
 		String[] serialesArray = idSeriales.split(",");
-		FacturaDetalle facturaDetalle = serviceFacturasDetalles.buscarPorId(idFacturaDetalle);
-		List<FacturaDetalleSerial> listaSeriales = new LinkedList<>();
-		List<FacturaDetalleSerial> listaSerialesnew = new LinkedList<>();
-		Double precio = 0.0;
-		if(facturaDetalle.getImei().equals("SI") || facturaDetalle.getImei().equals("1")){
-			listaSeriales = serviceFacturasDetallesSeriales.buscarPorDetalle(facturaDetalle);
-			for (FacturaDetalleSerial facturaDetalleSerial : listaSeriales) {
+		CompraDetalle compraDetalle = serviceComprasDetalles.buscarPorId(idCompraDetalle);
+		List<CompraDetalleSerial> listaSeriales = new LinkedList<>();
+		List<CompraDetalleSerial> listaSerialesnew = new LinkedList<>();
+		Double costo = 0.0;
+		if(compraDetalle.getCon_imei() == 1){
+			listaSeriales = serviceComprasDetallesSeriales.buscarPorCompraDetalle(compraDetalle);
+			for (CompraDetalleSerial compraDetalleSerial : listaSeriales) {
 				for (String serialArray : serialesArray) {
-					if(facturaDetalleSerial.getId().toString().equals(serialArray)) {
-						listaSerialesnew.add(facturaDetalleSerial);
-						precio+=facturaDetalleSerial.getPrecio();
+					if(compraDetalleSerial.getId().toString().equals(serialArray)) {
+						listaSerialesnew.add(compraDetalleSerial);
+						costo+=compraDetalleSerial.getCosto();
 					}
 				}
 			}
 		}
-		Integer itbis = facturaDetalle.getFactura().getComprobanteFiscal().getValor_itbis();
-		Double itbisTemp = itbis.doubleValue()/100;
-		itbisTemp*=precio;
-		Double precioTotal = precio+itbisTemp;
-		model.addAttribute("totalPrecioSerial", precio);
-		model.addAttribute("totalPrecioSerialItbis", precioTotal);
-		return "devoluciones/facturas/devolucion :: #precioArticuloConSerial";
+		model.addAttribute("totalCostoSerial", costo);
+		return "devoluciones/compras/devolucion :: #costoArticuloConSerial";
 	}
 	
 	@PostMapping("/ajax/devolverSeriales")
-	public String devolverSeriales(@RequestParam(name = "facturaDetalle") Integer facturaDetalleId,
+	public String devolverSeriales(@RequestParam(name = "compraDetalle") Integer compraDetalleId,
 			@RequestParam(name = "seriales") String seriales) {
-		FacturaDetalle facturaDetalle = serviceFacturasDetalles.buscarPorId(facturaDetalleId);
-		List<FacturaDetalleSerial> serialesFactura = serviceFacturasDetallesSeriales.buscarPorDetalle(facturaDetalle);
+		CompraDetalle compraDetalle = serviceComprasDetalles.buscarPorId(compraDetalleId);
+		List<CompraDetalleSerial> serialesCompra = serviceComprasDetallesSeriales.buscarPorCompraDetalle(compraDetalle);
 		String[] serialesArray = seriales.split(",");
-		List<FacturaDetalleSerial> newSeriales = new LinkedList<>();
-		for (FacturaDetalleSerial serialFactura : serialesFactura) {
+		List<CompraDetalleSerial> newSeriales = new LinkedList<>();
+		for (CompraDetalleSerial serialCompra : serialesCompra) {
 			for (String serialArray : serialesArray) {
-				if(serialFactura.getId().toString().equals(serialArray)) {
-					newSeriales.add(serialFactura);
+				if(serialCompra.getId().toString().equals(serialArray)) {
+					newSeriales.add(serialCompra);
 				}else {
-					serialFactura.setTempDevuelto(0);
-					serviceFacturasDetallesSeriales.guardar(serialFactura);
+					serialCompra.setTempDevuelto(0);
+					serviceComprasDetallesSeriales.guardar(serialCompra);
 				}
 			}
 		}
 				
 		if(!newSeriales.isEmpty()) {
-			for (FacturaDetalleSerial facturaDetalleSerial : newSeriales) {
-				facturaDetalleSerial.setTempDevuelto(1);
-				serviceFacturasDetallesSeriales.guardar(facturaDetalleSerial);
+			for (CompraDetalleSerial compraDetalleSerial : newSeriales) {
+				compraDetalleSerial.setTempDevuelto(1);
+				serviceComprasDetallesSeriales.guardar(compraDetalleSerial);
 			}
 		}
-		return "devoluciones/facturas/devolucion :: #temporal";
+		return "devoluciones/compras/devolucion :: #temporal";
 	}
 	
 	@PostMapping("/ajax/devolverSinSeriales")
-	public String devolverSinSeriales(@RequestParam(name = "facturaDetalle") Integer facturaDetalleId,
+	public String devolverSinSeriales(@RequestParam(name = "compraDetalle") Integer compraDetalleId,
 			@RequestParam(name = "cantidad") Integer cantidad) {
-		FacturaDetalle facturaDetalle = serviceFacturasDetalles.buscarPorId(facturaDetalleId);
-		facturaDetalle.setTemp_devolver(cantidad);
-		serviceFacturasDetalles.guardar(facturaDetalle);
-		return "devoluciones/facturas/devolucion :: #temporal";
+		CompraDetalle compraDetalle = serviceComprasDetalles.buscarPorId(compraDetalleId);
+		compraDetalle.setTemp_devolver(cantidad);
+		serviceComprasDetalles.guardar(compraDetalle);
+		return "devoluciones/compras/devolucion :: #temporal";
 	}
 	
 	@GetMapping("/ajax/infoArticuloTaller/{id}")
